@@ -1,33 +1,14 @@
-import { useRouter } from 'expo-router';
 import React from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
-import { useUserContext } from './context/UserContext';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 
 // メインページのコンポーネント
 export default function MainPage() {
-    const router = useRouter();
-    const { members, selectedUserIndex } = useUserContext();
-    const user = members[selectedUserIndex];
-
     return (
         <View style={styles.container}>
-            {/* ユーザー名表示 */}
-            {user && (
-                <Text style={styles.userName}>{user.name}</Text>
-            )}
-            {/* タスク表示 */}
-            <View style={styles.memberBox}>
-                <Text style={styles.memberName}>{user?.name}</Text>
-                <View style={styles.taskList}>
-                    {user?.tasks.length === 0 ? (
-                        <Text style={styles.noTask}>タスクなし</Text>
-                    ) : (
-                        user?.tasks.map((task, i) => (
-                            <Text key={i} style={styles.taskItem}>・{task}</Text>
-                        ))
-                    )}
-                </View>
-            </View>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/user')}>
+                <Text style={styles.buttonText}>おはよう！</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -40,33 +21,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#fff',
     },
-    userName: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 16,
-        color: '#007AFF',
-    },
-    memberBox: {
-        backgroundColor: '#f0f4ff',
-        borderRadius: 10,
+    button: {
+        backgroundColor: '#007AFF',
         padding: 12,
-        marginVertical: 6,
-        marginHorizontal: 16,
+        borderRadius: 8,
     },
-    memberName: {
+    buttonText: {
+        color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
-        marginBottom: 4,
-    },
-    taskList: {
-        marginLeft: 8,
-    },
-    taskItem: {
-        fontSize: 14,
-        color: '#333',
-    },
-    noTask: {
-        fontSize: 13,
-        color: '#aaa',
     },
 });

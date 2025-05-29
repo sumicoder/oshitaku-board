@@ -10,6 +10,7 @@ import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion'
 // ページリンク情報の配列
 const pageLinks = [
     { path: '/', label: 'ホーム' },
+    { path: '/user', label: 'ユーザー一覧' },
     // { path: '/main', label: 'メインページ' },
     // { path: '/(tabs)', label: 'タブ' },
     // { path: '/page1', label: 'ページ1' },
@@ -24,6 +25,11 @@ export default function CustomDrawerContent() {
     const { members, selectedUserIndex, addMember, selectUser } = useUserContext();
     const [modalVisible, setModalVisible] = useState(false);
     const [newMemberName, setNewMemberName] = useState('');
+
+    // 動物アイコン例（絵文字）
+    const taskImages = ['🌞', '🦷', '🧼', '👕', '🍚', '🧑‍🎓', '🎒', '🚪', '🏠', '🛁', '🛏️', '📚', '🎨', '🎮', '🍽️', '🦁', '🐻', '🐼', '🐰', '🐶', '🐱'];
+    // カラー例
+    const taskColors = ['#FFD700', '#00BFFF', '#FF69B4', '#90EE90', '#FFA500', '#FF6347', '#8A2BE2', '#00CED1', '#FFB6C1', '#A9A9A9'];
 
     // ページ遷移用リンクの共通関数
     const handleLinkPress = (path: string) => {
@@ -53,25 +59,31 @@ export default function CustomDrawerContent() {
             {/* ユーザー一覧 */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
             {members.map((member, idx) => (
-                <TouchableOpacity
-                    key={member.name + idx}
-                    style={[styles.userRow, idx === selectedUserIndex && styles.selectedUserRow]}
-                    onPress={() => selectUser(idx)}
-                >
-                    <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{member.name}</Text>
-                </TouchableOpacity>
+                <View key={member.name + idx} style={styles.userContainer}>
+                    <TouchableOpacity
+                        style={[styles.userRow, idx === selectedUserIndex && styles.selectedUserRow]}
+                        onPress={() => {
+                            selectUser(idx);
+                        }}
+                    >
+                        <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{member.name}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            router.push(`/user/${selectedUserIndex}`);
+                        }}
+                    >
+                        <Text style={styles.buttonText}>編集</Text>
+                    </TouchableOpacity>
+                </View>
             ))}
             {/* メンバー追加モーダル */}
             <Modal visible={modalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <Text style={{ fontWeight: 'bold', fontSize: 16 }}>メンバー名を入力</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="名前"
-                            value={newMemberName}
-                            onChangeText={setNewMemberName}
-                        />
+                        <TextInput style={styles.input} placeholder="名前" value={newMemberName} onChangeText={setNewMemberName} />
                         <View style={{ flexDirection: 'row', marginTop: 12 }}>
                             <TouchableOpacity
                                 style={styles.modalBtn}
@@ -148,6 +160,22 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#222',
     },
+    userContainer: {
+        marginTop: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    button: {
+        backgroundColor: '#007AFF',
+        padding: 12,
+        borderRadius: 8,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
     selectedUserName: {
         color: '#007AFF',
         fontWeight: 'bold',
@@ -192,5 +220,33 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 20,
         marginHorizontal: 8,
+    },
+    taskListRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+    taskListNameBtn: {
+        flex: 1,
+    },
+    taskListName: {
+        fontSize: 16,
+        color: '#222',
+    },
+    editBtn: {
+        padding: 8,
+    },
+    editBtnText: {
+        color: '#007AFF',
+        fontSize: 16,
+    },
+    deleteBtn: {
+        padding: 8,
+    },
+    deleteBtnText: {
+        color: '#f44',
+        fontSize: 16,
     },
 });
