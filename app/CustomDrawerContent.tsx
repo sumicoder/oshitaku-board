@@ -1,5 +1,5 @@
-import { RelativePathString, usePathname, useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { RelativePathString, usePathname, useRouter } from 'expo-router';
 import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useUserContext } from './context/UserContext';
 import ClockSettingAccordion from './settings/ClockSettingAccordion';
@@ -11,11 +11,7 @@ import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion'
 const pageLinks = [
     { path: '/', label: 'ホーム' },
     { path: '/user', label: 'ユーザー一覧' },
-    // { path: '/main', label: 'メインページ' },
     // { path: '/(tabs)', label: 'タブ' },
-    // { path: '/page1', label: 'ページ1' },
-    // { path: '/page2', label: 'ページ2' },
-    // { path: '/other', label: 'その他ページ' },
 ];
 
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
