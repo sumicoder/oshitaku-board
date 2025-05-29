@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
+import React from 'react';
 
 export default function Tab() {
   return (

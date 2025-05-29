@@ -1,3 +1,4 @@
+import React from 'react';
 import { Drawer } from 'expo-router/drawer';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { UserProvider } from './context/UserContext';

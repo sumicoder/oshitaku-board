@@ -1,18 +1,38 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { useUserContext } from './context/UserContext';
 
-// ホーム画面のコンポーネント
-export default function Home() {
+// メインページのコンポーネント
+export default function MainPage() {
+    const router = useRouter();
+    const { members, selectedUserIndex } = useUserContext();
+    const user = members[selectedUserIndex];
+
     return (
         <View style={styles.container}>
-            {/* ページタイトル */}
-            <Text style={styles.title}>ホーム</Text>
-            {/* ページの説明文 */}
-            <Text>これはホーム画面です。</Text>
+            {/* ユーザー名表示 */}
+            {user && (
+                <Text style={styles.userName}>{user.name}</Text>
+            )}
+            {/* タスク表示 */}
+            <View style={styles.memberBox}>
+                <Text style={styles.memberName}>{user?.name}</Text>
+                <View style={styles.taskList}>
+                    {user?.tasks.length === 0 ? (
+                        <Text style={styles.noTask}>タスクなし</Text>
+                    ) : (
+                        user?.tasks.map((task, i) => (
+                            <Text key={i} style={styles.taskItem}>・{task}</Text>
+                        ))
+                    )}
+                </View>
+            </View>
         </View>
     );
 }
 
+// スタイル定義
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -20,9 +40,33 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#fff',
     },
-    title: {
+    userName: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 16,
+        color: '#007AFF',
+    },
+    memberBox: {
+        backgroundColor: '#f0f4ff',
+        borderRadius: 10,
+        padding: 12,
+        marginVertical: 6,
+        marginHorizontal: 16,
+    },
+    memberName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    taskList: {
+        marginLeft: 8,
+    },
+    taskItem: {
+        fontSize: 14,
+        color: '#333',
+    },
+    noTask: {
+        fontSize: 13,
+        color: '#aaa',
     },
 });
