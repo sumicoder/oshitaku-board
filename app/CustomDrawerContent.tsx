@@ -9,11 +9,12 @@ import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion'
 
 // ページリンク情報の配列
 const pageLinks = [
-    { path: '/main', label: 'メインページ' },
-    { path: '/(tabs)', label: 'タブ' },
-    { path: '/page1', label: 'ページ1' },
-    { path: '/page2', label: 'ページ2' },
-    { path: '/other', label: 'その他ページ' },
+    { path: '/', label: 'ホーム' },
+    // { path: '/main', label: 'メインページ' },
+    // { path: '/(tabs)', label: 'タブ' },
+    // { path: '/page1', label: 'ページ1' },
+    // { path: '/page2', label: 'ページ2' },
+    // { path: '/other', label: 'その他ページ' },
 ];
 
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
@@ -45,6 +46,10 @@ export default function CustomDrawerContent() {
                 </TouchableOpacity>
             ))}
 
+            {/* メンバー追加ボタン */}
+            <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
+                <Text style={styles.addBtnText}>＋ メンバー追加</Text>
+            </TouchableOpacity>
             {/* ユーザー一覧 */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
             {members.map((member, idx) => (
@@ -56,10 +61,6 @@ export default function CustomDrawerContent() {
                     <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{member.name}</Text>
                 </TouchableOpacity>
             ))}
-            {/* メンバー追加ボタン */}
-            <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-                <Text style={styles.addBtnText}>＋ メンバー追加</Text>
-            </TouchableOpacity>
             {/* メンバー追加モーダル */}
             <Modal visible={modalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
     },
