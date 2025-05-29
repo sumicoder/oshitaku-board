@@ -1,17 +1,15 @@
 import { Stack } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
 
 export default function Tab() {
   return (
     <View style={styles.container}>
-    <Stack.Screen
+        <Stack.Screen
         options={{
-            headerTitle: 'Home',
-            headerRight: () => <Link href="/settings">設定</Link>
+            headerTitle: 'Settingsです',
         }}
     />
-      <Text>Tab [Home]</Text>
+      <Text>Tab [Settings]</Text>
     </View>
   );
 }
