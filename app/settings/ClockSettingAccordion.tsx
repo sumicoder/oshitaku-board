@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Switch, Text, TouchableOpacity, View } from 'react-native';
 import SettingAccordion from '../components/SettingAccordion';
+import { useClockSetting } from '../context/ClockSettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // 時計の設定アコーディオン
 export default function ClockSettingAccordion() {
-    // 時計の表示/非表示
-    const [isVisible, setIsVisible] = useState(true);
-    // アナログ or デジタル
-    const [clockType, setClockType] = useState<'analog' | 'digital'>('analog');
-    // サイズ（大中小）
-    const [clockSize, setClockSize] = useState<'large' | 'medium' | 'small'>('medium');
-    // 位置（右・左・真ん中）
-    const [clockPosition, setClockPosition] = useState<'left' | 'center' | 'right'>('right');
+    const {
+        isVisible,
+        setIsVisible,
+        clockType,
+        setClockType,
+        clockSize,
+        setClockSize,
+        clockPosition,
+        setClockPosition,
+    } = useClockSetting();
 
     return (
         <SettingAccordion title="時計の設定">
