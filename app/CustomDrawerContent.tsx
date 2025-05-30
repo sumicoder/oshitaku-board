@@ -22,11 +22,6 @@ export default function CustomDrawerContent() {
     const [modalVisible, setModalVisible] = useState(false);
     const [newMemberName, setNewMemberName] = useState('');
 
-    // 動物アイコン例（絵文字）
-    const taskImages = ['🌞', '🦷', '🧼', '👕', '🍚', '🧑‍🎓', '🎒', '🚪', '🏠', '🛁', '🛏️', '📚', '🎨', '🎮', '🍽️', '🦁', '🐻', '🐼', '🐰', '🐶', '🐱'];
-    // カラー例
-    const taskColors = ['#FFD700', '#00BFFF', '#FF69B4', '#90EE90', '#FFA500', '#FF6347', '#8A2BE2', '#00CED1', '#FFB6C1', '#A9A9A9'];
-
     // ページ遷移用リンクの共通関数
     const handleLinkPress = (path: string) => {
         if (pathname !== path) {

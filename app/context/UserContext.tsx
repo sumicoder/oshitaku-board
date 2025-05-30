@@ -28,6 +28,10 @@ type UserContextType = {
     selectUser: (index: number) => void;
     addTaskList: (userIdx: number, listName: string) => void;
     addTask: (userIdx: number, listIdx: number, task: Task) => void;
+    editTaskListName: (userIdx: number, listIdx: number, newName: string) => void;
+    deleteTaskList: (userIdx: number, listIdx: number) => void;
+    editTask: (userIdx: number, listIdx: number, taskIdx: number, newTask: Task) => void;
+    deleteTask: (userIdx: number, listIdx: number, taskIdx: number) => void;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -105,6 +109,80 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
+    // タスクリスト名編集
+    const editTaskListName = (userIdx: number, listIdx: number, newName: string) => {
+        setMembers((prev) =>
+            prev.map((m, idx) =>
+                idx === userIdx
+                    ? {
+                          ...m,
+                          taskLists: m.taskLists.map((l, lidx) =>
+                              lidx === listIdx ? { ...l, name: newName } : l
+                          ),
+                      }
+                    : m
+            )
+        );
+    };
+
+    // タスクリスト削除
+    const deleteTaskList = (userIdx: number, listIdx: number) => {
+        setMembers((prev) =>
+            prev.map((m, idx) =>
+                idx === userIdx
+                    ? {
+                          ...m,
+                          taskLists: m.taskLists.filter((_, lidx) => lidx !== listIdx),
+                      }
+                    : m
+            )
+        );
+    };
+
+    // タスク編集
+    const editTask = (userIdx: number, listIdx: number, taskIdx: number, newTask: Task) => {
+        setMembers((prev) =>
+            prev.map((m, idx) =>
+                idx === userIdx
+                    ? {
+                          ...m,
+                          taskLists: m.taskLists.map((l, lidx) =>
+                              lidx === listIdx
+                                  ? {
+                                        ...l,
+                                        tasks: l.tasks.map((t, tidx) =>
+                                            tidx === taskIdx ? { ...t, ...newTask } : t
+                                        ),
+                                    }
+                                  : l
+                          ),
+                      }
+                    : m
+            )
+        );
+    };
+
+    // タスク削除
+    const deleteTask = (userIdx: number, listIdx: number, taskIdx: number) => {
+        setMembers((prev) =>
+            prev.map((m, idx) =>
+                idx === userIdx
+                    ? {
+                          ...m,
+                          taskLists: m.taskLists.map((l, lidx) =>
+                              lidx === listIdx
+                                  ? {
+                                        ...l,
+                                        tasks: l.tasks.filter((_, tidx) => tidx !== taskIdx),
+                                    }
+                                  : l
+                          ),
+                      }
+                    : m
+            )
+        );
+    };
+
     return (
         <UserContext.Provider
             value={{
@@ -114,6 +192,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 selectUser,
                 addTaskList,
                 addTask,
+                editTaskListName,
+                deleteTaskList,
+                editTask,
+                deleteTask,
             }}
         >
             {children}
