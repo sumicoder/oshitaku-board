@@ -26,7 +26,7 @@ export default function SettingAccordion({ title, children, defaultOpen = false 
                 <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={18} color="#007AFF" />
             </TouchableOpacity>
             {open && (
-                <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} horizontal={false} showsVerticalScrollIndicator={true}>
+                <ScrollView contentContainerStyle={styles.contentContainer} horizontal={false} showsVerticalScrollIndicator={true}>
                     {children}
                 </ScrollView>
             )}

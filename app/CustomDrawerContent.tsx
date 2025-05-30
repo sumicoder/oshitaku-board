@@ -30,7 +30,7 @@ export default function CustomDrawerContent() {
     };
 
     return (
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             {/* ページ遷移リンク */}
             {pageLinks.map((link) => (
                 <TouchableOpacity
@@ -72,7 +72,7 @@ export default function CustomDrawerContent() {
             {/* メンバー追加モーダル */}
             <Modal visible={modalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
+                    <ScrollView contentContainerStyle={{ ...styles.modalContent, alignItems: 'center' }}>
                         <Text style={{ fontWeight: 'bold', fontSize: 16 }}>メンバー名を入力</Text>
                         <TextInput style={styles.input} placeholder="名前" value={newMemberName} onChangeText={setNewMemberName} />
                         <View style={{ flexDirection: 'row', marginTop: 12 }}>
@@ -92,7 +92,7 @@ export default function CustomDrawerContent() {
                                 <Text style={{ color: '#fff' }}>キャンセル</Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </ScrollView>
                 </View>
             </Modal>
             {/* 各種設定アコーディオン */}

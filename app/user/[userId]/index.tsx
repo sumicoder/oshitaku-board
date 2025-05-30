@@ -1,7 +1,7 @@
+import React, { useCallback, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useState } from 'react';
-import { Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useUserContext } from '../../context/UserContext';
 
 // ユーザー詳細ページのコンポーネント
@@ -118,7 +118,7 @@ const UserDetailScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             <Stack.Screen
                 options={{
                     title: user?.name || 'ユーザー詳細',
@@ -177,7 +177,7 @@ const UserDetailScreen = () => {
                     {/* タスクリスト名編集モーダル */}
                     <Modal visible={editListIdx !== null} transparent animationType="fade">
                         <View style={styles.modalOverlay}>
-                            <View style={styles.modalContent}>
+                            <ScrollView contentContainerStyle={styles.modalContent}>
                                 <Text style={styles.modalTitle}>リスト名を編集</Text>
                                 <TextInput
                                     style={styles.input}
@@ -193,13 +193,13 @@ const UserDetailScreen = () => {
                                         <Text style={{ color: '#fff' }}>キャンセル</Text>
                                     </TouchableOpacity>
                                 </View>
-                            </View>
+                            </ScrollView>
                         </View>
                     </Modal>
                     {/* タスク追加・編集モーダル（共通） */}
                     <Modal visible={modalVisible} transparent animationType="slide">
                         <View style={styles.modalOverlay}>
-                            <View style={styles.modalContent}>
+                            <ScrollView contentContainerStyle={styles.modalContent}>
                                 <Text style={styles.modalTitle}>{editTaskInfo ? 'タスクを編集' : 'タスクを追加'}</Text>
                                 {/* タスク名入力 */}
                                 <TextInput
@@ -241,21 +241,20 @@ const UserDetailScreen = () => {
                                         <Text style={{ color: '#fff' }}>キャンセル</Text>
                                     </TouchableOpacity>
                                 </View>
-                            </View>
+                            </ScrollView>
                         </View>
                     </Modal>
                 </>
             ) : (
                 <Text style={styles.errorText}>ユーザーが見つかりません</Text>
             )}
-        </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
         padding: 16,
     },
     title: {
@@ -316,8 +315,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 12,
         padding: 24,
-        alignItems: 'center',
         width: 300,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 100,
     },
     modalTitle: {
         fontSize: 16,

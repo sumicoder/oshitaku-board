@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUserContext } from '../context/UserContext';
 import { router } from 'expo-router';
 
@@ -9,7 +9,7 @@ export default function MainPage() {
     const user = members && members.length > 0 ? members[selectedUserIndex] : { name: '', taskLists: [] };
 
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             {/* ユーザー名表示 */}
             {user && <Text style={styles.userName}>{user.name}</Text>}
             {/* タスク表示 */}
@@ -47,7 +47,7 @@ export default function MainPage() {
                     <Text style={styles.buttonText}>編集</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fff',
     },
     userName: {
         fontSize: 24,
@@ -66,7 +65,7 @@ const styles = StyleSheet.create({
         color: '#007AFF',
     },
     memberBox: {
-        backgroundColor: '#f0f4ff',
+        backgroundColor: '#fff',
         borderRadius: 10,
         padding: 12,
         marginVertical: 6,
