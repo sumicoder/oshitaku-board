@@ -54,7 +54,6 @@ export default function MainPage() {
 // スタイル定義
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },

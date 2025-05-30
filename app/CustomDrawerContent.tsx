@@ -106,10 +106,6 @@ export default function CustomDrawerContent() {
 
 // スタイル定義
 const styles = StyleSheet.create({
-    scroll: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
     container: {
         paddingTop: 40,
         paddingBottom: 40,
