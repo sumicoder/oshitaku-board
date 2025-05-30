@@ -1,4 +1,5 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { initialTaskLists } from './taskInitialData';
 
 // タスク型
 export type Task = {
@@ -41,44 +42,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         {
             id: '1',
             name: 'ユーザー1',
-            taskLists: [
-                {
-                    id: '1',
-                    name: '朝の準備',
-                    tasks: [
-                        { title: 'おきた', image: '🌞', color: '#FFD700' },
-                        { title: 'うがいをする', image: '🦷', color: '#00BFFF' },
-                    ],
-                },
-                {
-                    id: '2',
-                    name: '夜の準備',
-                    tasks: [
-                        { title: 'おやすみ', image: '🌙', color: '#FFD700' },
-                        { title: 'うがい', image: '🦷', color: '#00BFFF' },
-                    ],
-                },
-            ],
+            taskLists: initialTaskLists,
         },
         {
             id: '2',
             name: 'ユーザー2',
-            taskLists: [
-                {
-                    id: '3',
-                    name: '朝の準備',
-                    tasks: [
-                        { title: 'おきた', image: '🌞', color: '#FFD700' },
-                        { title: 'うがいをする', image: '🦷', color: '#00BFFF' },
-                    ],
-                },
-            ],
+            taskLists: initialTaskLists,
         },
     ]);
     const [selectedUserIndex, setSelectedUserIndex] = useState(0);
 
     const addMember = (name: string) => {
-        setMembers((prev) => [...prev, { id: String(members.length + 1), name, taskLists: [] }]);
+        setMembers((prev) => [...prev, { id: String(members.length + 1), name, taskLists: initialTaskLists }]);
     };
     const selectUser = (index: number) => {
         setSelectedUserIndex(index);
