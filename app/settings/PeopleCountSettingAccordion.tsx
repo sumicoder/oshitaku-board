@@ -30,4 +30,4 @@ function RadioButton({ label, selected, onPress }: { label: string; selected: bo
             <Text style={[SettingStyles.radioLabel, selected && SettingStyles.radioLabelSelected]}>{label}</Text>
         </TouchableOpacity>
     );
-} 
+}

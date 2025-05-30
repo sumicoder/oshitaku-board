@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import Clock from './components/Clock';
@@ -77,33 +76,14 @@ const styles = StyleSheet.create({
         height: '100%',
         position: 'relative',
     },
-    userName: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 16,
-        color: '#007AFF',
-    },
-    memberBox: {
-        backgroundColor: '#f0f4ff',
-        borderRadius: 10,
+    button: {
+        backgroundColor: '#007AFF',
         padding: 12,
-        marginVertical: 6,
-        marginHorizontal: 16,
+        borderRadius: 8,
     },
-    memberName: {
+    buttonText: {
+        color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
-        marginBottom: 4,
-    },
-    taskList: {
-        marginLeft: 8,
-    },
-    taskItem: {
-        fontSize: 14,
-        color: '#333',
-    },
-    noTask: {
-        fontSize: 13,
-        color: '#aaa',
     },
 });

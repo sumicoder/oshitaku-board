@@ -4,10 +4,7 @@ import SettingAccordion from '../components/SettingAccordion';
 import SettingStyles from '../styles/SettingStyles';
 
 // 動物アイコンのリスト
-const animalIcons = [
-    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊',
-    '🐻', '🐼', '🐨', '🐯', '🦁', '🐮',
-];
+const animalIcons = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮'];
 
 // 進行度バーの設定アコーディオン
 export default function ProgressBarSettingAccordion() {
@@ -36,11 +33,7 @@ export default function ProgressBarSettingAccordion() {
                     {grid.map((row, rowIndex) => (
                         <View style={SettingStyles.iconGridRow} key={rowIndex}>
                             {row.map((icon) => (
-                                <TouchableOpacity
-                                    key={icon}
-                                    style={[SettingStyles.iconButton, selectedAnimal === icon && SettingStyles.iconButtonSelected]}
-                                    onPress={() => setSelectedAnimal(icon)}
-                                >
+                                <TouchableOpacity key={icon} style={[SettingStyles.iconButton, selectedAnimal === icon && SettingStyles.iconButtonSelected]} onPress={() => setSelectedAnimal(icon)}>
                                     <Text style={SettingStyles.iconText}>{icon}</Text>
                                 </TouchableOpacity>
                             ))}
@@ -50,4 +43,4 @@ export default function ProgressBarSettingAccordion() {
             </View>
         </SettingAccordion>
     );
-} 
+}
