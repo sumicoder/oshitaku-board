@@ -91,9 +91,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 idx === userIdx
                     ? {
                           ...m,
-                          taskLists: m.taskLists.map((l, lidx) =>
-                              lidx === listIdx ? { ...l, name: newName } : l
-                          ),
+                          taskLists: m.taskLists.map((l, lidx) => (lidx === listIdx ? { ...l, name: newName } : l)),
                       }
                     : m
             )
@@ -125,9 +123,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                               lidx === listIdx
                                   ? {
                                         ...l,
-                                        tasks: l.tasks.map((t, tidx) =>
-                                            tidx === taskIdx ? { ...t, ...newTask } : t
-                                        ),
+                                        tasks: l.tasks.map((t, tidx) => (tidx === taskIdx ? { ...t, ...newTask } : t)),
                                     }
                                   : l
                           ),
@@ -183,3 +179,5 @@ export const useUserContext = () => {
     if (!ctx) throw new Error('useUserContext must be used within UserProvider');
     return ctx;
 };
+
+export default UserProvider;

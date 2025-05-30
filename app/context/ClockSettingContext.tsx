@@ -35,3 +35,5 @@ export const useClockSetting = () => {
   if (!ctx) throw new Error('useClockSetting must be used within ClockSettingProvider');
   return ctx;
 };
+
+export default ClockSettingProvider;
