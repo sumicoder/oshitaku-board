@@ -10,7 +10,7 @@ import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion'
 // ページリンク情報の配列
 const pageLinks = [
     { path: '/', label: 'ホーム' },
-    { path: '/user', label: 'ユーザー一覧' },
+    // { path: '/user', label: 'ユーザー一覧' },
     // { path: '/(tabs)', label: 'タブ' },
 ];
 
@@ -32,7 +32,7 @@ export default function CustomDrawerContent() {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {/* ページ遷移リンク */}
-            {pageLinks.map((link) => (
+            {/* {pageLinks.map((link) => (
                 <TouchableOpacity
                     key={link.path}
                     style={[styles.linkRow, pathname === link.path && styles.activeLinkRow]}
@@ -41,7 +41,7 @@ export default function CustomDrawerContent() {
                 >
                     <Text style={[styles.linkText, pathname === link.path && styles.activeLinkText]}>{link.label}</Text>
                 </TouchableOpacity>
-            ))}
+            ))} */}
 
             {/* メンバー追加ボタン */}
             <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
@@ -50,15 +50,8 @@ export default function CustomDrawerContent() {
             {/* ユーザー一覧 */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
             {members.map((member, idx) => (
-                <View key={member.name + idx} style={styles.userContainer}>
-                    <TouchableOpacity
-                        style={[styles.userRow, idx === selectedUserIndex && styles.selectedUserRow]}
-                        onPress={() => {
-                            selectUser(idx);
-                        }}
-                    >
-                        <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{member.name}</Text>
-                    </TouchableOpacity>
+                <TouchableOpacity key={member.name + idx} style={styles.userContainer} onPress={() => selectUser(idx)}>
+                    <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{member.name}</Text>
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
@@ -67,7 +60,7 @@ export default function CustomDrawerContent() {
                     >
                         <Text style={styles.buttonText}>編集</Text>
                     </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
             ))}
             {/* メンバー追加モーダル */}
             <Modal visible={modalVisible} transparent animationType="slide">
@@ -148,7 +141,7 @@ const styles = StyleSheet.create({
         color: '#222',
     },
     userContainer: {
-        marginTop: 16,
+        margin: 16,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
