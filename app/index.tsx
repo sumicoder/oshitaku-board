@@ -96,19 +96,17 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         flexDirection: 'row',
-        gap: 10,
     },
     col: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 8,
     },
     clockCol: {
-        minWidth: 0,
         flexShrink: 0,
+        minWidth: 0,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 8,
+        zIndex: -1,
     },
 });

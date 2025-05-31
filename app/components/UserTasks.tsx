@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { useClockSetting } from '../context/ClockSettingContext';
 import { useUserContext } from '../context/UserContext';
+import { useUserSetting } from '../context/UserSettingContext';
+import TaskItem from './TaskItem';
 
 interface UserTasksProps {
     userId: number;
@@ -22,11 +25,29 @@ function hexToRgba(hex: string, alpha: number): string {
 const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { members } = useUserContext();
     const user = members && members.length > 0 ? members[userId] : { name: '', taskLists: [] };
-    // タブの選択状態
     const [selectedTab, setSelectedTab] = useState(0);
 
+    const { width } = useWindowDimensions();
+    const { isVisible, clockSize } = useClockSetting();
+    const { peopleCount } = useUserSetting();
+
+    const containerPadding = 24;
+    const taskListGap = 16;
+    // ClockAreaのロジックと合わせる
+    const clockSizeMap = { large: width * 0.6, medium: width * 0.5, small: width * 0.4 };
+    const clockPx = clockSizeMap[clockSize] || 0;
+    let itemMaxWidth: number;
+    if (peopleCount === 1 && isVisible) {
+        // 2カラム: 画面幅からclockSize, padding, gapを引いて2分割
+        itemMaxWidth = (width - clockPx - containerPadding * 2 - taskListGap) / 2;
+    } else {
+        // 2 or 3カラム
+        const numColumns = width > 600 ? 3 : 2;
+        itemMaxWidth = (width - containerPadding * 2 - taskListGap * (numColumns - 1)) / numColumns;
+    }
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingHorizontal: containerPadding }]}>
             {/* ユーザー名表示 */}
             {user && <Text style={styles.userName}>{user.name}</Text>}
             {/* タブUI */}
@@ -45,22 +66,16 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                 <Text style={styles.noTask}>タスクなし</Text>
             ) : (
                 <View style={styles.taskContainer}>
-                    <ScrollView contentContainerStyle={styles.taskScroll}>
+                    <ScrollView contentContainerStyle={[styles.taskScroll, { gap: taskListGap }]}>
                         {user.taskLists[selectedTab]?.tasks.length === 0 ? (
                             <Text style={styles.noTask}>タスクなし</Text>
                         ) : (
                             user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
-                                <View
+                                <TaskItem
                                     key={taskIdx}
-                                    style={[
-                                        styles.taskItem,
-                                        { borderColor: 'black', borderWidth: 1 },
-                                        // { backgroundColor: hexToRgba(task.color, 0.2) }
-                                    ]}
-                                >
-                                    <Text style={styles.taskIcon}>{task.image}</Text>
-                                    <Text style={styles.taskTitle}>{task.title}</Text>
-                                </View>
+                                    task={task}
+                                    maxWidth={itemMaxWidth}
+                                />
                             ))
                         )}
                     </ScrollView>
@@ -85,18 +100,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 10,
         padding: 8,
-        marginHorizontal: 24,
         textAlign: 'center',
     },
     // タブUI
     tabContainer: {
         height: 40,
-        marginBottom: 8,
+        marginVertical: 8,
     },
     tabScroll: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 24,
     },
     tab: {
         paddingHorizontal: 16,
@@ -127,9 +140,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     taskScroll: {
-        gap: 16,
         flexDirection: 'row',
-        justifyContent: 'center',
         flexWrap: 'wrap',
         paddingBlockStart: 20,
         paddingBlockEnd: 100,
@@ -139,17 +150,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#fff',
         borderRadius: 10,
-        padding: 16,
+        paddingVertical: 24,
+        paddingHorizontal: 16,
+        borderColor: 'black',
+        borderWidth: 1,
+        width: '100%',
     },
     taskIcon: {
         fontSize: 24,
-        marginRight: 24,
+        marginRight: 16,
+        flexShrink: 0,
     },
     taskTitle: {
-        fontSize: 16,
+        fontSize: 28,
         fontWeight: 'bold',
         color: '#333',
-        minWidth: 200,
-        maxWidth: 250,
+        flexShrink: 1,
     },
 });
