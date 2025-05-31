@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
 import { Svg, Circle, Line } from 'react-native-svg';
 
 interface ClockProps {
     size?: number;
-    style?: StyleProp<ViewStyle>;
 }
 
-const Clock: React.FC<ClockProps> = ({ size = 200, style }) => {
+const Clock: React.FC<ClockProps> = ({ size }) => {
+    if (!size) return null;
     const [date, setDate] = useState(new Date());
 
     useEffect(() => {
@@ -24,7 +23,7 @@ const Clock: React.FC<ClockProps> = ({ size = 200, style }) => {
     const hourDeg = (hour % 12) * 30 + min * 0.5;
 
     return (
-        <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={style}>
+        <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
             <Circle cx={size / 2} cy={size / 2} r={size / 2 - 5} fill="#fff" stroke="#333" strokeWidth="4" />
             {/* Hour hand */}
             <Line x1={size / 2} y1={size / 2} x2={size / 2} y2={size / 2 - size * 0.25} stroke="#333" strokeWidth="6" strokeLinecap="round" transform={`rotate(${hourDeg} ${size / 2} ${size / 2})`} />

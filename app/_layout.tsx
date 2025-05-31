@@ -3,7 +3,6 @@ import React from 'react';
 import { ClockSettingProvider } from './context/ClockSettingContext';
 import { UserProvider } from './context/UserContext';
 import UserSettingProvider from './context/UserSettingContext';
-
 import CustomDrawerContent from './CustomDrawerContent';
 
 export default function Layout() {

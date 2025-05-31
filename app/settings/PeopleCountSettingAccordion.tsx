@@ -19,13 +19,8 @@ export default function PeopleCountSettingAccordion() {
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>人数</Text>
                 <View style={SettingStyles.radioGroup}>
-                    {options.map(i => (
-                        <RadioButton
-                            key={i}
-                            label={`${i}人`}
-                            selected={peopleCount === i}
-                            onPress={() => setPeopleCount(i)}
-                        />
+                    {options.map((i) => (
+                        <RadioButton key={i} label={`${i}人`} selected={peopleCount === i} onPress={() => setPeopleCount(i)} />
                     ))}
                 </View>
             </View>
