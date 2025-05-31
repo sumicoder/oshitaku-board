@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
 import { RelativePathString, usePathname, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useUserContext } from './context/UserContext';
 import ClockSettingAccordion from './settings/ClockSettingAccordion';
-import PeopleCountSettingAccordion from './settings/PeopleCountSettingAccordion';
 import ProgressBarSettingAccordion from './settings/ProgressBarSettingAccordion';
 import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion';
+import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 
 // ページリンク情報の配列
 const pageLinks = [
@@ -92,7 +92,7 @@ export default function CustomDrawerContent() {
             <ClockSettingAccordion />
             <ProgressBarSettingAccordion />
             <TaskDisplaySettingAccordion />
-            <PeopleCountSettingAccordion />
+            <UserCountSettingAccordion />
         </ScrollView>
     );
 }

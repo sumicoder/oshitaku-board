@@ -1,8 +1,8 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 interface UserSettingContextType {
-    peopleCount: number;
-    setPeopleCount: (n: number) => void;
+    userCount: number;
+    setUserCount: (n: number) => void;
     // 今後追加したいユーザー設定項目もここに追加
     // 例: userTheme: string; setUserTheme: (t: string) => void;
 }
@@ -10,7 +10,7 @@ interface UserSettingContextType {
 const UserSettingContext = createContext<UserSettingContextType | undefined>(undefined);
 
 export const UserSettingProvider = ({ children }: { children: ReactNode }) => {
-    const [peopleCount, setPeopleCount] = useState(2);
+    const [userCount, setUserCount] = useState(2);
 
     // 今後の設定もここでuseState管理
     // const [userTheme, setUserTheme] = useState('light');
@@ -18,8 +18,8 @@ export const UserSettingProvider = ({ children }: { children: ReactNode }) => {
     return (
         <UserSettingContext.Provider
             value={{
-                peopleCount,
-                setPeopleCount,
+                userCount,
+                setUserCount,
                 // userTheme, setUserTheme
             }}
         >

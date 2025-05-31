@@ -8,31 +8,31 @@ import SettingStyles from '../styles/SettingStyles';
 // 時計の設定アコーディオン
 export default function ClockSettingAccordion() {
     const { isVisible, setIsVisible, clockType, setClockType, clockSize, setClockSize, clockPosition, setClockPosition } = useClockSetting();
-    const { peopleCount } = useUserSetting();
+    const { userCount } = useUserSetting();
 
     // 選択肢を動的に
     const options = [
-        { label: '左', value: 'left', disabled: peopleCount === 2 || peopleCount === 3 },
-        { label: '真ん中', value: 'center', disabled: peopleCount === 1 || peopleCount === 3 },
-        { label: '右', value: 'right', disabled: peopleCount === 2 || peopleCount === 3 },
+        { label: '左', value: 'left', disabled: userCount === 2 || userCount === 3 },
+        { label: '真ん中', value: 'center', disabled: userCount === 1 || userCount === 3 },
+        { label: '右', value: 'right', disabled: userCount === 2 || userCount === 3 },
     ];
 
-    // peopleCountやclockPositionが変わったときに自動補正
+    // userCountやclockPositionが変わったときに自動補正
     useEffect(() => {
-        if (peopleCount === 1) {
+        if (userCount === 1) {
             if (clockPosition === 'center' || clockPosition === undefined || clockPosition === null || clockPosition === '') {
                 setClockPosition('left'); // または 'right'
             }
-        } else if (peopleCount === 2) {
+        } else if (userCount === 2) {
             if (clockPosition !== 'center') {
                 setClockPosition('center');
             }
-        } else if (peopleCount === 3) {
+        } else if (userCount === 3) {
             if (clockPosition !== undefined && clockPosition !== null && clockPosition !== '') {
                 setClockPosition(''); // 未選択状態
             }
         }
-    }, [peopleCount, clockPosition, setClockPosition]);
+    }, [userCount, clockPosition, setClockPosition]);
 
     return (
         <SettingAccordion title="時計の設定">

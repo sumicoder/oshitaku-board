@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
-import { initialTaskLists } from './taskInitialData';
+import { initialTaskLists } from '../data/taskInitialData';
 
 // タスク型
 export type Task = {

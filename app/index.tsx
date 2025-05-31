@@ -10,8 +10,8 @@ import { useUserSetting } from './context/UserSettingContext';
 export default function MainPage() {
     const { isVisible, clockPosition } = useClockSetting();
     const { members } = useUserContext();
-    const { peopleCount } = useUserSetting();
-    const visibleMembers = members.slice(0, peopleCount);
+    const { userCount } = useUserSetting();
+    const visibleMembers = members.slice(0, userCount);
 
     // 並び順を決定
     let columns: React.ReactNode[] = [];

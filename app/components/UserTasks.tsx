@@ -3,8 +3,8 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensio
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useUserContext } from '../context/UserContext';
 import { useUserSetting } from '../context/UserSettingContext';
-import TaskItem from './TaskItem';
 import { getClockSizePx } from '../utils/clockSize';
+import TaskItem from './TaskItem';
 
 interface UserTasksProps {
     userId: number;
@@ -30,7 +30,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
 
     const { height, width } = useWindowDimensions();
     const { isVisible, clockSize } = useClockSetting();
-    const { peopleCount } = useUserSetting();
+    const { userCount } = useUserSetting();
 
     const clockPx = getClockSizePx(clockSize, height);
 
@@ -39,18 +39,18 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const taskCordBorder = 1;
 
     let itemMaxWidth: number;
-    if (peopleCount === 1 && isVisible) {
+    if (userCount === 1 && isVisible) {
         // 2カラム: 画面幅からclockSize, padding, gapを引いて2分割
         const taskColumn = 2;
         const taskColumnSpace = containerPadding * 2; // 画面左右のpadding
         const taskBorderSpace = taskCordBorder * 2 * taskColumn; // タスクの枠線の幅 * 2カラム分
         itemMaxWidth = (width - clockPx - taskColumnSpace - taskListGap - taskBorderSpace) / taskColumn;
-    } else if (peopleCount === 2 && !isVisible) {
+    } else if (userCount === 2 && !isVisible) {
         // 1カラム: 画面幅からpadding, gapを引いて1カラム
         const taskColumn = 1;
         const taskColumnSpace = containerPadding * 2; // 画面左右のpadding
         const taskBorderSpace = taskCordBorder * 2 * taskColumn; // タスクの枠線の幅 * 2カラム分
-        itemMaxWidth = (width - taskColumnSpace - taskBorderSpace) / peopleCount;
+        itemMaxWidth = (width - taskColumnSpace - taskBorderSpace) / userCount;
     } else {
         // 2 or 3カラム
         const numColumns = width > 600 ? 3 : 2;
@@ -85,7 +85,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                             <Text style={styles.noTask}>タスクなし</Text>
                         ) : (
                             user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
-                                <TaskItem key={taskIdx} task={task} style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder, borderColor: 'black' }} />
+                                <TaskItem key={taskIdx} task={task} style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }} />
                             ))
                         )}
                     </ScrollView>
@@ -140,11 +140,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     // タスクUI
-    noTask: {
-        fontSize: 20,
-        color: '#aaa',
-        textAlign: 'center',
-    },
     taskContainer: {
         flex: 1,
         width: '100%',
@@ -155,26 +150,10 @@ const styles = StyleSheet.create({
         paddingBlockStart: 20,
         paddingBlockEnd: 100,
     },
-    taskItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        paddingVertical: 24,
-        paddingHorizontal: 16,
-        borderColor: 'black',
-        borderWidth: 1,
+    noTask: {
+        fontSize: 20,
+        color: '#aaa',
+        textAlign: 'center',
         width: '100%',
-    },
-    taskIcon: {
-        fontSize: 24,
-        marginRight: 16,
-        flexShrink: 0,
-    },
-    taskTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#333',
-        flexShrink: 1,
     },
 });

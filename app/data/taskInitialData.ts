@@ -1,5 +1,5 @@
 // 全ユーザー共通の初期タスクリスト・タスク内容
-import { TaskList } from './UserContext';
+import { TaskList } from '../context/UserContext';
 
 export const initialTaskLists: TaskList[] = [
     {

@@ -6,8 +6,8 @@ import { useUserSetting } from '../context/UserSettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // 表示人数の設定アコーディオン
-export default function PeopleCountSettingAccordion() {
-    const { peopleCount, setPeopleCount } = useUserSetting();
+export default function UserCountSettingAccordion() {
+    const { userCount, setUserCount } = useUserSetting();
     const { members } = useUserContext();
 
     // 最大3つまで
@@ -20,7 +20,7 @@ export default function PeopleCountSettingAccordion() {
                 <Text style={SettingStyles.label}>人数</Text>
                 <View style={SettingStyles.radioGroup}>
                     {options.map((i) => (
-                        <RadioButton key={i} label={`${i}人`} selected={peopleCount === i} onPress={() => setPeopleCount(i)} />
+                        <RadioButton key={i} label={`${i}人`} selected={userCount === i} onPress={() => setUserCount(i)} />
                     ))}
                 </View>
             </View>
