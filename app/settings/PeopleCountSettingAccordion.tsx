@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import SettingAccordion from '../components/SettingAccordion';
+import { useUserSetting } from '../context/UserSettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // 表示人数の設定アコーディオン
 export default function PeopleCountSettingAccordion() {
-    // 表示人数（1〜3人）
-    const [peopleCount, setPeopleCount] = useState<1 | 2 | 3>(1);
+    const { peopleCount, setPeopleCount } = useUserSetting();
 
     return (
         <SettingAccordion title="表示人数の設定">

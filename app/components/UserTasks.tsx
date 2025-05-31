@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useUserContext } from '../context/UserContext';
-import { router } from 'expo-router';
 
 interface UserTasksProps {
     userId: number;
@@ -11,25 +10,36 @@ interface UserTasksProps {
 const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { members } = useUserContext();
     const user = members && members.length > 0 ? members[userId] : { name: '', taskLists: [] };
+    // タブの選択状態
+    const [selectedTab, setSelectedTab] = useState(0);
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {/* ユーザー名表示 */}
             {user && <Text style={styles.userName}>{user.name}</Text>}
-            {/* タスク表示 */}
+            {/* タブUI */}
+            <View style={{ flexDirection: 'row', marginBottom: 8 }}>
+                {user.taskLists.map((list, idx) => (
+                    <TouchableOpacity key={idx} style={[styles.tab, selectedTab === idx && styles.tabSelected]} onPress={() => setSelectedTab(idx)}>
+                        <Text style={selectedTab === idx ? styles.tabTextSelected : styles.tabText}>{list.name}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+
+            {/* 選択中のタスクリストのみ表示 */}
             <View style={styles.memberBox}>
-                <Text style={styles.memberName}>{user?.name}</Text>
-                <View style={styles.taskList}>
-                    {user?.taskLists.length === 0 ? (
-                        <Text style={styles.noTask}>タスクなし</Text>
+                <View style={styles.taskListContainer}>
+                    {user.taskLists.length === 0 ? (
+                        <View style={styles.taskList}>
+                            <Text style={styles.noTask}>タスクなし</Text>
+                        </View>
                     ) : (
-                        user?.taskLists.map((list, listIdx) => (
-                            <View key={listIdx} style={{ marginBottom: 8 }}>
-                                <Text style={{ fontWeight: 'bold', color: '#007AFF' }}>{list.name}</Text>
-                                {list.tasks.length === 0 ? (
+                        <View style={styles.taskList}>
+                            <View style={{ marginBottom: 8 }}>
+                                {user.taskLists[selectedTab]?.tasks.length === 0 ? (
                                     <Text style={styles.noTask}>タスクなし</Text>
                                 ) : (
-                                    list.tasks.map((task, taskIdx) => (
+                                    user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
                                         <View key={taskIdx} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <Text style={{ fontSize: 16, marginRight: 4 }}>{task.image}</Text>
                                             <Text style={[styles.taskItem, { color: task.color }]}>{task.title}</Text>
@@ -37,19 +47,9 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                     ))
                                 )}
                             </View>
-                        ))
+                        </View>
                     )}
                 </View>
-            </View>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        router.push(`/user/${userId}`);
-                    }}
-                >
-                    <Text style={styles.buttonText}>編集</Text>
-                </TouchableOpacity>
             </View>
         </ScrollView>
     );
@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         justifyContent: 'center',
+        paddingVertical: 100,
     },
     userName: {
         fontSize: 24,
@@ -70,9 +71,6 @@ const styles = StyleSheet.create({
         color: '#007AFF',
     },
     memberBox: {
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 12,
         marginVertical: 6,
         marginHorizontal: 16,
     },
@@ -81,8 +79,16 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 4,
     },
+    taskListContainer: {
+        flex: 1,
+        width: '100%',
+        flexDirection: 'row',
+    },
     taskList: {
+        backgroundColor: '#fff',
         marginLeft: 8,
+        borderRadius: 10,
+        padding: 12,
     },
     taskItem: {
         fontSize: 14,
@@ -92,18 +98,22 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#aaa',
     },
-    buttonContainer: {
-        margin: 16,
-        alignItems: 'center',
+    tab: {
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderBottomWidth: 2,
+        borderBottomColor: 'transparent',
+        marginRight: 8,
     },
-    button: {
-        backgroundColor: '#007AFF',
-        padding: 12,
-        borderRadius: 8,
+    tabSelected: {
+        borderBottomColor: '#007AFF',
     },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
+    tabText: {
+        color: '#333',
+        fontWeight: 'bold',
+    },
+    tabTextSelected: {
+        color: '#007AFF',
         fontWeight: 'bold',
     },
 });
