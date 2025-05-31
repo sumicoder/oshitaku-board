@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Switch, Text, TouchableOpacity, View } from 'react-native';
 import SettingAccordion from '../components/SettingAccordion';
 import { useClockSetting } from '../context/ClockSettingContext';
@@ -7,22 +7,32 @@ import SettingStyles from '../styles/SettingStyles';
 
 // 時計の設定アコーディオン
 export default function ClockSettingAccordion() {
-    const {
-        isVisible,
-        setIsVisible,
-        clockType,
-        setClockType,
-        clockSize,
-        setClockSize,
-        clockPosition,
-        setClockPosition,
-    } = useClockSetting();
+    const { isVisible, setIsVisible, clockType, setClockType, clockSize, setClockSize, clockPosition, setClockPosition } = useClockSetting();
     const { peopleCount } = useUserSetting();
 
     // 選択肢を動的に
-    const options = peopleCount === 1
-        ? [{ label: '左', value: 'left' }, { label: '右', value: 'right' }]
-        : [{ label: '左', value: 'left' }, { label: '真ん中', value: 'center' }, { label: '右', value: 'right' }];
+    const options = [
+        { label: '左', value: 'left', disabled: peopleCount === 2 || peopleCount === 3 },
+        { label: '真ん中', value: 'center', disabled: peopleCount === 1 || peopleCount === 3 },
+        { label: '右', value: 'right', disabled: peopleCount === 2 || peopleCount === 3 },
+    ];
+
+    // peopleCountやclockPositionが変わったときに自動補正
+    useEffect(() => {
+        if (peopleCount === 1) {
+            if (clockPosition === 'center' || clockPosition === undefined || clockPosition === null || clockPosition === '') {
+                setClockPosition('left'); // または 'right'
+            }
+        } else if (peopleCount === 2) {
+            if (clockPosition !== 'center') {
+                setClockPosition('center');
+            }
+        } else if (peopleCount === 3) {
+            if (clockPosition !== undefined && clockPosition !== null && clockPosition !== '') {
+                setClockPosition(''); // 未選択状態
+            }
+        }
+    }, [peopleCount, clockPosition, setClockPosition]);
 
     return (
         <SettingAccordion title="時計の設定">
@@ -52,13 +62,8 @@ export default function ClockSettingAccordion() {
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>位置</Text>
                 <View style={SettingStyles.radioGroup}>
-                    {options.map(opt => (
-                        <RadioButton
-                            key={opt.value}
-                            label={opt.label}
-                            selected={clockPosition === opt.value}
-                            onPress={() => setClockPosition(opt.value as any)}
-                        />
+                    {options.map((opt) => (
+                        <RadioButton key={opt.value} label={opt.label} selected={clockPosition === opt.value} onPress={() => setClockPosition(opt.value as any)} disabled={opt.disabled} />
                     ))}
                 </View>
             </View>
@@ -67,9 +72,9 @@ export default function ClockSettingAccordion() {
 }
 
 // ラジオボタン用コンポーネント
-function RadioButton({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+function RadioButton({ label, selected, onPress, disabled = false }: { label: string; selected: boolean; onPress: () => void; disabled?: boolean }) {
     return (
-        <TouchableOpacity style={[SettingStyles.radioButton, selected && SettingStyles.radioButtonSelected]} onPress={onPress}>
+        <TouchableOpacity style={[SettingStyles.radioButton, selected && SettingStyles.radioButtonSelected, disabled && { opacity: 0.3 }]} onPress={disabled ? undefined : onPress} disabled={disabled}>
             <View style={[SettingStyles.radioCircle, selected && SettingStyles.radioCircleSelected]} />
             <Text style={[SettingStyles.radioLabel, selected && SettingStyles.radioLabelSelected]}>{label}</Text>
         </TouchableOpacity>

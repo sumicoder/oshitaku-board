@@ -54,8 +54,8 @@ export default function MainPage() {
                 <View style={styles.col} key="user0">
                     <UserTasks userId={0} />
                 </View>,
-                <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea />}
+                <View style={[styles.clockCol, { minWidth: 100 }]} key="clock">
+                    {isVisible ? <ClockArea /> : <View style={styles.colBorder} />}
                 </View>,
                 <View style={styles.col} key="user1">
                     <UserTasks userId={1} />
@@ -108,5 +108,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: -1,
+    },
+    colBorder: {
+        backgroundColor: '#333',
+        width: 3,
+        height: '100%',
+        zIndex: -1,
+        position: 'absolute',
+        left: '50%',
+        top: 0,
+        bottom: 0,
+        transform: [{ translateX: '-50%' }],
     },
 });

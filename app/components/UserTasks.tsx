@@ -4,6 +4,7 @@ import { useClockSetting } from '../context/ClockSettingContext';
 import { useUserContext } from '../context/UserContext';
 import { useUserSetting } from '../context/UserSettingContext';
 import TaskItem from './TaskItem';
+import { getClockSizePx } from '../utils/clockSize';
 
 interface UserTasksProps {
     userId: number;
@@ -31,29 +32,32 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { isVisible, clockSize } = useClockSetting();
     const { peopleCount } = useUserSetting();
 
+    const clockPx = getClockSizePx(clockSize, height);
+
     const containerPadding = 24;
     const taskListGap = 16;
     const taskCordBorder = 1;
-    // ClockAreaのロジックと合わせる
 
-    const clockSizeMap = {
-        large: height * 0.6,
-        medium: height * 0.5,
-        small: height * 0.4,
-    };
-    const clockPx = clockSizeMap[clockSize] || 0;
     let itemMaxWidth: number;
     if (peopleCount === 1 && isVisible) {
         // 2カラム: 画面幅からclockSize, padding, gapを引いて2分割
         const taskColumn = 2;
-        const taskColumnSpace = containerPadding * 2;
-        const taskBorderSpace = taskCordBorder * 2 * taskColumn;
-
+        const taskColumnSpace = containerPadding * 2; // 画面左右のpadding
+        const taskBorderSpace = taskCordBorder * 2 * taskColumn; // タスクの枠線の幅 * 2カラム分
         itemMaxWidth = (width - clockPx - taskColumnSpace - taskListGap - taskBorderSpace) / taskColumn;
+    } else if (peopleCount === 2 && !isVisible) {
+        // 1カラム: 画面幅からpadding, gapを引いて1カラム
+        const taskColumn = 1;
+        const taskColumnSpace = containerPadding * 2; // 画面左右のpadding
+        const taskBorderSpace = taskCordBorder * 2 * taskColumn; // タスクの枠線の幅 * 2カラム分
+        itemMaxWidth = (width - taskColumnSpace - taskBorderSpace) / peopleCount;
     } else {
         // 2 or 3カラム
         const numColumns = width > 600 ? 3 : 2;
-        itemMaxWidth = (width - containerPadding * 2 - taskListGap * (numColumns - 1) - taskCordBorder * 2 * numColumns) / numColumns;
+        const taskColumnSpace = containerPadding * 2; // 画面左右のpadding
+        const taskBorderSpace = taskCordBorder * 2 * numColumns; // タスクの枠線の幅 * 2カラム分
+        const taskListGapSpace = taskListGap * (numColumns - 1); // タスクリストのgap * (カラム数 - 1)
+        itemMaxWidth = (width - taskColumnSpace - taskListGapSpace - taskBorderSpace) / numColumns;
     }
 
     return (

@@ -2,7 +2,7 @@ import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 export type ClockType = 'analog' | 'digital';
 export type ClockSize = 'large' | 'medium' | 'small';
-export type ClockPosition = 'left' | 'center' | 'right';
+export type ClockPosition = 'left' | 'center' | 'right' | '';
 
 interface ClockSettingContextType {
   isVisible: boolean;
