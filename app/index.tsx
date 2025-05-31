@@ -8,28 +8,87 @@ import { useUserSetting } from './context/UserSettingContext';
 
 // メインページのコンポーネント
 export default function MainPage() {
-    const { isVisible: isClockVisible } = useClockSetting();
+    const { isVisible, clockPosition } = useClockSetting();
     const { members } = useUserContext();
     const { peopleCount } = useUserSetting();
     const visibleMembers = members.slice(0, peopleCount);
-    // 表示するカラム数
-    const colCount = (isClockVisible ? 1 : 0) + visibleMembers.length;
-    return (
-        <View style={styles.container}>
-            {/* ユーザー */}
-            {visibleMembers.map((_, idx) => (
-                <ScrollView key={idx} contentContainerStyle={styles.col}>
-                    <UserTasks userId={idx} />
-                </ScrollView>
-            ))}
-            {/* 時計 */}
-            {isClockVisible && (
-                <View style={styles.clockCol}>
-                    <ClockArea />
-                </View>
-            )}
-        </View>
-    );
+
+    // 並び順を決定
+    let columns: React.ReactNode[] = [];
+    if (visibleMembers.length === 1) {
+        if (clockPosition === 'left') {
+            columns = [
+                <View style={styles.clockCol} key="clock">
+                    {isVisible && <ClockArea />}
+                </View>,
+                <ScrollView contentContainerStyle={styles.col} key="user0">
+                    <UserTasks userId={0} />
+                </ScrollView>,
+            ];
+        } else {
+            // 'right'
+            columns = [
+                <ScrollView contentContainerStyle={styles.col} key="user0">
+                    <UserTasks userId={0} />
+                </ScrollView>,
+                <View style={styles.clockCol} key="clock">
+                    {isVisible && <ClockArea />}
+                </View>,
+            ];
+        }
+    } else if (visibleMembers.length === 2) {
+        if (clockPosition === 'left') {
+            columns = [
+                <View style={styles.clockCol} key="clock">
+                    {isVisible && <ClockArea />}
+                </View>,
+                <ScrollView contentContainerStyle={styles.col} key="user0">
+                    <UserTasks userId={0} />
+                </ScrollView>,
+                <ScrollView contentContainerStyle={styles.col} key="user1">
+                    <UserTasks userId={1} />
+                </ScrollView>,
+            ];
+        } else if (clockPosition === 'center') {
+            columns = [
+                <ScrollView contentContainerStyle={styles.col} key="user0">
+                    <UserTasks userId={0} />
+                </ScrollView>,
+                <View style={styles.clockCol} key="clock">
+                    {isVisible && <ClockArea />}
+                </View>,
+                <ScrollView contentContainerStyle={styles.col} key="user1">
+                    <UserTasks userId={1} />
+                </ScrollView>,
+            ];
+        } else {
+            // 'right'
+            columns = [
+                <ScrollView contentContainerStyle={styles.col} key="user0">
+                    <UserTasks userId={0} />
+                </ScrollView>,
+                <ScrollView contentContainerStyle={styles.col} key="user1">
+                    <UserTasks userId={1} />
+                </ScrollView>,
+                <View style={styles.clockCol} key="clock">
+                    {isVisible && <ClockArea />}
+                </View>,
+            ];
+        }
+    } else if (visibleMembers.length === 3) {
+        columns = [
+            <ScrollView contentContainerStyle={styles.col} key="user0">
+                <UserTasks userId={0} />
+            </ScrollView>,
+            <ScrollView contentContainerStyle={styles.col} key="user1">
+                <UserTasks userId={1} />
+            </ScrollView>,
+            <ScrollView contentContainerStyle={styles.col} key="user2">
+                <UserTasks userId={2} />
+            </ScrollView>,
+        ];
+    }
+    return <View style={styles.container}>{columns}</View>;
 }
 
 const styles = StyleSheet.create({

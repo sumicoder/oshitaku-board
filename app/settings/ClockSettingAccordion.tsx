@@ -2,6 +2,7 @@ import React from 'react';
 import { Switch, Text, TouchableOpacity, View } from 'react-native';
 import SettingAccordion from '../components/SettingAccordion';
 import { useClockSetting } from '../context/ClockSettingContext';
+import { useUserSetting } from '../context/UserSettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // 時計の設定アコーディオン
@@ -16,6 +17,12 @@ export default function ClockSettingAccordion() {
         clockPosition,
         setClockPosition,
     } = useClockSetting();
+    const { peopleCount } = useUserSetting();
+
+    // 選択肢を動的に
+    const options = peopleCount === 1
+        ? [{ label: '左', value: 'left' }, { label: '右', value: 'right' }]
+        : [{ label: '左', value: 'left' }, { label: '真ん中', value: 'center' }, { label: '右', value: 'right' }];
 
     return (
         <SettingAccordion title="時計の設定">
@@ -45,9 +52,14 @@ export default function ClockSettingAccordion() {
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>位置</Text>
                 <View style={SettingStyles.radioGroup}>
-                    <RadioButton label="左" selected={clockPosition === 'left'} onPress={() => setClockPosition('left')} />
-                    <RadioButton label="真ん中" selected={clockPosition === 'center'} onPress={() => setClockPosition('center')} />
-                    <RadioButton label="右" selected={clockPosition === 'right'} onPress={() => setClockPosition('right')} />
+                    {options.map(opt => (
+                        <RadioButton
+                            key={opt.value}
+                            label={opt.label}
+                            selected={clockPosition === opt.value}
+                            onPress={() => setClockPosition(opt.value as any)}
+                        />
+                    ))}
                 </View>
             </View>
         </SettingAccordion>
