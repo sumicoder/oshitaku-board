@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import ClockArea from './components/ClockArea';
 import UserTasks from './components/UserTasks';
 import { useClockSetting } from './context/ClockSettingContext';
@@ -21,16 +21,16 @@ export default function MainPage() {
                 <View style={styles.clockCol} key="clock">
                     {isVisible && <ClockArea />}
                 </View>,
-                <ScrollView contentContainerStyle={styles.col} key="user0">
+                <View style={styles.col} key="user0">
                     <UserTasks userId={0} />
-                </ScrollView>,
+                </View>,
             ];
         } else {
             // 'right'
             columns = [
-                <ScrollView contentContainerStyle={styles.col} key="user0">
+                <View style={styles.col} key="user0">
                     <UserTasks userId={0} />
-                </ScrollView>,
+                </View>,
                 <View style={styles.clockCol} key="clock">
                     {isVisible && <ClockArea />}
                 </View>,
@@ -42,34 +42,34 @@ export default function MainPage() {
                 <View style={styles.clockCol} key="clock">
                     {isVisible && <ClockArea />}
                 </View>,
-                <ScrollView contentContainerStyle={styles.col} key="user0">
+                <View style={styles.col} key="user0">
                     <UserTasks userId={0} />
-                </ScrollView>,
-                <ScrollView contentContainerStyle={styles.col} key="user1">
+                </View>,
+                <View style={styles.col} key="user1">
                     <UserTasks userId={1} />
-                </ScrollView>,
+                </View>,
             ];
         } else if (clockPosition === 'center') {
             columns = [
-                <ScrollView contentContainerStyle={styles.col} key="user0">
+                <View style={styles.col} key="user0">
                     <UserTasks userId={0} />
-                </ScrollView>,
+                </View>,
                 <View style={styles.clockCol} key="clock">
                     {isVisible && <ClockArea />}
                 </View>,
-                <ScrollView contentContainerStyle={styles.col} key="user1">
+                <View style={styles.col} key="user1">
                     <UserTasks userId={1} />
-                </ScrollView>,
+                </View>,
             ];
         } else {
             // 'right'
             columns = [
-                <ScrollView contentContainerStyle={styles.col} key="user0">
+                <View style={styles.col} key="user0">
                     <UserTasks userId={0} />
-                </ScrollView>,
-                <ScrollView contentContainerStyle={styles.col} key="user1">
+                </View>,
+                <View style={styles.col} key="user1">
                     <UserTasks userId={1} />
-                </ScrollView>,
+                </View>,
                 <View style={styles.clockCol} key="clock">
                     {isVisible && <ClockArea />}
                 </View>,
@@ -77,15 +77,15 @@ export default function MainPage() {
         }
     } else if (visibleMembers.length === 3) {
         columns = [
-            <ScrollView contentContainerStyle={styles.col} key="user0">
+            <View style={styles.col} key="user0">
                 <UserTasks userId={0} />
-            </ScrollView>,
-            <ScrollView contentContainerStyle={styles.col} key="user1">
+            </View>,
+            <View style={styles.col} key="user1">
                 <UserTasks userId={1} />
-            </ScrollView>,
-            <ScrollView contentContainerStyle={styles.col} key="user2">
+            </View>,
+            <View style={styles.col} key="user2">
                 <UserTasks userId={2} />
-            </ScrollView>,
+            </View>,
         ];
     }
     return <View style={styles.container}>{columns}</View>;

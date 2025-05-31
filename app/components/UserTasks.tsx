@@ -6,6 +6,18 @@ interface UserTasksProps {
     userId: number;
 }
 
+function hexToRgba(hex: string, alpha: number): string {
+    // '#rgb' → '#rrggbb' に変換
+    let c = hex.replace('#', '');
+    if (c.length === 3) {
+        c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+    }
+    const r = parseInt(c.substring(0, 2), 16);
+    const g = parseInt(c.substring(2, 4), 16);
+    const b = parseInt(c.substring(4, 6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
+
 // 時計表示専用コンポーネント
 const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { members } = useUserContext();
@@ -14,44 +26,47 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const [selectedTab, setSelectedTab] = useState(0);
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.container}>
             {/* ユーザー名表示 */}
             {user && <Text style={styles.userName}>{user.name}</Text>}
             {/* タブUI */}
-            <View style={{ flexDirection: 'row', marginBottom: 8 }}>
-                {user.taskLists.map((list, idx) => (
-                    <TouchableOpacity key={idx} style={[styles.tab, selectedTab === idx && styles.tabSelected]} onPress={() => setSelectedTab(idx)}>
-                        <Text style={selectedTab === idx ? styles.tabTextSelected : styles.tabText}>{list.name}</Text>
-                    </TouchableOpacity>
-                ))}
+            <View style={styles.tabContainer}>
+                <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
+                    {user.taskLists.map((list, idx) => (
+                        <TouchableOpacity key={idx} style={[styles.tab, selectedTab === idx && styles.tabSelected]} onPress={() => setSelectedTab(idx)}>
+                            <Text style={selectedTab === idx ? styles.tabTextSelected : styles.tabText}>{list.name}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
             </View>
 
             {/* 選択中のタスクリストのみ表示 */}
-            <View style={styles.memberBox}>
-                <View style={styles.taskListContainer}>
-                    {user.taskLists.length === 0 ? (
-                        <View style={styles.taskList}>
+            {user.taskLists.length === 0 ? (
+                <Text style={styles.noTask}>タスクなし</Text>
+            ) : (
+                <View style={styles.taskContainer}>
+                    <ScrollView contentContainerStyle={styles.taskScroll}>
+                        {user.taskLists[selectedTab]?.tasks.length === 0 ? (
                             <Text style={styles.noTask}>タスクなし</Text>
-                        </View>
-                    ) : (
-                        <View style={styles.taskList}>
-                            <View style={{ marginBottom: 8 }}>
-                                {user.taskLists[selectedTab]?.tasks.length === 0 ? (
-                                    <Text style={styles.noTask}>タスクなし</Text>
-                                ) : (
-                                    user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
-                                        <View key={taskIdx} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <Text style={{ fontSize: 16, marginRight: 4 }}>{task.image}</Text>
-                                            <Text style={[styles.taskItem, { color: task.color }]}>{task.title}</Text>
-                                        </View>
-                                    ))
-                                )}
-                            </View>
-                        </View>
-                    )}
+                        ) : (
+                            user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
+                                <View
+                                    key={taskIdx}
+                                    style={[
+                                        styles.taskItem,
+                                        { borderColor: 'black', borderWidth: 1 },
+                                        // { backgroundColor: hexToRgba(task.color, 0.2) }
+                                    ]}
+                                >
+                                    <Text style={styles.taskIcon}>{task.image}</Text>
+                                    <Text style={styles.taskTitle}>{task.title}</Text>
+                                </View>
+                            ))
+                        )}
+                    </ScrollView>
                 </View>
-            </View>
-        </ScrollView>
+            )}
+        </View>
     );
 };
 
@@ -60,43 +75,28 @@ export default UserTasks;
 // スタイル定義
 const styles = StyleSheet.create({
     container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 100,
+        flex: 1,
+        paddingVertical: 20,
     },
     userName: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 16,
         color: '#007AFF',
-    },
-    memberBox: {
-        marginVertical: 6,
-        marginHorizontal: 16,
-    },
-    memberName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 4,
-    },
-    taskListContainer: {
-        flex: 1,
-        width: '100%',
-        flexDirection: 'row',
-    },
-    taskList: {
         backgroundColor: '#fff',
-        marginLeft: 8,
         borderRadius: 10,
-        padding: 12,
+        padding: 8,
+        marginHorizontal: 24,
+        textAlign: 'center',
     },
-    taskItem: {
-        fontSize: 14,
-        color: '#333',
+    // タブUI
+    tabContainer: {
+        height: 40,
+        marginBottom: 8,
     },
-    noTask: {
-        fontSize: 13,
-        color: '#aaa',
+    tabScroll: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: 24,
     },
     tab: {
         paddingHorizontal: 16,
@@ -115,5 +115,41 @@ const styles = StyleSheet.create({
     tabTextSelected: {
         color: '#007AFF',
         fontWeight: 'bold',
+    },
+    // タスクUI
+    noTask: {
+        fontSize: 20,
+        color: '#aaa',
+        textAlign: 'center',
+    },
+    taskContainer: {
+        flex: 1,
+        width: '100%',
+    },
+    taskScroll: {
+        gap: 16,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        paddingBlockStart: 20,
+        paddingBlockEnd: 100,
+    },
+    taskItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 16,
+    },
+    taskIcon: {
+        fontSize: 24,
+        marginRight: 24,
+    },
+    taskTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+        minWidth: 200,
+        maxWidth: 250,
     },
 });

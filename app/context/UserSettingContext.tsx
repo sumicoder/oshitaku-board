@@ -10,7 +10,7 @@ interface UserSettingContextType {
 const UserSettingContext = createContext<UserSettingContextType | undefined>(undefined);
 
 export const UserSettingProvider = ({ children }: { children: ReactNode }) => {
-    const [peopleCount, setPeopleCount] = useState(1);
+    const [peopleCount, setPeopleCount] = useState(2);
 
     // 今後の設定もここでuseState管理
     // const [userTheme, setUserTheme] = useState('light');
