@@ -126,7 +126,7 @@ const UserDetailScreen = () => {
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => {
-                                router.push(`/user/`);
+                                router.push(`/`);
                             }}
                         >
                             <Text>戻る</Text>
