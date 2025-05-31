@@ -1,14 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Task } from '../context/UserContext';
 
 interface TaskItemProps {
     task: Task;
-    maxWidth: number;
+    style: ViewStyle;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, maxWidth }) => (
-    <View style={[styles.taskItem, { maxWidth: maxWidth }]}>
+const TaskItem: React.FC<TaskItemProps> = ({ task, style }) => (
+    <View style={[styles.taskItem, style]}>
         <Text style={styles.taskIcon}>{task.image}</Text>
         <Text style={styles.taskTitle}>{task.title}</Text>
     </View>
@@ -23,8 +23,6 @@ const styles = StyleSheet.create({
         paddingVertical: 24,
         paddingHorizontal: 16,
         borderColor: 'black',
-        borderWidth: 1,
-        margin: 4,
         width: '100%',
     },
     taskIcon: {

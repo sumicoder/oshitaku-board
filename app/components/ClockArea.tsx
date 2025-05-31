@@ -11,12 +11,12 @@ const ClockArea: React.FC = () => {
     const { height } = useWindowDimensions();
 
     // サイズ計算
-    const sizeMap = {
+    const clockSizeMap = {
         large: height * 0.6,
         medium: height * 0.5,
         small: height * 0.4,
     };
-    const clockSizePx = sizeMap[clockSize];
+    const clockSizePx = clockSizeMap[clockSize];
     if (!clockSizePx) return null;
 
     const clockContainerStyle: ViewStyle = {

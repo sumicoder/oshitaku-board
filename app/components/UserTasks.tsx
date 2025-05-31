@@ -27,23 +27,33 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const user = members && members.length > 0 ? members[userId] : { name: '', taskLists: [] };
     const [selectedTab, setSelectedTab] = useState(0);
 
-    const { width } = useWindowDimensions();
+    const { height, width } = useWindowDimensions();
     const { isVisible, clockSize } = useClockSetting();
     const { peopleCount } = useUserSetting();
 
     const containerPadding = 24;
     const taskListGap = 16;
+    const taskCordBorder = 1;
     // ClockAreaのロジックと合わせる
-    const clockSizeMap = { large: width * 0.6, medium: width * 0.5, small: width * 0.4 };
+
+    const clockSizeMap = {
+        large: height * 0.6,
+        medium: height * 0.5,
+        small: height * 0.4,
+    };
     const clockPx = clockSizeMap[clockSize] || 0;
     let itemMaxWidth: number;
     if (peopleCount === 1 && isVisible) {
         // 2カラム: 画面幅からclockSize, padding, gapを引いて2分割
-        itemMaxWidth = (width - clockPx - containerPadding * 2 - taskListGap) / 2;
+        const taskColumn = 2;
+        const taskColumnSpace = containerPadding * 2;
+        const taskBorderSpace = taskCordBorder * 2 * taskColumn;
+
+        itemMaxWidth = (width - clockPx - taskColumnSpace - taskListGap - taskBorderSpace) / taskColumn;
     } else {
         // 2 or 3カラム
         const numColumns = width > 600 ? 3 : 2;
-        itemMaxWidth = (width - containerPadding * 2 - taskListGap * (numColumns - 1)) / numColumns;
+        itemMaxWidth = (width - containerPadding * 2 - taskListGap * (numColumns - 1) - taskCordBorder * 2 * numColumns) / numColumns;
     }
 
     return (
@@ -71,11 +81,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                             <Text style={styles.noTask}>タスクなし</Text>
                         ) : (
                             user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
-                                <TaskItem
-                                    key={taskIdx}
-                                    task={task}
-                                    maxWidth={itemMaxWidth}
-                                />
+                                <TaskItem key={taskIdx} task={task} style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder, borderColor: 'black' }} />
                             ))
                         )}
                     </ScrollView>
