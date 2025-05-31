@@ -1,4 +1,5 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { initialTaskLists } from '../data/taskInitialData';
 
 // タスク型
@@ -38,19 +39,33 @@ type UserContextType = {
 export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [members, setMembers] = useState<Member[]>([
-        {
-            id: '1',
-            name: 'ユーザー1',
-            taskLists: initialTaskLists,
-        },
-        {
-            id: '2',
-            name: 'ユーザー2',
-            taskLists: initialTaskLists,
-        },
-    ]);
+    const [members, setMembers] = useState<Member[]>([]);
     const [selectedUserIndex, setSelectedUserIndex] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    // 初回マウント時にストレージから復元
+    useEffect(() => {
+        (async () => {
+            const membersData = await AsyncStorage.getItem('members');
+            const selectedUserIndexData = await AsyncStorage.getItem('selectedUserIndex');
+            if (membersData) setMembers(JSON.parse(membersData));
+            else
+                setMembers([
+                    { id: '1', name: 'ユーザー1', taskLists: initialTaskLists },
+                    { id: '2', name: 'ユーザー2', taskLists: initialTaskLists },
+                ]);
+            if (selectedUserIndexData) setSelectedUserIndex(Number(selectedUserIndexData));
+            setLoading(false);
+        })();
+    }, []);
+
+    // 変更時に保存
+    useEffect(() => {
+        if (!loading) AsyncStorage.setItem('members', JSON.stringify(members));
+    }, [members, loading]);
+    useEffect(() => {
+        if (!loading) AsyncStorage.setItem('selectedUserIndex', String(selectedUserIndex));
+    }, [selectedUserIndex, loading]);
 
     const addMember = (name: string) => {
         setMembers((prev) => [...prev, { id: String(members.length + 1), name, taskLists: initialTaskLists }]);
@@ -153,6 +168,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             )
         );
     };
+
+    if (loading) return null; // ローディングUI推奨
 
     return (
         <UserContext.Provider
