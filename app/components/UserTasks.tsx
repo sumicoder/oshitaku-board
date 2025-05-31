@@ -24,7 +24,7 @@ function hexToRgba(hex: string, alpha: number): string {
 
 // 時計表示専用コンポーネント
 const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
-    const { members } = useUserContext();
+    const { members, toggleTaskDone } = useUserContext();
     const user = members && members.length > 0 ? members[userId] : { name: '', taskLists: [] };
     const [selectedTab, setSelectedTab] = useState(0);
 
@@ -85,7 +85,13 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                             <Text style={styles.noTask}>タスクなし</Text>
                         ) : (
                             user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
-                                <TaskItem key={taskIdx} task={task} style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }} />
+                                <TaskItem
+                                    // props
+                                    key={taskIdx}
+                                    task={task}
+                                    style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }}
+                                    onPress={() => toggleTaskDone(userId, selectedTab, taskIdx)}
+                                />
                             ))
                         )}
                     </ScrollView>

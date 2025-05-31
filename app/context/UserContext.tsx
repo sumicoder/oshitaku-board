@@ -7,6 +7,7 @@ export type Task = {
     title: string;
     image: string;
     color: string;
+    done?: boolean;
 };
 
 // タスクリスト型
@@ -34,6 +35,7 @@ type UserContextType = {
     deleteTaskList: (userIdx: number, listIdx: number) => void;
     editTask: (userIdx: number, listIdx: number, taskIdx: number, newTask: Task) => void;
     deleteTask: (userIdx: number, listIdx: number, taskIdx: number) => void;
+    toggleTaskDone: (userIdx: number, listIdx: number, taskIdx: number) => void;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -169,6 +171,28 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         );
     };
 
+    const toggleTaskDone = (userIdx: number, listIdx: number, taskIdx: number) => {
+        setMembers((prev) =>
+            prev.map((m, idx) =>
+                idx === userIdx
+                    ? {
+                          ...m,
+                          taskLists: m.taskLists.map((l, lidx) =>
+                              lidx === listIdx
+                                  ? {
+                                        ...l,
+                                        tasks: l.tasks.map((t, tidx) =>
+                                            tidx === taskIdx ? { ...t, done: !t.done } : t
+                                        ),
+                                    }
+                                  : l
+                          ),
+                      }
+                    : m
+            )
+        );
+    };
+
     if (loading) return null; // ローディングUI推奨
 
     return (
@@ -184,6 +208,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 deleteTaskList,
                 editTask,
                 deleteTask,
+                toggleTaskDone,
             }}
         >
             {children}

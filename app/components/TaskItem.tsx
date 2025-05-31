@@ -1,17 +1,23 @@
 import React from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Task } from '../context/UserContext';
 
 interface TaskItemProps {
     task: Task;
     style: ViewStyle;
+    onPress: () => void;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, style }) => (
-    <View style={[styles.taskItem, style]}>
+const TaskItem: React.FC<TaskItemProps> = ({ task, style, onPress }) => (
+    <TouchableOpacity onPress={onPress} style={[styles.taskItem, style]}>
         <Text style={styles.taskIcon}>{task.image}</Text>
         <Text style={styles.taskTitle}>{task.title}</Text>
-    </View>
+        {task.done && (
+            <View style={styles.overlay}>
+                <Text style={styles.overlayText}>できた！</Text>
+            </View>
+        )}
+    </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
@@ -35,6 +41,19 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333',
         flexShrink: 1,
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,200,0,0.7)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        zIndex: 10,
+    },
+    overlayText: {
+        color: '#fff',
+        fontSize: 28,
+        fontWeight: 'bold',
     },
 });
 
