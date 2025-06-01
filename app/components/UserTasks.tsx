@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
@@ -28,12 +28,13 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { members, toggleTaskDone } = useUserContext();
     const user = members && members.length > 0 ? members[userId] : { name: '', taskLists: [] };
     const [selectedTab, setSelectedTab] = useState(0);
+    const scrollRef = useRef<ScrollView>(null);
     // const [showDoneIdx, setShowDoneIdx] = useState<number | null>(null);
     // const timerRef = useRef<number | null>(null);
     // const doneShowTime = 2000;
 
     const { height, width } = useWindowDimensions();
-    const { isVisible, clockSize } = useClockSetting();
+    const { isVisible, clockSize, clockPosition } = useClockSetting();
     const { userCount } = useUserSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
 
@@ -75,6 +76,13 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
         itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / TASK_COLUMN;
     }
 
+    // スクロール位置を左端に戻す
+    useEffect(() => {
+        if (displayMode === 'single' && scrollRef.current) {
+            scrollRef.current.scrollTo({ x: 0, animated: false });
+        }
+    }, [isVisible, clockSize, clockPosition, userCount, selectedTab, displayMode, userId, tasks?.length]);
+
     return (
         <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
             {/* ユーザー名表示 */}
@@ -100,6 +108,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                     ) : displayMode === 'single' ? (
                         // 単一表示: 横並び・スナップ
                         <ScrollView
+                            ref={scrollRef}
                             horizontal
                             pagingEnabled
                             snapToInterval={itemMaxWidth + TASK_LIST_GAP_SPACE}
