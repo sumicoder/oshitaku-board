@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import Carousel from 'react-native-reanimated-carousel';
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import { useUserContext } from '../context/UserContext';
@@ -28,45 +29,71 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { members, toggleTaskDone } = useUserContext();
     const user = members && members.length > 0 ? members[userId] : { name: '', taskLists: [] };
     const [selectedTab, setSelectedTab] = useState(0);
-    const [showDoneIdx, setShowDoneIdx] = useState<number | null>(null); // 直前に"できた"にしたタスクのindex
-    const timerRef = useRef<number | null>(null);
-    const doneShowTime = 2000;
+    // const [showDoneIdx, setShowDoneIdx] = useState<number | null>(null);
+    // const timerRef = useRef<number | null>(null);
+    // const doneShowTime = 2000;
 
     const { height, width } = useWindowDimensions();
     const { isVisible, clockSize } = useClockSetting();
     const { userCount } = useUserSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
 
-    const clockPx = getClockSizePx(clockSize, height);
+    // ユーザーのタスクを取得
+    const tasks = user.taskLists[selectedTab]?.tasks;
 
-    const containerPadding = 24;
-    const taskListGap = 16;
-    const taskCordBorder = 1;
+    // 時計の幅を取得
+    const clockSizePx = getClockSizePx(clockSize, height);
+    const clockColumnSize = isVisible && userCount !== 3 ? clockSizePx : 0;
 
+    // 定数定義
+    const MAGIC_MIN_WIDTH = 100; // ユーザー数2、時計非表示の場合の`minWidth` => index.tsxにある
+    const MAGIC_HEIGHT = 260; // マジックナンバー[ヘッダー、ユーザー名、タブなどの`margin`や`padding`や`gap`など適当な値]
+    // タスクのカラム数
+    const CONTAINER_WIDTH = (width - clockColumnSize) / userCount;
+    const TASK_COLUMN = displayMode === 'single' ? 1 : CONTAINER_WIDTH > 1080 ? 3 : CONTAINER_WIDTH > 600 ? 2 : 1;
+    // コンテナのpadding
+    const CONTAINER_PADDING = 24;
+    const TASK_COLUMN_SPACE = displayMode === 'single' ? CONTAINER_PADDING * 2 * userCount : CONTAINER_PADDING * 2; // 画面左右のpadding
+    // タスクリストのgap
+    const TASK_LIST_GAP = 16;
+    const TASK_LIST_GAP_SPACE = TASK_LIST_GAP * TASK_COLUMN;
+    // タスクの高さ
+    const TASK_HEIGHT = height - MAGIC_HEIGHT;
+    // タスクの枠線の幅
+    const TASK_CORD_BORDER = 1;
+    const TASK_BORDER_WIDTH = TASK_CORD_BORDER * 2;
+    const TASK_BORDER_SPACE = TASK_BORDER_WIDTH * userCount * TASK_COLUMN;
+
+    // タスクの最大幅を計算
     let itemMaxWidth: number;
-    if (userCount === 1 && isVisible) {
-        // 2カラム: 画面幅からclockSize, padding, gapを引いて2分割
-        const taskColumn = 2;
-        const taskColumnSpace = containerPadding * 2; // 画面左右のpadding
-        const taskBorderSpace = taskCordBorder * 2 * taskColumn; // タスクの枠線の幅 * 2カラム分
-        itemMaxWidth = (width - clockPx - taskColumnSpace - taskListGap - taskBorderSpace) / taskColumn;
+    if (userCount === 1 && displayMode === 'single' && isVisible) {
+        // ユーザー表示1, タスク単一表示、時計表示
+        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
+    } else if (userCount === 1 && displayMode === 'single' && !isVisible) {
+        // ユーザー表示1, タスク単一表示、時計非表示
+        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
+    } else if (userCount === 1 && isVisible) {
+        // ユーザー表示1、タスク一覧表示, 時計表示
+        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / TASK_COLUMN;
+    } else if (userCount === 2 && displayMode === 'single' && isVisible) {
+        // ユーザー表示2, タスク単一表示、時計表示
+        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
+    } else if (userCount === 2 && displayMode === 'single' && !isVisible) {
+        // ユーザー表示2, タスク単一表示、時計非表示
+        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize - MAGIC_MIN_WIDTH) / userCount;
     } else if (userCount === 2 && !isVisible) {
-        // 1カラム: 画面幅からpadding, gapを引いて1カラム
-        const taskColumn = 1;
-        const taskColumnSpace = containerPadding * 2; // 画面左右のpadding
-        const taskBorderSpace = taskCordBorder * 2 * taskColumn; // タスクの枠線の幅 * 2カラム分
-        itemMaxWidth = (width - taskColumnSpace - taskBorderSpace) / userCount;
+        // ユーザー表示2、タスク一覧表示, 時計非表示
+        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - clockColumnSize) / userCount;
+    } else if (userCount === 3 && displayMode === 'single') {
+        // ユーザー表示3、タスク単一表示, 時計非表示
+        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
     } else {
-        // 2 or 3カラム
-        const numColumns = width > 600 ? 3 : 2;
-        const taskColumnSpace = containerPadding * 2; // 画面左右のpadding
-        const taskBorderSpace = taskCordBorder * 2 * numColumns; // タスクの枠線の幅 * 2カラム分
-        const taskListGapSpace = taskListGap * (numColumns - 1); // タスクリストのgap * (カラム数 - 1)
-        itemMaxWidth = (width - taskColumnSpace - taskListGapSpace - taskBorderSpace) / numColumns;
+        // ユーザー表示3以上、タスク一覧表示 or ユーザー表示1、タスク一覧表示、時計非表示
+        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / TASK_COLUMN;
     }
 
     return (
-        <View style={[styles.container, { paddingHorizontal: containerPadding }]}>
+        <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
             {/* ユーザー名表示 */}
             {user && <Text style={styles.userName}>{user.name}</Text>}
             {/* タブUI */}
@@ -85,55 +112,94 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                 <Text style={styles.noTask}>タスクなし</Text>
             ) : (
                 <View style={styles.taskContainer}>
-                    <ScrollView contentContainerStyle={[styles.taskScroll, { gap: taskListGap }]}>
-                        {user.taskLists[selectedTab]?.tasks.length === 0 ? (
-                            <Text style={styles.noTask}>タスクなし</Text>
-                        ) : displayMode === 'single' ? (
-                            // 単一表示
-                            (() => {
-                                const tasks = user.taskLists[selectedTab]?.tasks || [];
-                                const undoneTasks = tasks.filter((task) => !task.done);
+                    {tasks.length === 0 ? (
+                        <Text style={styles.noTask}>タスクなし</Text>
+                    ) : displayMode === 'single' ? (
+                        // 単一表示: 横並び・スナップ
+                        <ScrollView
+                            horizontal
+                            pagingEnabled
+                            snapToInterval={itemMaxWidth}
+                            decelerationRate="fast"
+                            showsHorizontalScrollIndicator={true}
+                            contentContainerStyle={[
+                                styles.taskScroll,
+                                {
+                                    paddingBlockEnd: 0,
+                                    flexDirection: 'row',
+                                    height: '100%',
+                                    width: (itemMaxWidth + TASK_LIST_GAP) * (tasks.length || 1),
+                                },
+                            ]}
+                        >
+                            {(() => {
+                                const userTasks = tasks || [];
+                                const undoneTasks = userTasks.filter((task) => !task.done);
                                 if (undoneTasks.length === 0) {
                                     return (
-                                        <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+                                        <View style={{ width: CONTAINER_WIDTH, alignItems: 'center', justifyContent: 'center', paddingBlockStart: 32 }}>
                                             <Text style={{ fontSize: 28, color: '#22a', fontWeight: 'bold' }}>ぜんぶできたね！</Text>
                                         </View>
                                     );
                                 }
                                 // 直前に"できた"にしたタスクがあればそれを3秒間表示
-                                if (showDoneIdx !== null) {
-                                    const doneTask = tasks[showDoneIdx];
-                                    if (doneTask) {
-                                        return <TaskItem key={showDoneIdx} task={{ ...doneTask, done: true }} style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }} onPress={() => {}} />;
-                                    }
-                                }
-                                const firstUndone = undoneTasks[0];
-                                const taskIdx = tasks.findIndex((t) => t === firstUndone);
-                                return (
+                                // if (showDoneIdx !== null) {
+                                //     const doneTask = userTasks[showDoneIdx];
+                                //     if (doneTask) {
+                                //         return (
+                                //             <TaskItem
+                                //                 key={showDoneIdx}
+                                //                 task={{ ...doneTask, done: true }}
+                                //                 style={{ width: itemMaxWidth, height: '75%', alignItems: 'center', justifyContent: 'center', borderWidth: TASK_CORD_BORDER }}
+                                //                 onPress={() => {}}
+                                //             />
+                                //         );
+                                //     }
+                                // }
+                                // const firstUndone = undoneTasks[0];
+                                // const taskIdx = userTasks.findIndex((t) => t === firstUndone);
+                                return userTasks.map((task, taskIdx) => (
                                     <TaskItem
                                         key={taskIdx}
-                                        task={firstUndone}
-                                        style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }}
+                                        task={task}
+                                        style={{
+                                            marginHorizontal: TASK_LIST_GAP / 2,
+                                            width: itemMaxWidth,
+                                            height: TASK_HEIGHT,
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            borderWidth: TASK_CORD_BORDER,
+                                            borderRadius: 0,
+                                        }}
                                         onPress={() => {
-                                            setShowDoneIdx(taskIdx);
+                                            // setShowDoneIdx(taskIdx);
                                             toggleTaskDone(userId, selectedTab, taskIdx);
-                                            if (timerRef.current) clearTimeout(timerRef.current);
-                                            timerRef.current = setTimeout(() => {
-                                                setShowDoneIdx(null);
-                                            }, doneShowTime);
+                                            // if (timerRef.current) clearTimeout(timerRef.current);
+                                            // timerRef.current = setTimeout(() => {
+                                            //     setShowDoneIdx(null);
+                                            // }, doneShowTime);
                                         }}
                                     />
-                                );
-                            })()
-                        ) : (
-                            // 一覧表示
-                            user.taskLists[selectedTab]?.tasks
-                                .filter((task) => showCompleted || !task.done)
-                                .map((task, taskIdx) => (
-                                    <TaskItem key={taskIdx} task={task} style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }} onPress={() => toggleTaskDone(userId, selectedTab, taskIdx)} />
-                                ))
-                        )}
-                    </ScrollView>
+                                ));
+                            })()}
+                        </ScrollView>
+                    ) : (
+                        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.taskScroll, { gap: TASK_LIST_GAP }]}>
+                            {
+                                // 一覧表示
+                                tasks
+                                    .filter((task) => showCompleted || !task.done)
+                                    .map((task, taskIdx) => (
+                                        <TaskItem
+                                            key={taskIdx}
+                                            task={task}
+                                            style={{ maxWidth: itemMaxWidth, borderWidth: TASK_CORD_BORDER }}
+                                            onPress={() => toggleTaskDone(userId, selectedTab, taskIdx)}
+                                        />
+                                    ))
+                            }
+                        </ScrollView>
+                    )}
                 </View>
             )}
         </View>
@@ -197,7 +263,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         paddingBlockStart: 20,
         paddingBlockEnd: 100,
-        height: '100%',
+        width: '100%',
     },
     noTask: {
         fontSize: 20,

@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Task } from '../context/UserContext';
-import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 
 interface TaskItemProps {
     task: Task;
@@ -10,9 +9,8 @@ interface TaskItemProps {
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({ task, style, onPress }) => {
-    const { displayMode } = useTaskDisplaySetting();
     return (
-        <TouchableOpacity onPress={onPress} style={[styles.taskItem, style, displayMode === 'single' && styles.taskItemSingle]}>
+        <TouchableOpacity onPress={onPress} style={[styles.taskItem, style]}>
             <Text style={styles.taskIcon}>{task.image}</Text>
             <Text style={styles.taskTitle}>{task.title}</Text>
             {task.done && (
@@ -34,10 +32,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderColor: 'black',
         width: '100%',
-    },
-    taskItemSingle: {
-        maxWidth: '100%',
-        height: '100%',
+        overflow: 'hidden',
     },
     taskIcon: {
         fontSize: 24,
@@ -55,7 +50,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,200,0,0.7)',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 10,
         zIndex: 10,
     },
     overlayText: {
