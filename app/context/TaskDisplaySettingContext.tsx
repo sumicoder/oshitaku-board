@@ -6,33 +6,48 @@ type DisplayMode = 'list' | 'single';
 interface TaskDisplaySettingContextType {
     displayMode: DisplayMode;
     setDisplayMode: (mode: DisplayMode) => void;
+    showCompleted: boolean;
+    setShowCompleted: (show: boolean) => void;
 }
 
 const TaskDisplaySettingContext = createContext<TaskDisplaySettingContextType | undefined>(undefined);
 
 export const TaskDisplaySettingProvider = ({ children }: { children: ReactNode }) => {
     const [displayMode, setDisplayMode] = useState<DisplayMode>('list');
+    const [showCompleted, setShowCompleted] = useState(true);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
             const mode = await AsyncStorage.getItem('taskDisplayMode');
-            if (mode === 'list' || mode === 'single') setDisplayMode(mode);
+            const showCompletedData = await AsyncStorage.getItem('taskShowCompleted');
+            if (mode === 'list' || mode === 'single') {
+                setDisplayMode(mode);
+            }
+            if (showCompletedData === 'false') {
+                setShowCompleted(false);
+            } else {
+                setShowCompleted(true);
+            }
             setLoading(false);
         })();
     }, []);
 
     useEffect(() => {
-        if (!loading) AsyncStorage.setItem('taskDisplayMode', displayMode);
+        if (!loading) {
+            AsyncStorage.setItem('taskDisplayMode', displayMode);
+        }
     }, [displayMode, loading]);
+
+    useEffect(() => {
+        if (!loading) {
+            AsyncStorage.setItem('taskShowCompleted', String(showCompleted));
+        }
+    }, [showCompleted, loading]);
 
     if (loading) return null;
 
-    return (
-        <TaskDisplaySettingContext.Provider value={{ displayMode, setDisplayMode }}>
-            {children}
-        </TaskDisplaySettingContext.Provider>
-    );
+    return <TaskDisplaySettingContext.Provider value={{ displayMode, setDisplayMode, showCompleted, setShowCompleted }}>{children}</TaskDisplaySettingContext.Provider>;
 };
 
 export const useTaskDisplaySetting = () => {

@@ -1,12 +1,12 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Switch, Text, TouchableOpacity, View } from 'react-native';
 import SettingAccordion from '../components/SettingAccordion';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // タスク表示の設定アコーディオン
 export default function TaskDisplaySettingAccordion() {
-    const { displayMode, setDisplayMode } = useTaskDisplaySetting();
+    const { displayMode, setDisplayMode, showCompleted, setShowCompleted } = useTaskDisplaySetting();
 
     return (
         <SettingAccordion title="タスク表示の設定">
@@ -16,6 +16,10 @@ export default function TaskDisplaySettingAccordion() {
                     <RadioButton label="一覧表示" selected={displayMode === 'list'} onPress={() => setDisplayMode('list')} />
                     <RadioButton label="単一表示" selected={displayMode === 'single'} onPress={() => setDisplayMode('single')} />
                 </View>
+            </View>
+            <View style={SettingStyles.row}>
+                <Text style={SettingStyles.label}>完了タスクを表示</Text>
+                <Switch value={showCompleted} onValueChange={setShowCompleted} />
             </View>
         </SettingAccordion>
     );

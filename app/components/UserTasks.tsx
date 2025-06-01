@@ -35,7 +35,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { height, width } = useWindowDimensions();
     const { isVisible, clockSize } = useClockSetting();
     const { userCount } = useUserSetting();
-    const { displayMode } = useTaskDisplaySetting();
+    const { displayMode, showCompleted } = useTaskDisplaySetting();
 
     const clockPx = getClockSizePx(clockSize, height);
 
@@ -88,18 +88,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                     <ScrollView contentContainerStyle={[styles.taskScroll, { gap: taskListGap }]}>
                         {user.taskLists[selectedTab]?.tasks.length === 0 ? (
                             <Text style={styles.noTask}>タスクなし</Text>
-                        ) : displayMode === 'list' ? (
-                            // 一覧表示
-                            user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
-                                <TaskItem
-                                    // props
-                                    key={taskIdx}
-                                    task={task}
-                                    style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }}
-                                    onPress={() => toggleTaskDone(userId, selectedTab, taskIdx)}
-                                />
-                            ))
-                        ) : (
+                        ) : displayMode === 'single' ? (
                             // 単一表示
                             (() => {
                                 const tasks = user.taskLists[selectedTab]?.tasks || [];
@@ -115,14 +104,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                 if (showDoneIdx !== null) {
                                     const doneTask = tasks[showDoneIdx];
                                     if (doneTask) {
-                                        return (
-                                            <TaskItem
-                                                key={showDoneIdx}
-                                                task={{ ...doneTask, done: true }}
-                                                style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }}
-                                                onPress={() => {}}
-                                            />
-                                        );
+                                        return <TaskItem key={showDoneIdx} task={{ ...doneTask, done: true }} style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }} onPress={() => {}} />;
                                     }
                                 }
                                 const firstUndone = undoneTasks[0];
@@ -143,6 +125,13 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                     />
                                 );
                             })()
+                        ) : (
+                            // 一覧表示
+                            user.taskLists[selectedTab]?.tasks
+                                .filter((task) => showCompleted || !task.done)
+                                .map((task, taskIdx) => (
+                                    <TaskItem key={taskIdx} task={task} style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }} onPress={() => toggleTaskDone(userId, selectedTab, taskIdx)} />
+                                ))
                         )}
                     </ScrollView>
                 </View>
