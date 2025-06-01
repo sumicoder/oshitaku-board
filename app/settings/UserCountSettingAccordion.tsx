@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, View } from 'react-native';
+import RadioButton from '../components/RadioButton';
 import SettingAccordion from '../components/SettingAccordion';
 import { useUserContext } from '../context/UserContext';
 import { useUserSetting } from '../context/UserSettingContext';
@@ -25,15 +26,5 @@ export default function UserCountSettingAccordion() {
                 </View>
             </View>
         </SettingAccordion>
-    );
-}
-
-// ラジオボタン用コンポーネント
-function RadioButton({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
-    return (
-        <TouchableOpacity style={[SettingStyles.radioButton, selected && SettingStyles.radioButtonSelected]} onPress={onPress}>
-            <View style={[SettingStyles.radioCircle, selected && SettingStyles.radioCircleSelected]} />
-            <Text style={[SettingStyles.radioLabel, selected && SettingStyles.radioLabelSelected]}>{label}</Text>
-        </TouchableOpacity>
     );
 }

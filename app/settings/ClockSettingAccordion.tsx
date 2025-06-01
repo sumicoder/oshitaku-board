@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import { Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Text, View } from 'react-native';
 import SettingAccordion from '../components/SettingAccordion';
-import { useClockSetting } from '../context/ClockSettingContext';
+import { ClockPosition, useClockSetting } from '../context/ClockSettingContext';
 import { useUserSetting } from '../context/UserSettingContext';
 import SettingStyles from '../styles/SettingStyles';
+import RadioButton from '../components/RadioButton';
+import SwitchButton from '../components/SwitchButton';
 
 // 時計の設定アコーディオン
 export default function ClockSettingAccordion() {
@@ -40,7 +42,7 @@ export default function ClockSettingAccordion() {
             {/* 表示/非表示トグル */}
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>時計を表示</Text>
-                <Switch value={isVisible} onValueChange={setIsVisible} disabled={userCount === 3} />
+                <SwitchButton value={isVisible} onValueChange={setIsVisible} disabled={userCount === 3} />
             </View>
             {/* アナログ/デジタル選択 */}
             <View style={SettingStyles.row}>
@@ -64,20 +66,10 @@ export default function ClockSettingAccordion() {
                 <Text style={SettingStyles.label}>位置</Text>
                 <View style={SettingStyles.radioGroup}>
                     {options.map((opt) => (
-                        <RadioButton key={opt.value} label={opt.label} selected={clockPosition === opt.value} onPress={() => setClockPosition(opt.value as any)} disabled={opt.disabled} />
+                        <RadioButton key={opt.value} label={opt.label} selected={clockPosition === opt.value} onPress={() => setClockPosition(opt.value as ClockPosition)} disabled={opt.disabled} />
                     ))}
                 </View>
             </View>
         </SettingAccordion>
-    );
-}
-
-// ラジオボタン用コンポーネント
-function RadioButton({ label, selected, onPress, disabled = false }: { label: string; selected: boolean; onPress: () => void; disabled?: boolean }) {
-    return (
-        <TouchableOpacity style={[SettingStyles.radioButton, selected && SettingStyles.radioButtonSelected, disabled && { opacity: 0.3 }]} onPress={disabled ? undefined : onPress} disabled={disabled}>
-            <View style={[SettingStyles.radioCircle, selected && SettingStyles.radioCircleSelected]} />
-            <Text style={[SettingStyles.radioLabel, selected && SettingStyles.radioLabelSelected]}>{label}</Text>
-        </TouchableOpacity>
     );
 }
