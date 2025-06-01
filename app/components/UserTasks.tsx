@@ -25,8 +25,8 @@ function hexToRgba(hex: string, alpha: number): string {
 
 // 時計表示専用コンポーネント
 const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
-    const { members, toggleTaskDone } = useUserContext();
-    const user = members && members.length > 0 ? members[userId] : { name: '', taskLists: [] };
+    const { user, toggleTaskDone } = useUserContext();
+    const currentUser = user && user.length > 0 ? user[userId] : { name: '', taskLists: [] };
     const [selectedTab, setSelectedTab] = useState(0);
     const scrollRef = useRef<ScrollView>(null);
     // const [showDoneIdx, setShowDoneIdx] = useState<number | null>(null);
@@ -39,7 +39,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { displayMode, showCompleted } = useTaskDisplaySetting();
 
     // ユーザーのタスクを取得
-    const tasks = user.taskLists[selectedTab]?.tasks;
+    const tasks = currentUser.taskLists[selectedTab]?.tasks;
 
     // 時計の幅を取得
     const clockSizePx = getClockSizePx(clockSize, height);
@@ -86,11 +86,11 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     return (
         <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
             {/* ユーザー名表示 */}
-            {user && <Text style={styles.userName}>{user.name}</Text>}
+            {currentUser && <Text style={styles.userName}>{currentUser.name}</Text>}
             {/* タブUI */}
             <View style={styles.tabContainer}>
                 <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
-                    {user.taskLists.map((list, idx) => (
+                    {currentUser.taskLists.map((list, idx) => (
                         <TouchableOpacity key={idx} style={[styles.tab, selectedTab === idx && styles.tabSelected]} onPress={() => setSelectedTab(idx)}>
                             <Text style={selectedTab === idx ? styles.tabTextSelected : styles.tabText}>{list.name}</Text>
                         </TouchableOpacity>
@@ -99,7 +99,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
             </View>
 
             {/* 選択中のタスクリストのみ表示 */}
-            {user.taskLists.length === 0 ? (
+            {currentUser.taskLists.length === 0 ? (
                 <Text style={styles.noTask}>タスクなし</Text>
             ) : (
                 <View style={styles.taskContainer}>

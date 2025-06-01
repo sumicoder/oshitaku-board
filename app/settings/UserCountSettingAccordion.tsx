@@ -9,10 +9,10 @@ import SettingStyles from '../styles/SettingStyles';
 // 表示人数の設定アコーディオン
 export default function UserCountSettingAccordion() {
     const { userCount, setUserCount } = useUserSetting();
-    const { members } = useUserContext();
+    const { user } = useUserContext();
 
     // 最大3つまで
-    const maxCount = Math.min(members.length, 3);
+    const maxCount = Math.min(user.length, 3);
     const options = Array.from({ length: maxCount }, (_, i) => i + 1);
 
     return (

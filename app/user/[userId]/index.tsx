@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useUserContext } from '../../context/UserContext';
 
@@ -9,11 +9,11 @@ const UserDetailScreen = () => {
     // expo-routerからuserIdを取得
     const { userId } = useLocalSearchParams();
     // Contextからユーザー情報・タスクリスト並び替え関数を取得
-    const { members, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask } = useUserContext();
+    const { user, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask } = useUserContext();
 
     // userIdはインデックスとして扱う
     const userIndex = Number(userId);
-    const user = members[userIndex];
+    const currentUser = user[userIndex];
 
     // タスク追加用のアイコンとカラー候補
     const taskImages = ['🌞', '🦷', '🧼', '👕', '🍚', '🧑‍🎓', '🎒', '🚪', '🏠', '🛁', '🛏️', '📚', '🎨', '🎮', '🍽️', '🦁', '🐻', '🐼', '🐰', '🐶', '🐱'];
@@ -33,14 +33,14 @@ const UserDetailScreen = () => {
 
     // タスクリスト追加ハンドラ
     const handleAddTaskList = useCallback(() => {
-        if (!user) return;
-        if (user.taskLists.length >= 3) {
+        if (!currentUser) return;
+        if (currentUser.taskLists.length >= 3) {
             Alert.alert('タスクリストは最大3つまでです');
             return;
         }
         // 仮のリスト名（本来はモーダルで入力）
-        addTaskList(userIndex, `新しいリスト${user.taskLists.length + 1}`);
-    }, [user, userIndex, addTaskList]);
+        addTaskList(userIndex, `新しいリスト${currentUser.taskLists.length + 1}`);
+    }, [currentUser, userIndex, addTaskList]);
 
     // タスク追加ハンドラ（モーダルを開く）
     const handleOpenAddTaskModal = useCallback((listIdx: number) => {
@@ -53,7 +53,7 @@ const UserDetailScreen = () => {
 
     // タスク登録処理
     const handleRegisterTask = useCallback(() => {
-        if (!user || targetListIdx === null) return;
+        if (!currentUser || targetListIdx === null) return;
         if (!newTaskName.trim()) {
             Alert.alert('タスク名を入力してください');
             return;
@@ -64,7 +64,7 @@ const UserDetailScreen = () => {
             color: selectedColor,
         });
         setModalVisible(false);
-    }, [user, userIndex, addTask, newTaskName, selectedImage, selectedColor, targetListIdx]);
+    }, [currentUser, userIndex, addTask, newTaskName, selectedImage, selectedColor, targetListIdx]);
 
     // タスクリスト編集開始
     const handleOpenEditListModal = (listIdx: number, currentName: string) => {
@@ -73,7 +73,7 @@ const UserDetailScreen = () => {
     };
     // タスクリスト編集確定
     const handleEditListName = () => {
-        if (user && editListIdx !== null && editListName.trim()) {
+        if (currentUser && editListIdx !== null && editListName.trim()) {
             editTaskListName(userIndex, editListIdx, editListName.trim());
         }
         setEditListIdx(null);
@@ -96,7 +96,7 @@ const UserDetailScreen = () => {
     };
     // タスク編集確定
     const handleEditTask = () => {
-        if (!user || !editTaskInfo) return;
+        if (!currentUser || !editTaskInfo) return;
         if (!newTaskName.trim()) {
             Alert.alert('タスク名を入力してください');
             return;
@@ -121,7 +121,7 @@ const UserDetailScreen = () => {
         <ScrollView contentContainerStyle={styles.container}>
             <Stack.Screen
                 options={{
-                    title: user?.name || 'ユーザー詳細',
+                    title: currentUser?.name || 'ユーザー詳細',
                     headerBackTitle: '戻る',
                     headerLeft: () => (
                         <TouchableOpacity
@@ -134,14 +134,14 @@ const UserDetailScreen = () => {
                     ),
                 }}
             />
-            {user ? (
+            {currentUser ? (
                 <>
-                    <Text style={styles.title}>{user.name} のタスクリスト</Text>
+                    <Text style={styles.title}>{currentUser.name} のタスクリスト</Text>
                     <TouchableOpacity style={styles.addBtn} onPress={handleAddTaskList}>
                         <Text style={styles.addBtnText}>＋ タスクリスト追加</Text>
                     </TouchableOpacity>
                     <View style={styles.taskList}>
-                        {user.taskLists.map((list, listIdx) => (
+                        {currentUser.taskLists.map((list, listIdx) => (
                             <View key={listIdx} style={{ marginBottom: 8 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                                     <Text style={styles.taskListName}>{list.name}</Text>

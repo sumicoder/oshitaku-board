@@ -18,16 +18,16 @@ export type TaskList = {
 };
 
 // ユーザー型
-export type Member = {
+export type User = {
     id: string;
     name: string;
     taskLists: TaskList[];
 };
 
 type UserContextType = {
-    members: Member[];
+    user: User[];
     selectedUserIndex: number;
-    addMember: (name: string) => void;
+    addUser: (name: string) => void;
     selectUser: (index: number) => void;
     addTaskList: (userIdx: number, listName: string) => void;
     addTask: (userIdx: number, listIdx: number, task: Task) => void;
@@ -41,36 +41,40 @@ type UserContextType = {
 export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [members, setMembers] = useState<Member[]>([]);
+    const [user, serUser] = useState<User[]>([]);
     const [selectedUserIndex, setSelectedUserIndex] = useState(0);
     const [loading, setLoading] = useState(true);
 
     // 初回マウント時にストレージから復元
     useEffect(() => {
         (async () => {
-            const membersData = await AsyncStorage.getItem('members');
+            const membersData = await AsyncStorage.getItem('user');
             const selectedUserIndexData = await AsyncStorage.getItem('selectedUserIndex');
-            if (membersData) setMembers(JSON.parse(membersData));
-            else
-                setMembers([
+            if (membersData) {
+                serUser(JSON.parse(membersData));
+            } else {
+                serUser([
                     { id: '1', name: 'ユーザー1', taskLists: initialTaskLists },
                     { id: '2', name: 'ユーザー2', taskLists: initialTaskLists },
                 ]);
-            if (selectedUserIndexData) setSelectedUserIndex(Number(selectedUserIndexData));
+            }
+            if (selectedUserIndexData) {
+                setSelectedUserIndex(Number(selectedUserIndexData));
+            }
             setLoading(false);
         })();
     }, []);
 
     // 変更時に保存
     useEffect(() => {
-        if (!loading) AsyncStorage.setItem('members', JSON.stringify(members));
-    }, [members, loading]);
+        if (!loading) AsyncStorage.setItem('user', JSON.stringify(user));
+    }, [user, loading]);
     useEffect(() => {
         if (!loading) AsyncStorage.setItem('selectedUserIndex', String(selectedUserIndex));
     }, [selectedUserIndex, loading]);
 
-    const addMember = (name: string) => {
-        setMembers((prev) => [...prev, { id: String(members.length + 1), name, taskLists: initialTaskLists }]);
+    const addUser = (name: string) => {
+        serUser((prev) => [...prev, { id: String(user.length + 1), name, taskLists: initialTaskLists }]);
     };
     const selectUser = (index: number) => {
         setSelectedUserIndex(index);
@@ -78,7 +82,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // タスクリスト追加
     const addTaskList = (userIdx: number, listName: string) => {
-        setMembers((prev) => {
+        serUser((prev) => {
             const next = prev.map((m, idx) =>
                 idx === userIdx && m.taskLists.length < 3 ? { ...m, taskLists: [...m.taskLists, { id: String(m.taskLists.length + 1), name: listName, tasks: [] }] } : m
             );
@@ -88,7 +92,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // タスク追加
     const addTask = (userIdx: number, listIdx: number, task: Task) => {
-        setMembers((prev) => {
+        serUser((prev) => {
             const next = prev.map((m, idx) =>
                 idx === userIdx
                     ? {
@@ -103,7 +107,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // タスクリスト名編集
     const editTaskListName = (userIdx: number, listIdx: number, newName: string) => {
-        setMembers((prev) =>
+        serUser((prev) =>
             prev.map((m, idx) =>
                 idx === userIdx
                     ? {
@@ -117,7 +121,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // タスクリスト削除
     const deleteTaskList = (userIdx: number, listIdx: number) => {
-        setMembers((prev) =>
+        serUser((prev) =>
             prev.map((m, idx) =>
                 idx === userIdx
                     ? {
@@ -131,7 +135,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // タスク編集
     const editTask = (userIdx: number, listIdx: number, taskIdx: number, newTask: Task) => {
-        setMembers((prev) =>
+        serUser((prev) =>
             prev.map((m, idx) =>
                 idx === userIdx
                     ? {
@@ -152,7 +156,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // タスク削除
     const deleteTask = (userIdx: number, listIdx: number, taskIdx: number) => {
-        setMembers((prev) =>
+        serUser((prev) =>
             prev.map((m, idx) =>
                 idx === userIdx
                     ? {
@@ -172,7 +176,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const toggleTaskDone = (userIdx: number, listIdx: number, taskIdx: number) => {
-        setMembers((prev) =>
+        serUser((prev) =>
             prev.map((m, idx) =>
                 idx === userIdx
                     ? {
@@ -181,9 +185,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                               lidx === listIdx
                                   ? {
                                         ...l,
-                                        tasks: l.tasks.map((t, tidx) =>
-                                            tidx === taskIdx ? { ...t, done: !t.done } : t
-                                        ),
+                                        tasks: l.tasks.map((t, tidx) => (tidx === taskIdx ? { ...t, done: !t.done } : t)),
                                     }
                                   : l
                           ),
@@ -198,9 +200,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return (
         <UserContext.Provider
             value={{
-                members,
+                user,
                 selectedUserIndex,
-                addMember,
+                addUser,
                 selectUser,
                 addTaskList,
                 addTask,

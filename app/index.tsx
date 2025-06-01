@@ -9,13 +9,13 @@ import { useUserSetting } from './context/UserSettingContext';
 // メインページのコンポーネント
 export default function MainPage() {
     const { isVisible, clockPosition } = useClockSetting();
-    const { members } = useUserContext();
+    const { user } = useUserContext();
     const { userCount } = useUserSetting();
-    const visibleMembers = members.slice(0, userCount);
+    const visibleUsers = user.slice(0, userCount);
 
     // 並び順を決定
     let columns: React.ReactNode[] = [];
-    if (visibleMembers.length === 1) {
+    if (visibleUsers.length === 1) {
         if (clockPosition === 'left') {
             columns = [
                 <View style={styles.clockCol} key="clock">
@@ -36,7 +36,7 @@ export default function MainPage() {
                 </View>,
             ];
         }
-    } else if (visibleMembers.length === 2) {
+    } else if (visibleUsers.length === 2) {
         if (clockPosition === 'left') {
             columns = [
                 <View style={styles.clockCol} key="clock">
@@ -75,7 +75,7 @@ export default function MainPage() {
                 </View>,
             ];
         }
-    } else if (visibleMembers.length === 3) {
+    } else if (visibleUsers.length === 3) {
         columns = [
             <View style={styles.col} key="user0">
                 <UserTasks userId={0} />
