@@ -22,9 +22,9 @@ export default function CustomDrawerContent() {
             </TouchableOpacity>
             {/* ユーザー一覧 */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
-            {user.map((member, idx) => (
-                <View key={member.name + idx} style={styles.userContainer}>
-                    <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{member.name}</Text>
+            {user.map((user, idx) => (
+                <View key={user.name + idx} style={styles.userContainer}>
+                    <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{user.name}</Text>
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {

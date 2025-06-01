@@ -48,10 +48,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     // 初回マウント時にストレージから復元
     useEffect(() => {
         (async () => {
-            const membersData = await AsyncStorage.getItem('user');
+            const usersData = await AsyncStorage.getItem('user');
             const selectedUserIndexData = await AsyncStorage.getItem('selectedUserIndex');
-            if (membersData) {
-                serUser(JSON.parse(membersData));
+            if (usersData) {
+                serUser(JSON.parse(usersData));
             } else {
                 serUser([
                     { id: '1', name: 'ユーザー1', taskLists: initialTaskLists },
