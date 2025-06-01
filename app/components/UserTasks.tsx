@@ -66,29 +66,13 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
 
     // タスクの最大幅を計算
     let itemMaxWidth: number;
-    if (userCount === 1 && displayMode === 'single' && isVisible) {
-        // ユーザー表示1, タスク単一表示、時計表示
-        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
-    } else if (userCount === 1 && displayMode === 'single' && !isVisible) {
-        // ユーザー表示1, タスク単一表示、時計非表示
-        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
-    } else if (userCount === 1 && isVisible) {
-        // ユーザー表示1、タスク一覧表示, 時計表示
-        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / TASK_COLUMN;
-    } else if (userCount === 2 && displayMode === 'single' && isVisible) {
-        // ユーザー表示2, タスク単一表示、時計表示
-        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
-    } else if (userCount === 2 && displayMode === 'single' && !isVisible) {
-        // ユーザー表示2, タスク単一表示、時計非表示
+    if (userCount === 2 && !isVisible) {
+        // ユーザー表示2、時計非表示の場合のみ中央に余白あり
         itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize - MAGIC_MIN_WIDTH) / userCount;
-    } else if (userCount === 2 && !isVisible) {
-        // ユーザー表示2、タスク一覧表示, 時計非表示
-        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - clockColumnSize) / userCount;
-    } else if (userCount === 3 && displayMode === 'single') {
-        // ユーザー表示3、タスク単一表示, 時計非表示
+    } else if (displayMode === 'single') {
+        // タスク単一表示
         itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
     } else {
-        // ユーザー表示3以上、タスク一覧表示 or ユーザー表示1、タスク一覧表示、時計非表示
         itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / TASK_COLUMN;
     }
 
@@ -128,7 +112,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                     paddingBlockEnd: 0,
                                     flexDirection: 'row',
                                     height: '100%',
-                                    width: (itemMaxWidth + TASK_LIST_GAP) * (tasks.length || 1),
+                                    width: (itemMaxWidth + TASK_LIST_GAP_SPACE) * (tasks.length || 1),
                                 },
                             ]}
                         >
@@ -163,7 +147,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                         key={taskIdx}
                                         task={task}
                                         style={{
-                                            marginHorizontal: TASK_LIST_GAP / 2,
+                                            marginHorizontal: TASK_LIST_GAP_SPACE / 2,
                                             width: itemMaxWidth,
                                             height: TASK_HEIGHT,
                                             alignItems: 'center',
