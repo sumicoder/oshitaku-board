@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useClockSetting } from '../context/ClockSettingContext';
+import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import { useUserContext } from '../context/UserContext';
 import { useUserSetting } from '../context/UserSettingContext';
 import { getClockSizePx } from '../utils/clockSize';
@@ -27,10 +28,14 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { members, toggleTaskDone } = useUserContext();
     const user = members && members.length > 0 ? members[userId] : { name: '', taskLists: [] };
     const [selectedTab, setSelectedTab] = useState(0);
+    const [showDoneIdx, setShowDoneIdx] = useState<number | null>(null); // 直前に"できた"にしたタスクのindex
+    const timerRef = useRef<number | null>(null);
+    const doneShowTime = 2000;
 
     const { height, width } = useWindowDimensions();
     const { isVisible, clockSize } = useClockSetting();
     const { userCount } = useUserSetting();
+    const { displayMode } = useTaskDisplaySetting();
 
     const clockPx = getClockSizePx(clockSize, height);
 
@@ -83,7 +88,8 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                     <ScrollView contentContainerStyle={[styles.taskScroll, { gap: taskListGap }]}>
                         {user.taskLists[selectedTab]?.tasks.length === 0 ? (
                             <Text style={styles.noTask}>タスクなし</Text>
-                        ) : (
+                        ) : displayMode === 'list' ? (
+                            // 一覧表示
                             user.taskLists[selectedTab]?.tasks.map((task, taskIdx) => (
                                 <TaskItem
                                     // props
@@ -93,6 +99,50 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                     onPress={() => toggleTaskDone(userId, selectedTab, taskIdx)}
                                 />
                             ))
+                        ) : (
+                            // 単一表示
+                            (() => {
+                                const tasks = user.taskLists[selectedTab]?.tasks || [];
+                                const undoneTasks = tasks.filter((task) => !task.done);
+                                if (undoneTasks.length === 0) {
+                                    return (
+                                        <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+                                            <Text style={{ fontSize: 28, color: '#22a', fontWeight: 'bold' }}>ぜんぶできたね！</Text>
+                                        </View>
+                                    );
+                                }
+                                // 直前に"できた"にしたタスクがあればそれを3秒間表示
+                                if (showDoneIdx !== null) {
+                                    const doneTask = tasks[showDoneIdx];
+                                    if (doneTask) {
+                                        return (
+                                            <TaskItem
+                                                key={showDoneIdx}
+                                                task={{ ...doneTask, done: true }}
+                                                style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }}
+                                                onPress={() => {}}
+                                            />
+                                        );
+                                    }
+                                }
+                                const firstUndone = undoneTasks[0];
+                                const taskIdx = tasks.findIndex((t) => t === firstUndone);
+                                return (
+                                    <TaskItem
+                                        key={taskIdx}
+                                        task={firstUndone}
+                                        style={{ maxWidth: itemMaxWidth, borderWidth: taskCordBorder }}
+                                        onPress={() => {
+                                            setShowDoneIdx(taskIdx);
+                                            toggleTaskDone(userId, selectedTab, taskIdx);
+                                            if (timerRef.current) clearTimeout(timerRef.current);
+                                            timerRef.current = setTimeout(() => {
+                                                setShowDoneIdx(null);
+                                            }, doneShowTime);
+                                        }}
+                                    />
+                                );
+                            })()
                         )}
                     </ScrollView>
                 </View>
@@ -108,6 +158,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingVertical: 20,
+        width: '100%',
     },
     userName: {
         fontSize: 24,

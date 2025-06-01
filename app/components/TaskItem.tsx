@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Task } from '../context/UserContext';
+import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 
 interface TaskItemProps {
     task: Task;
@@ -8,17 +9,20 @@ interface TaskItemProps {
     onPress: () => void;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, style, onPress }) => (
-    <TouchableOpacity onPress={onPress} style={[styles.taskItem, style]}>
-        <Text style={styles.taskIcon}>{task.image}</Text>
-        <Text style={styles.taskTitle}>{task.title}</Text>
-        {task.done && (
-            <View style={styles.overlay}>
-                <Text style={styles.overlayText}>できた！</Text>
-            </View>
-        )}
-    </TouchableOpacity>
-);
+const TaskItem: React.FC<TaskItemProps> = ({ task, style, onPress }) => {
+    const { displayMode } = useTaskDisplaySetting();
+    return (
+        <TouchableOpacity onPress={onPress} style={[styles.taskItem, style, displayMode === 'single' && styles.taskItemSingle]}>
+            <Text style={styles.taskIcon}>{task.image}</Text>
+            <Text style={styles.taskTitle}>{task.title}</Text>
+            {task.done && (
+                <View style={styles.overlay}>
+                    <Text style={styles.overlayText}>できた！</Text>
+                </View>
+            )}
+        </TouchableOpacity>
+    );
+};
 
 const styles = StyleSheet.create({
     taskItem: {
@@ -30,6 +34,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderColor: 'black',
         width: '100%',
+    },
+    taskItemSingle: {
+        maxWidth: '100%',
     },
     taskIcon: {
         fontSize: 24,

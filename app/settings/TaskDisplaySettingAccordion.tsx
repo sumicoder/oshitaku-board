@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import SettingAccordion from '../components/SettingAccordion';
+import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // タスク表示の設定アコーディオン
 export default function TaskDisplaySettingAccordion() {
-    // タスク表示モード：一覧 or 単一
-    const [displayMode, setDisplayMode] = useState<'list' | 'single'>('list');
+    const { displayMode, setDisplayMode } = useTaskDisplaySetting();
 
     return (
         <SettingAccordion title="タスク表示の設定">
