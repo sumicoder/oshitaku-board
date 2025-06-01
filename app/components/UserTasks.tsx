@@ -102,7 +102,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                         <ScrollView
                             horizontal
                             pagingEnabled
-                            snapToInterval={itemMaxWidth}
+                            snapToInterval={itemMaxWidth + TASK_LIST_GAP_SPACE}
                             decelerationRate="fast"
                             showsHorizontalScrollIndicator={true}
                             contentContainerStyle={[
