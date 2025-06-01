@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     },
     taskItemSingle: {
         maxWidth: '100%',
+        height: '100%',
     },
     taskIcon: {
         fontSize: 24,

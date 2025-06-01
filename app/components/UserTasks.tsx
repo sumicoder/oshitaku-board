@@ -159,6 +159,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 20,
         width: '100%',
+        height: '100%',
     },
     userName: {
         fontSize: 24,
@@ -200,12 +201,14 @@ const styles = StyleSheet.create({
     taskContainer: {
         flex: 1,
         width: '100%',
+        height: '100%',
     },
     taskScroll: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         paddingBlockStart: 20,
         paddingBlockEnd: 100,
+        height: '100%',
     },
     noTask: {
         fontSize: 20,
