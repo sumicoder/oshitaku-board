@@ -31,15 +31,16 @@ export default function ClockSettingAccordion() {
             if (clockPosition !== undefined && clockPosition !== null && clockPosition !== '') {
                 setClockPosition(''); // 未選択状態
             }
+            if (isVisible) setIsVisible(false); // 時計を必ず非表示
         }
-    }, [userCount, clockPosition, setClockPosition]);
+    }, [userCount, clockPosition, setClockPosition, isVisible, setIsVisible]);
 
     return (
         <SettingAccordion title="時計の設定">
             {/* 表示/非表示トグル */}
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>時計を表示</Text>
-                <Switch value={isVisible} onValueChange={setIsVisible} />
+                <Switch value={isVisible} onValueChange={setIsVisible} disabled={userCount === 3} />
             </View>
             {/* アナログ/デジタル選択 */}
             <View style={SettingStyles.row}>

@@ -1,15 +1,19 @@
 import React from 'react';
 import { useWindowDimensions, View, ViewStyle } from 'react-native';
 import { useClockSetting } from '../context/ClockSettingContext';
+import { useUserSetting } from '../context/UserSettingContext';
+import { getClockSizePx } from '../utils/clockSize';
 import Clock from './Clock';
 import DigitalClock from './DigitalClock';
-import { getClockSizePx } from '../utils/clockSize';
 
 // 時計表示専用コンポーネント
 const ClockArea: React.FC = () => {
     // 時計設定（グローバル）
     const { clockType, clockSize } = useClockSetting();
     const { height } = useWindowDimensions();
+    const { userCount } = useUserSetting();
+
+    if (userCount === 3) return null;
 
     // サイズ計算
     const clockSizePx = getClockSizePx(clockSize, height);
