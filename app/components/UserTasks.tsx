@@ -1,6 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import Carousel from 'react-native-reanimated-carousel';
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import { useUserContext } from '../context/UserContext';
@@ -208,6 +207,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 8,
         textAlign: 'center',
+        minHeight: 52,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     // タブUI
     tabContainer: {
