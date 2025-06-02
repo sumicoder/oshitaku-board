@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import TaskItem from '../../components/TaskItem';
 import { colorList, iconList, useUserContext } from '../../context/UserContext';
 
 // ユーザー詳細ページのコンポーネント
@@ -30,6 +31,9 @@ const UserDetailScreen = () => {
     const [editListIdx, setEditListIdx] = useState<number | null>(null);
     const [editListName, setEditListName] = useState('');
     const [editTaskInfo, setEditTaskInfo] = useState<{ listIdx: number; taskIdx: number; task: any } | null>(null);
+
+    // タブUIの状態
+    const [selectedTab, setSelectedTab] = useState(0);
 
     // タスクリスト追加ハンドラ
     const handleAddTaskList = useCallback(() => {
@@ -79,10 +83,11 @@ const UserDetailScreen = () => {
     };
     // タスクリスト削除
     const handleDeleteList = (listIdx: number) => {
-        Alert.alert('確認', 'このタスクリストを削除しますか？', [
-            { text: 'キャンセル', style: 'cancel' },
-            { text: '削除', style: 'destructive', onPress: () => deleteTaskList(userIndex, listIdx) },
-        ]);
+        // Alert.alert('確認', 'このタスクリストを削除しますか？', [
+        //     { text: 'キャンセル', style: 'cancel' },
+        //     { text: '削除', style: 'destructive', onPress: () => deleteTaskList(userIndex, listIdx) },
+        // ]);
+        deleteTaskList(userIndex, listIdx);
     };
     // タスク編集開始
     const handleOpenEditTaskModal = (listIdx: number, taskIdx: number, task: any) => {
@@ -159,42 +164,56 @@ const UserDetailScreen = () => {
             {currentUser ? (
                 <>
                     <Text style={styles.title}>{currentUser.name} のタスクリスト</Text>
-                    <TouchableOpacity style={styles.addBtn} onPress={handleAddTaskList}>
-                        <Text style={styles.addBtnText}>＋ タスクリスト追加</Text>
-                    </TouchableOpacity>
-                    <View style={styles.taskList}>
-                        {currentUser.taskLists.map((list, listIdx) => (
-                            <View key={listIdx} style={{ marginBottom: 8 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                                    <Text style={styles.taskListName}>{list.name}</Text>
+                    <View style={styles.tabContainer}>
+                        <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
+                            {currentUser.taskLists.map((list, idx) => (
+                                <View key={idx} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <TouchableOpacity style={[styles.tab, { borderBottomColor: selectedTab === idx ? currentUser.color : 'transparent' }]} onPress={() => setSelectedTab(idx)}>
+                                        <Text style={[styles.tabText, { fontWeight: selectedTab === idx ? 'bold' : 'normal', color: selectedTab === idx ? currentUser.color : '#333' }]}>
+                                            {list.name}
+                                        </Text>
+                                    </TouchableOpacity>
                                     {/* タスクリスト編集・削除ボタン */}
-                                    <TouchableOpacity onPress={() => handleOpenEditListModal(listIdx, list.name)} style={{ marginLeft: 8 }}>
-                                        <Ionicons name="pencil" size={18} color="#007AFF" />
+                                    <TouchableOpacity onPress={() => handleOpenEditListModal(idx, list.name)} style={{ marginLeft: 4 }}>
+                                        <Ionicons name="pencil" size={24} color={'#333'} />
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => handleDeleteList(listIdx)} style={{ marginLeft: 4 }}>
-                                        <Ionicons name="trash" size={18} color="#f44" />
+                                    <TouchableOpacity onPress={() => handleDeleteList(idx)} style={{ marginLeft: 2 }}>
+                                        <Ionicons name="trash" size={24} color="#f44" />
                                     </TouchableOpacity>
                                 </View>
-                                <View style={styles.taskList}>
-                                    {list.tasks.map((task, taskIdx) => (
-                                        <View key={taskIdx} style={[styles.taskItem, { flexDirection: 'row', alignItems: 'center' }]}>
-                                            <Text style={styles.taskImage}>{task.image}</Text>
-                                            <Text style={styles.taskTitle}>{task.title}</Text>
-                                            {/* タスク編集・削除ボタン */}
-                                            <TouchableOpacity onPress={() => handleOpenEditTaskModal(listIdx, taskIdx, task)} style={{ marginLeft: 8 }}>
-                                                <Ionicons name="pencil" size={16} color="#007AFF" />
-                                            </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => handleDeleteTask(listIdx, taskIdx)} style={{ marginLeft: 4 }}>
-                                                <Ionicons name="trash" size={16} color="#f44" />
-                                            </TouchableOpacity>
-                                        </View>
-                                    ))}
+                            ))}
+                            {currentUser.taskLists.length < 3 && (
+                                <View style={{ marginLeft: 40 }}>
+                                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => handleAddTaskList()}>
+                                        <Ionicons name="add" size={24} color={'#333'} />
+                                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>タスクリストを追加</Text>
+                                    </TouchableOpacity>
                                 </View>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => handleOpenAddTaskModal(listIdx)}>
-                                    <Text style={styles.addBtnText}>＋ タスク追加</Text>
-                                </TouchableOpacity>
-                            </View>
-                        ))}
+                            )}
+                        </ScrollView>
+                    </View>
+                    {/* タスク追加ボタン */}
+                    <TouchableOpacity style={[styles.addBtn, { backgroundColor: currentUser.color }]} onPress={() => handleOpenAddTaskModal(selectedTab)}>
+                        <Text style={styles.addBtnText}>＋ タスク追加</Text>
+                    </TouchableOpacity>
+                    {/* タスク一覧（TaskItemで表示） */}
+                    <View style={styles.taskList}>
+                        {currentUser.taskLists[selectedTab]?.tasks.length === 0 ? (
+                            <Text style={styles.noTask}>タスクなし</Text>
+                        ) : (
+                            currentUser.taskLists[selectedTab].tasks.map((task, taskIdx) => (
+                                <View key={taskIdx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                                    <TaskItem task={task} currentUser={currentUser} style={{ flex: 1, borderWidth: 1, marginRight: 8 }} onPress={() => {}} />
+                                    {/* 編集・削除ボタン */}
+                                    <TouchableOpacity onPress={() => handleOpenEditTaskModal(selectedTab, taskIdx, task)} style={{ marginRight: 4 }}>
+                                        <Ionicons name="pencil" size={24} color={'#333'} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => handleDeleteTask(selectedTab, taskIdx)}>
+                                        <Ionicons name="trash" size={24} color="#f44" />
+                                    </TouchableOpacity>
+                                </View>
+                            ))
+                        )}
                     </View>
                     {/* タスクリスト名編集モーダル */}
                     <Modal visible={editListIdx !== null} transparent animationType="fade">
@@ -428,6 +447,29 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingVertical: 8,
         paddingHorizontal: 20,
+    },
+    tabContainer: {
+        marginBottom: 16,
+        borderBottomWidth: 2,
+        borderColor: '#ccc',
+    },
+    tabScroll: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 24,
+    },
+    tab: {
+        padding: 8,
+        marginRight: 8,
+    },
+    tabText: {
+        fontSize: 16,
+    },
+    noTask: {
+        fontSize: 16,
+        textAlign: 'center',
+        marginTop: 40,
     },
 });
 
