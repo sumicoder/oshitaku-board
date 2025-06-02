@@ -4,6 +4,7 @@ import { useClockSetting } from '../context/ClockSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import { useUserContext } from '../context/UserContext';
 import { useUserCountSetting } from '../context/UserCountSettingContext';
+import { useProgressBarSetting } from '../context/ProgressBarSettingContext';
 import { getClockSizePx } from '../utils/clockSize';
 import TaskItem from './TaskItem';
 
@@ -26,6 +27,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const { isVisible, clockSize, clockPosition } = useClockSetting();
     const { userCount } = useUserCountSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
+    const { isProgressBarVisible } = useProgressBarSetting();
 
     // ユーザーのタスクを取得
     const tasks = currentUser.taskLists[selectedTab]?.tasks;
@@ -79,9 +81,11 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
         <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
             {/* ユーザー名表示 */}
             {currentUser && (
-                <View style={styles.userName} onLayout={e => setProgressBarWidth(e.nativeEvent.layout.width)}>
+                <View style={styles.userName} onLayout={(e) => setProgressBarWidth(e.nativeEvent.layout.width)}>
                     <Text style={[styles.userNameText, { color: currentUser.color }]}>{currentUser.name}</Text>
-                    <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: currentUser.color, zIndex: -1, transform: [{ translateX: (-1 + percent) * progressBarWidth }] }} />
+                    {isProgressBarVisible && (
+                        <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: currentUser.color, zIndex: -1, transform: [{ translateX: (-1 + percent) * progressBarWidth }] }} />
+                    )}
                 </View>
             )}
             {/* タブUI */}

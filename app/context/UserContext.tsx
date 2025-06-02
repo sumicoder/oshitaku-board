@@ -55,7 +55,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     // 初回マウント時にストレージから復元
     useEffect(() => {
         (async () => {
-            const usersData = await AsyncStorage.getItem('user');
+            const usersData = await AsyncStorage.getItem('users');
             const selectedUserIndexData = await AsyncStorage.getItem('selectedUserIndex');
             if (usersData) {
                 serUser(JSON.parse(usersData));
@@ -74,7 +74,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // 変更時に保存
     useEffect(() => {
-        if (!loading) AsyncStorage.setItem('user', JSON.stringify(users));
+        if (!loading) AsyncStorage.setItem('users', JSON.stringify(users));
     }, [users, loading]);
     useEffect(() => {
         if (!loading) AsyncStorage.setItem('selectedUserIndex', String(selectedUserIndex));

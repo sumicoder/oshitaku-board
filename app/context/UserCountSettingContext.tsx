@@ -16,8 +16,8 @@ export const UserCountSettingProvider = ({ children }: { children: ReactNode }) 
 
     useEffect(() => {
         (async () => {
-            const userCountData = await AsyncStorage.getItem('userCount');
-            if (userCountData) setUserCount(Number(userCountData));
+            const data = await AsyncStorage.getItem('userCount');
+            if (data) setUserCount(Number(data));
             setLoading(false);
         })();
     }, []);
