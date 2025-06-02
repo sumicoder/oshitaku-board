@@ -62,8 +62,10 @@ const UserDetailScreen = () => {
             return;
         }
         addTask(userIndex, targetListIdx, {
+            id: Math.random().toString(36).substring(2, 15),
             title: newTaskName.trim(),
             image: selectedImage,
+            done: false,
         });
         setModalVisible(false);
     }, [currentUser, userIndex, addTask, newTaskName, selectedImage, targetListIdx]);
@@ -104,8 +106,10 @@ const UserDetailScreen = () => {
             return;
         }
         editTask(userIndex, editTaskInfo.listIdx, editTaskInfo.taskIdx, {
+            id: editTaskInfo.task.id,
             title: newTaskName.trim(),
             image: selectedImage,
+            done: false,
         });
         setModalVisible(false);
         setEditTaskInfo(null);

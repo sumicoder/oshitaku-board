@@ -4,9 +4,10 @@ import { initialTaskLists } from '../data/taskInitialData';
 
 // タスク型
 export type Task = {
+    id: string;
     title: string;
     image: string;
-    done?: boolean;
+    done: boolean;
 };
 
 // タスクリスト型
@@ -38,9 +39,9 @@ type UserContextType = {
     addTask: (userIdx: number, listIdx: number, task: Task) => void;
     editTaskListName: (userIdx: number, listIdx: number, newName: string) => void;
     deleteTaskList: (userIdx: number, listIdx: number) => void;
-    editTask: (userIdx: number, listIdx: number, taskIdx: number, newTask: Task) => void;
-    deleteTask: (userIdx: number, listIdx: number, taskIdx: number) => void;
-    toggleTaskDone: (userIdx: number, listIdx: number, taskIdx: number) => void;
+    editTask: (userIdx: number, listIdx: number, taskIdx: string, newTask: Task) => void;
+    deleteTask: (userIdx: number, listIdx: number, taskIdx: string) => void;
+    toggleTaskDone: (userIdx: number, listIdx: number, taskIdx: string) => void;
     editUser: (userIdx: number, newName: string, newColor: string) => void;
     deleteUser: (userIdx: number) => void;
 };
@@ -104,7 +105,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 idx === userIdx
                     ? {
                           ...m,
-                          taskLists: m.taskLists.map((l, lidx) => (lidx === listIdx ? { ...l, tasks: [...l.tasks, { ...task, id: String(l.tasks.length + 1) }] } : l)),
+                          taskLists: m.taskLists.map((l, lidx) => (lidx === listIdx ? { ...l, tasks: [...l.tasks, { ...task, id: Math.random().toString(36).substring(2, 15) }] } : l)),
                       }
                     : m
             );
@@ -141,7 +142,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // タスク編集
-    const editTask = (userIdx: number, listIdx: number, taskIdx: number, newTask: Task) => {
+    const editTask = (userIdx: number, listIdx: number, taskIdx: string, newTask: Task) => {
         serUser((prev) =>
             prev.map((m, idx) =>
                 idx === userIdx
@@ -151,7 +152,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                               lidx === listIdx
                                   ? {
                                         ...l,
-                                        tasks: l.tasks.map((t, tidx) => (tidx === taskIdx ? { ...t, ...newTask } : t)),
+                                        tasks: l.tasks.map((t) => (t.id === taskIdx ? { ...t, ...newTask } : t)),
                                     }
                                   : l
                           ),
@@ -162,7 +163,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // タスク削除
-    const deleteTask = (userIdx: number, listIdx: number, taskIdx: number) => {
+    const deleteTask = (userIdx: number, listIdx: number, taskIdx: string) => {
         serUser((prev) =>
             prev.map((m, idx) =>
                 idx === userIdx
@@ -172,7 +173,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                               lidx === listIdx
                                   ? {
                                         ...l,
-                                        tasks: l.tasks.filter((_, tidx) => tidx !== taskIdx),
+                                        tasks: l.tasks.filter((t) => t.id !== taskIdx),
                                     }
                                   : l
                           ),
@@ -182,7 +183,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         );
     };
 
-    const toggleTaskDone = (userIdx: number, listIdx: number, taskIdx: number) => {
+    const toggleTaskDone = (userIdx: number, listIdx: number, taskIdx: string) => {
         serUser((prev) =>
             prev.map((m, idx) =>
                 idx === userIdx
@@ -192,7 +193,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                               lidx === listIdx
                                   ? {
                                         ...l,
-                                        tasks: l.tasks.map((t, tidx) => (tidx === taskIdx ? { ...t, done: !t.done } : t)),
+                                        tasks: l.tasks.map((t) => (t.id === taskIdx ? { ...t, done: !t.done } : t)),
                                     }
                                   : l
                           ),

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useClockSetting } from '../context/ClockSettingContext';
+import { useProgressBarSetting } from '../context/ProgressBarSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import { useUserContext } from '../context/UserContext';
 import { useUserCountSetting } from '../context/UserCountSettingContext';
-import { useProgressBarSetting } from '../context/ProgressBarSettingContext';
 import { getClockSizePx } from '../utils/clockSize';
 import TaskItem from './TaskItem';
 
@@ -19,9 +19,9 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const [selectedTab, setSelectedTab] = useState(0);
     const scrollRef = useRef<ScrollView>(null);
     const [progressBarWidth, setProgressBarWidth] = useState(0);
-    // const [showDoneIdx, setShowDoneIdx] = useState<number | null>(null);
-    // const timerRef = useRef<number | null>(null);
-    // const doneShowTime = 2000;
+    const [showDoneIdx, setShowDoneIdx] = useState<string | null>(null);
+    const timerRef = useRef<number | null>(null);
+    const doneShowTime = 2000;
 
     const { height, width } = useWindowDimensions();
     const { isVisible, clockSize, clockPosition } = useClockSetting();
@@ -75,7 +75,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
         if (displayMode === 'single' && scrollRef.current) {
             scrollRef.current.scrollTo({ x: 0, animated: false });
         }
-    }, [isVisible, clockSize, clockPosition, userCount, selectedTab, displayMode, userId, tasks?.length]);
+    }, [isVisible, clockSize, clockPosition, userCount, selectedTab, displayMode, userId]);
 
     return (
         <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
@@ -126,35 +126,9 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                             ]}
                         >
                             {(() => {
-                                const userTasks = tasks || [];
-                                const undoneTasks = userTasks.filter((task) => !task.done);
-                                if (undoneTasks.length === 0) {
-                                    return (
-                                        <View style={{ width: CONTAINER_WIDTH, alignItems: 'center', justifyContent: 'center', paddingBlockStart: 32 }}>
-                                            <Text style={{ fontSize: 28, color: '#22a', fontWeight: 'bold' }}>ぜんぶできたね！</Text>
-                                        </View>
-                                    );
-                                }
-                                // 直前に"できた"にしたタスクがあればそれを3秒間表示
-                                // if (showDoneIdx !== null) {
-                                //     const doneTask = userTasks[showDoneIdx];
-                                //     if (doneTask) {
-                                //         return (
-                                //             <TaskItem
-                                //                 key={showDoneIdx}
-                                // currentUser={currentUser}
-                                //                 task={{ ...doneTask, done: true }}
-                                //                 style={{ width: itemMaxWidth, height: '75%', alignItems: 'center', justifyContent: 'center', borderWidth: TASK_CORD_BORDER }}
-                                //                 onPress={() => {}}
-                                //             />
-                                //         );
-                                //     }
-                                // }
-                                // const firstUndone = undoneTasks[0];
-                                // const taskIdx = userTasks.findIndex((t) => t === firstUndone);
-                                return userTasks.map((task, taskIdx) => (
+                                return tasks.map((task) => (
                                     <TaskItem
-                                        key={taskIdx}
+                                        key={task.id}
                                         currentUser={currentUser}
                                         task={task}
                                         style={{
@@ -166,31 +140,62 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                             borderWidth: TASK_CORD_BORDER,
                                             borderRadius: 0,
                                         }}
-                                        onPress={() => {
-                                            // setShowDoneIdx(taskIdx);
-                                            toggleTaskDone(userId, selectedTab, taskIdx);
-                                            // if (timerRef.current) clearTimeout(timerRef.current);
-                                            // timerRef.current = setTimeout(() => {
-                                            //     setShowDoneIdx(null);
-                                            // }, doneShowTime);
-                                        }}
+                                        onPress={() => toggleTaskDone(userId, selectedTab, task.id)}
                                     />
                                 ));
                             })()}
                         </ScrollView>
                     ) : (
                         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.taskScroll, { gap: TASK_LIST_GAP }]}>
+                            {(() => {
+                                const undoneTasks = tasks.filter((task) => !task.done);
+                                if (undoneTasks.length === 0 && !showCompleted) {
+                                    return (
+                                        <View style={{ width: CONTAINER_WIDTH, alignItems: 'center', justifyContent: 'center', paddingBlockStart: 32 }}>
+                                            <Text style={{ fontSize: 28, color: '#22a', fontWeight: 'bold' }}>ぜんぶできたね！</Text>
+                                        </View>
+                                    );
+                                }
+                            })()}
+                            {(() => {
+                                // 直前に"できた"にしたタスクがあればそれを3秒間表示
+                                if (showDoneIdx !== null) {
+                                    const doneTask = tasks.find((task) => task.id === showDoneIdx);
+                                    if (doneTask) {
+                                        return (
+                                            <TaskItem
+                                                key={showDoneIdx}
+                                                currentUser={currentUser}
+                                                task={{ ...doneTask, done: true }}
+                                                style={{ maxWidth: itemMaxWidth, borderWidth: TASK_CORD_BORDER }}
+                                                onPress={() => {}}
+                                            />
+                                        );
+                                    }
+                                }
+                            })()}
                             {
                                 // 一覧表示
                                 tasks
                                     .filter((task) => showCompleted || !task.done)
-                                    .map((task, taskIdx) => (
+                                    .map((task) => (
                                         <TaskItem
-                                            key={taskIdx}
+                                            key={task.id}
                                             currentUser={currentUser}
                                             task={task}
                                             style={{ maxWidth: itemMaxWidth, borderWidth: TASK_CORD_BORDER }}
-                                            onPress={() => toggleTaskDone(userId, selectedTab, taskIdx)}
+                                            onPress={() => {
+                                                if (!showCompleted) {
+                                                    setShowDoneIdx(task.id);
+                                                }
+                                                toggleTaskDone(userId, selectedTab, task.id);
+                                                if (timerRef.current) {
+                                                    clearTimeout(timerRef.current);
+                                                }
+                                                timerRef.current = setTimeout(() => {
+                                                    setShowDoneIdx(null);
+                                                }, doneShowTime);
+                                            }}
                                         />
                                     ))
                             }
