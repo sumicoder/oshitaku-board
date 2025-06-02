@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensio
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import { useUserContext } from '../context/UserContext';
-import { useUserSetting } from '../context/UserSettingContext';
+import { useUserCountSetting } from '../context/UserCountSettingContext';
 import { getClockSizePx } from '../utils/clockSize';
 import TaskItem from './TaskItem';
 
@@ -24,7 +24,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
 
     const { height, width } = useWindowDimensions();
     const { isVisible, clockSize, clockPosition } = useClockSetting();
-    const { userCount } = useUserSetting();
+    const { userCount } = useUserCountSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
 
     // ユーザーのタスクを取得

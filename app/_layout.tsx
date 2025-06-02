@@ -3,19 +3,19 @@ import React from 'react';
 import { ClockSettingProvider } from './context/ClockSettingContext';
 import TaskDisplaySettingProvider from './context/TaskDisplaySettingContext';
 import { UserProvider } from './context/UserContext';
-import UserSettingProvider from './context/UserSettingContext';
+import UserCountSettingProvider from './context/UserCountSettingContext';
 import CustomDrawerContent from './CustomDrawerContent';
 
 export default function Layout() {
     return (
         <TaskDisplaySettingProvider>
-            <UserSettingProvider>
+            <UserCountSettingProvider>
                 <UserProvider>
                     <ClockSettingProvider>
                         <Drawer drawerContent={() => <CustomDrawerContent />} />
                     </ClockSettingProvider>
                 </UserProvider>
-            </UserSettingProvider>
+            </UserCountSettingProvider>
         </TaskDisplaySettingProvider>
     );
 }

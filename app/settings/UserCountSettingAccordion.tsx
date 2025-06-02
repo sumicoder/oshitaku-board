@@ -3,12 +3,12 @@ import { Text, View } from 'react-native';
 import RadioButton from '../components/RadioButton';
 import SettingAccordion from '../components/SettingAccordion';
 import { useUserContext } from '../context/UserContext';
-import { useUserSetting } from '../context/UserSettingContext';
+import { useUserCountSetting } from '../context/UserCountSettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // 表示人数の設定アコーディオン
 export default function UserCountSettingAccordion() {
-    const { userCount, setUserCount } = useUserSetting();
+    const { userCount, setUserCount } = useUserCountSetting();
     const { users } = useUserContext();
 
     // 最大3つまで

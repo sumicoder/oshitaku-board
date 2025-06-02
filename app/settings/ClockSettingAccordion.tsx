@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
-import SettingAccordion from '../components/SettingAccordion';
-import { ClockPosition, useClockSetting } from '../context/ClockSettingContext';
-import { useUserSetting } from '../context/UserSettingContext';
-import SettingStyles from '../styles/SettingStyles';
 import RadioButton from '../components/RadioButton';
+import SettingAccordion from '../components/SettingAccordion';
 import SwitchButton from '../components/SwitchButton';
+import { ClockPosition, useClockSetting } from '../context/ClockSettingContext';
+import { useUserCountSetting } from '../context/UserCountSettingContext';
+import SettingStyles from '../styles/SettingStyles';
 
 // 時計の設定アコーディオン
 export default function ClockSettingAccordion() {
     const { isVisible, setIsVisible, clockType, setClockType, clockSize, setClockSize, clockPosition, setClockPosition } = useClockSetting();
-    const { userCount } = useUserSetting();
+    const { userCount } = useUserCountSetting();
 
     // 選択肢を動的に
     const options = [

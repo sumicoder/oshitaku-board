@@ -1,7 +1,7 @@
 import React from 'react';
 import { useWindowDimensions, View, ViewStyle } from 'react-native';
 import { useClockSetting } from '../context/ClockSettingContext';
-import { useUserSetting } from '../context/UserSettingContext';
+import { useUserCountSetting } from '../context/UserCountSettingContext';
 import { getClockSizePx } from '../utils/clockSize';
 import Clock from './Clock';
 import DigitalClock from './DigitalClock';
@@ -11,7 +11,7 @@ const ClockArea: React.FC = () => {
     // 時計設定（グローバル）
     const { clockType, clockSize } = useClockSetting();
     const { height } = useWindowDimensions();
-    const { userCount } = useUserSetting();
+    const { userCount } = useUserCountSetting();
 
     if (userCount === 3) return null;
 

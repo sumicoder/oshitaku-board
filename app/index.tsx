@@ -4,13 +4,13 @@ import ClockArea from './components/ClockArea';
 import UserTasks from './components/UserTasks';
 import { useClockSetting } from './context/ClockSettingContext';
 import { useUserContext } from './context/UserContext';
-import { useUserSetting } from './context/UserSettingContext';
+import { useUserCountSetting } from './context/UserCountSettingContext';
 
 // メインページのコンポーネント
 export default function MainPage() {
     const { isVisible, clockPosition } = useClockSetting();
     const { users } = useUserContext();
-    const { userCount } = useUserSetting();
+    const { userCount } = useUserCountSetting();
     const visibleUsers = users.slice(0, userCount);
 
     // 並び順を決定

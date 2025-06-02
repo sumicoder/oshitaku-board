@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
-import { Switch, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import RadioButton from '../components/RadioButton';
-import SwitchButton from '../components/SwitchButton';
 import SettingAccordion from '../components/SettingAccordion';
+import SwitchButton from '../components/SwitchButton';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
+import { useUserCountSetting } from '../context/UserCountSettingContext';
 import SettingStyles from '../styles/SettingStyles';
-import { useUserSetting } from '../context/UserSettingContext';
 
 // タスク表示の設定アコーディオン
 export default function TaskDisplaySettingAccordion() {
     const { displayMode, setDisplayMode, showCompleted, setShowCompleted } = useTaskDisplaySetting();
-    const { userCount } = useUserSetting();
+    const { userCount } = useUserCountSetting();
 
     // displayModeが変わったときに自動補正
     useEffect(() => {
