@@ -30,7 +30,7 @@ export const colorList = ['#FFD700', '#00BFFF', '#FF69B4', '#90EE90', '#FFA500',
 export const iconList = ['🌞', '🦷', '🧼', '👕', '🍚', '🧑‍🎓', '🎒', '🚪', '🏠', '🛁', '🛏️', '📚', '🎨', '🎮', '🍽️', '🦁', '🐻', '🐼', '🐰', '🐶', '🐱'];
 
 type UserContextType = {
-    user: User[];
+    users: User[];
     selectedUserIndex: number;
     addUser: (name: string, color: string) => void;
     selectUser: (index: number) => void;
@@ -48,7 +48,7 @@ type UserContextType = {
 export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [user, serUser] = useState<User[]>([]);
+    const [users, serUser] = useState<User[]>([]);
     const [selectedUserIndex, setSelectedUserIndex] = useState(0);
     const [loading, setLoading] = useState(true);
 
@@ -74,8 +74,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // 変更時に保存
     useEffect(() => {
-        if (!loading) AsyncStorage.setItem('user', JSON.stringify(user));
-    }, [user, loading]);
+        if (!loading) AsyncStorage.setItem('user', JSON.stringify(users));
+    }, [users, loading]);
     useEffect(() => {
         if (!loading) AsyncStorage.setItem('selectedUserIndex', String(selectedUserIndex));
     }, [selectedUserIndex, loading]);
@@ -222,7 +222,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return (
         <UserContext.Provider
             value={{
-                user,
+                users,
                 selectedUserIndex,
                 addUser,
                 selectUser,

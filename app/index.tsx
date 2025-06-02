@@ -9,9 +9,9 @@ import { useUserSetting } from './context/UserSettingContext';
 // メインページのコンポーネント
 export default function MainPage() {
     const { isVisible, clockPosition } = useClockSetting();
-    const { user } = useUserContext();
+    const { users } = useUserContext();
     const { userCount } = useUserSetting();
-    const visibleUsers = user.slice(0, userCount);
+    const visibleUsers = users.slice(0, userCount);
 
     // 並び順を決定
     let columns: React.ReactNode[] = [];

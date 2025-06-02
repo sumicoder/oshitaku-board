@@ -11,22 +11,10 @@ interface UserTasksProps {
     userId: number;
 }
 
-function hexToRgba(hex: string, alpha: number): string {
-    // '#rgb' → '#rrggbb' に変換
-    let c = hex.replace('#', '');
-    if (c.length === 3) {
-        c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
-    }
-    const r = parseInt(c.substring(0, 2), 16);
-    const g = parseInt(c.substring(2, 4), 16);
-    const b = parseInt(c.substring(4, 6), 16);
-    return `rgba(${r},${g},${b},${alpha})`;
-}
-
-// 時計表示専用コンポーネント
 const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
-    const { user, toggleTaskDone } = useUserContext();
-    const currentUser = user && user.length > 0 ? user[userId] : { name: '', taskLists: [] };
+    const { users, toggleTaskDone } = useUserContext();
+    const currentUser = users && users.length > 0 ? users[userId] : { id: users.length.toString(), name: 'ユーザー', taskLists: [], color: '#007AFF' };
+
     const [selectedTab, setSelectedTab] = useState(0);
     const scrollRef = useRef<ScrollView>(null);
     // const [showDoneIdx, setShowDoneIdx] = useState<number | null>(null);
@@ -86,13 +74,13 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     return (
         <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
             {/* ユーザー名表示 */}
-            {currentUser && <Text style={styles.userName}>{currentUser.name}</Text>}
+            {currentUser && <Text style={[styles.userName, { color: currentUser.color }]}>{currentUser.name}</Text>}
             {/* タブUI */}
             <View style={styles.tabContainer}>
                 <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
                     {currentUser.taskLists.map((list, idx) => (
-                        <TouchableOpacity key={idx} style={[styles.tab, selectedTab === idx && styles.tabSelected]} onPress={() => setSelectedTab(idx)}>
-                            <Text style={selectedTab === idx ? styles.tabTextSelected : styles.tabText}>{list.name}</Text>
+                        <TouchableOpacity key={idx} style={[styles.tab, { borderBottomColor: selectedTab === idx ? currentUser.color : 'transparent' }]} onPress={() => setSelectedTab(idx)}>
+                            <Text style={[styles.tabText, { fontWeight: selectedTab === idx ? 'bold' : 'normal', color: selectedTab === idx ? currentUser.color : '#333' }]}>{list.name}</Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
@@ -141,6 +129,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                 //         return (
                                 //             <TaskItem
                                 //                 key={showDoneIdx}
+                                // currentUser={currentUser}
                                 //                 task={{ ...doneTask, done: true }}
                                 //                 style={{ width: itemMaxWidth, height: '75%', alignItems: 'center', justifyContent: 'center', borderWidth: TASK_CORD_BORDER }}
                                 //                 onPress={() => {}}
@@ -153,6 +142,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                 return userTasks.map((task, taskIdx) => (
                                     <TaskItem
                                         key={taskIdx}
+                                        currentUser={currentUser}
                                         task={task}
                                         style={{
                                             marginHorizontal: TASK_LIST_GAP_SPACE / 2,
@@ -184,6 +174,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
                                     .map((task, taskIdx) => (
                                         <TaskItem
                                             key={taskIdx}
+                                            currentUser={currentUser}
                                             task={task}
                                             style={{ maxWidth: itemMaxWidth, borderWidth: TASK_CORD_BORDER }}
                                             onPress={() => toggleTaskDone(userId, selectedTab, taskIdx)}
@@ -211,7 +202,6 @@ const styles = StyleSheet.create({
     userName: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#007AFF',
         backgroundColor: '#fff',
         borderRadius: 10,
         padding: 8,
@@ -236,16 +226,8 @@ const styles = StyleSheet.create({
         borderBottomColor: 'transparent',
         marginRight: 8,
     },
-    tabSelected: {
-        borderBottomColor: '#007AFF',
-    },
     tabText: {
         color: '#333',
-        fontWeight: 'bold',
-    },
-    tabTextSelected: {
-        color: '#007AFF',
-        fontWeight: 'bold',
     },
     // タスクUI
     taskContainer: {

@@ -9,11 +9,11 @@ const UserDetailScreen = () => {
     // expo-routerからuserIdを取得
     const { userId } = useLocalSearchParams();
     // Contextからユーザー情報・タスクリスト並び替え関数を取得
-    const { user, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask, editUser, deleteUser } = useUserContext();
+    const { users, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask, editUser, deleteUser } = useUserContext();
 
     // userIdはインデックスとして扱う
     const userIndex = Number(userId);
-    const currentUser = user[userIndex];
+    const currentUser = users[userIndex];
 
     // ユーザー名編集用の状態
     const [newEditUserName, setNewEditUserName] = useState(currentUser.name);

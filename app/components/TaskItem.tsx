@@ -1,20 +1,22 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { Task } from '../context/UserContext';
+import { Task, User } from '../context/UserContext';
+import { hexToRgba } from '../utils/hexToRgba';
 
 interface TaskItemProps {
     task: Task;
+    currentUser: User;
     style: ViewStyle;
     onPress: () => void;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, style, onPress }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ task, currentUser, style, onPress }) => {
     return (
         <TouchableOpacity onPress={onPress} style={[styles.taskItem, style]}>
             <Text style={styles.taskIcon}>{task.image}</Text>
             <Text style={styles.taskTitle}>{task.title}</Text>
             {task.done && (
-                <View style={styles.overlay}>
+                <View style={[styles.overlay, { backgroundColor: hexToRgba(currentUser.color, 0.7) }]}>
                     <Text style={styles.overlayText}>できた！</Text>
                 </View>
             )}
@@ -47,7 +49,6 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,200,0,0.7)',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10,

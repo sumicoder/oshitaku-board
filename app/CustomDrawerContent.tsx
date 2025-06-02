@@ -10,7 +10,7 @@ import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
 export default function CustomDrawerContent() {
     const router = useRouter();
-    const { user, addUser, selectedUserIndex, selectUser } = useUserContext();
+    const { users, addUser, selectedUserIndex, selectUser } = useUserContext();
     const [modalVisible, setModalVisible] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [selectedColor, setSelectedColor] = useState(colorList[0]);
@@ -22,11 +22,11 @@ export default function CustomDrawerContent() {
             </TouchableOpacity>
             {/* ユーザー一覧 */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
-            {user.map((user, idx) => (
+            {users.map((user, idx) => (
                 <View key={user.name + idx} style={styles.userContainer}>
-                    <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{user.name}</Text>
+                    <Text style={[styles.userName]}>{user.name}</Text>
                     <TouchableOpacity
-                        style={styles.button}
+                        style={[styles.button, { backgroundColor: user.color }]}
                         onPress={() => {
                             selectUser(idx);
                             router.push(`/user/${idx}`);
@@ -127,14 +127,15 @@ const styles = StyleSheet.create({
         color: '#222',
     },
     userContainer: {
-        margin: 16,
+        marginHorizontal: 16,
+        marginVertical: 12,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
     button: {
-        backgroundColor: '#007AFF',
-        padding: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
         borderRadius: 8,
     },
     buttonText: {
