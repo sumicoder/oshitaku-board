@@ -6,7 +6,6 @@ import { initialTaskLists } from '../data/taskInitialData';
 export type Task = {
     title: string;
     image: string;
-    color: string;
     done?: boolean;
 };
 
@@ -22,12 +21,18 @@ export type User = {
     id: string;
     name: string;
     taskLists: TaskList[];
+    color: string;
 };
+
+// 色リスト
+export const colorList = ['#FFD700', '#00BFFF', '#FF69B4', '#90EE90', '#FFA500', '#FF6347', '#8A2BE2', '#00CED1', '#FFB6C1', '#A9A9A9'];
+// アイコンリスト
+export const iconList = ['🌞', '🦷', '🧼', '👕', '🍚', '🧑‍🎓', '🎒', '🚪', '🏠', '🛁', '🛏️', '📚', '🎨', '🎮', '🍽️', '🦁', '🐻', '🐼', '🐰', '🐶', '🐱'];
 
 type UserContextType = {
     user: User[];
     selectedUserIndex: number;
-    addUser: (name: string) => void;
+    addUser: (name: string, color: string) => void;
     selectUser: (index: number) => void;
     addTaskList: (userIdx: number, listName: string) => void;
     addTask: (userIdx: number, listIdx: number, task: Task) => void;
@@ -36,6 +41,8 @@ type UserContextType = {
     editTask: (userIdx: number, listIdx: number, taskIdx: number, newTask: Task) => void;
     deleteTask: (userIdx: number, listIdx: number, taskIdx: number) => void;
     toggleTaskDone: (userIdx: number, listIdx: number, taskIdx: number) => void;
+    editUser: (userIdx: number, newName: string, newColor: string) => void;
+    deleteUser: (userIdx: number) => void;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -54,8 +61,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 serUser(JSON.parse(usersData));
             } else {
                 serUser([
-                    { id: '1', name: 'ユーザー1', taskLists: initialTaskLists },
-                    { id: '2', name: 'ユーザー2', taskLists: initialTaskLists },
+                    { id: '1', name: 'ユーザー1', taskLists: initialTaskLists, color: '#FFD700' },
+                    { id: '2', name: 'ユーザー2', taskLists: initialTaskLists, color: '#00BFFF' },
                 ]);
             }
             if (selectedUserIndexData) {
@@ -73,8 +80,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         if (!loading) AsyncStorage.setItem('selectedUserIndex', String(selectedUserIndex));
     }, [selectedUserIndex, loading]);
 
-    const addUser = (name: string) => {
-        serUser((prev) => [...prev, { id: String(user.length + 1), name, taskLists: initialTaskLists }]);
+    const addUser = (name: string, color: string) => {
+        serUser((prev) => [...prev, { id: String(prev.length + 1), name, taskLists: initialTaskLists, color }]);
     };
     const selectUser = (index: number) => {
         setSelectedUserIndex(index);
@@ -195,6 +202,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         );
     };
 
+    // ユーザー名・色編集
+    const editUser = (userIdx: number, newName: string, newColor: string) => {
+        serUser((prev) => prev.map((u, idx) => (idx === userIdx ? { ...u, name: newName, color: newColor } : u)));
+    };
+
+    // ユーザー削除
+    const deleteUser = (userIdx: number) => {
+        serUser((prev) => prev.filter((_, idx) => idx !== userIdx));
+        setSelectedUserIndex((prevIdx) => {
+            if (prevIdx === userIdx) return 0;
+            if (prevIdx > userIdx) return prevIdx - 1;
+            return prevIdx;
+        });
+    };
+
     if (loading) return null; // ローディングUI推奨
 
     return (
@@ -211,6 +233,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 editTask,
                 deleteTask,
                 toggleTaskDone,
+                editUser,
+                deleteUser,
             }}
         >
             {children}

@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useUserContext } from './context/UserContext';
+import { colorList, useUserContext } from './context/UserContext';
 import ClockSettingAccordion from './settings/ClockSettingAccordion';
 import ProgressBarSettingAccordion from './settings/ProgressBarSettingAccordion';
 import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion';
@@ -13,7 +13,7 @@ export default function CustomDrawerContent() {
     const { user, addUser, selectedUserIndex, selectUser } = useUserContext();
     const [modalVisible, setModalVisible] = useState(false);
     const [newUserName, setNewUserName] = useState('');
-
+    const [selectedColor, setSelectedColor] = useState(colorList[0]);
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {/* メンバー追加ボタン */}
@@ -42,12 +42,22 @@ export default function CustomDrawerContent() {
                     <ScrollView contentContainerStyle={styles.modalContent}>
                         <Text style={{ fontWeight: 'bold', fontSize: 16 }}>メンバー名を入力</Text>
                         <TextInput style={styles.input} placeholder="名前" value={newUserName} onChangeText={setNewUserName} />
+                        <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 12 }}>色を選択</Text>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                            {colorList.map((color) => (
+                                <TouchableOpacity
+                                    key={color}
+                                    style={[styles.colorButton, { backgroundColor: color }, selectedColor === color && styles.colorButtonSelected]}
+                                    onPress={() => setSelectedColor(color)}
+                                />
+                            ))}
+                        </View>
                         <View style={{ flexDirection: 'row', marginTop: 12 }}>
                             <TouchableOpacity
                                 style={styles.modalBtn}
                                 onPress={() => {
                                     if (newUserName.trim()) {
-                                        addUser(newUserName.trim());
+                                        addUser(newUserName.trim(), selectedColor);
                                         setNewUserName('');
                                         setModalVisible(false);
                                     }
@@ -144,6 +154,18 @@ const styles = StyleSheet.create({
         width: 200,
         marginTop: 12,
         fontSize: 16,
+    },
+    colorButton: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        marginRight: 8,
+        borderWidth: 2,
+        borderColor: '#ccc',
+    },
+    colorButtonSelected: {
+        borderColor: '#007AFF',
+        borderWidth: 3,
     },
     modalBtn: {
         backgroundColor: '#007AFF',
