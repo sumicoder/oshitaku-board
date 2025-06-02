@@ -17,6 +17,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
 
     const [selectedTab, setSelectedTab] = useState(0);
     const scrollRef = useRef<ScrollView>(null);
+    const [progressBarWidth, setProgressBarWidth] = useState(0);
     // const [showDoneIdx, setShowDoneIdx] = useState<number | null>(null);
     // const timerRef = useRef<number | null>(null);
     // const doneShowTime = 2000;
@@ -28,6 +29,9 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
 
     // ユーザーのタスクを取得
     const tasks = currentUser.taskLists[selectedTab]?.tasks;
+    const total = tasks?.length || 0;
+    const done = tasks?.filter((t) => t.done).length || 0;
+    const percent = total > 0 ? done / total : 0;
 
     // 時計の幅を取得
     const clockSizePx = getClockSizePx(clockSize, height);
@@ -74,7 +78,12 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     return (
         <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
             {/* ユーザー名表示 */}
-            {currentUser && <Text style={[styles.userName, { color: currentUser.color }]}>{currentUser.name}</Text>}
+            {currentUser && (
+                <View style={styles.userName} onLayout={e => setProgressBarWidth(e.nativeEvent.layout.width)}>
+                    <Text style={[styles.userNameText, { color: currentUser.color }]}>{currentUser.name}</Text>
+                    <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: currentUser.color, zIndex: -1, transform: [{ translateX: (-1 + percent) * progressBarWidth }] }} />
+                </View>
+            )}
             {/* タブUI */}
             <View style={styles.tabContainer}>
                 <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
@@ -200,15 +209,22 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     userName: {
-        fontSize: 24,
-        fontWeight: 'bold',
         backgroundColor: '#fff',
         borderRadius: 10,
         padding: 8,
-        textAlign: 'center',
         minHeight: 52,
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
+    },
+    userNameText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        backgroundColor: '#fff',
+        paddingHorizontal: 16,
+        borderRadius: 8,
     },
     // タブUI
     tabContainer: {

@@ -27,7 +27,7 @@ export default function TaskDisplaySettingAccordion() {
                 </View>
             </View>
             <View style={SettingStyles.row}>
-                <Text style={SettingStyles.label}>完了タスクを表示</Text>
+                <Text style={SettingStyles.label}>完了タスク<br />を表示</Text>
                 <SwitchButton value={showCompleted} onValueChange={setShowCompleted} disabled={displayMode === 'single'} />
             </View>
         </SettingAccordion>
