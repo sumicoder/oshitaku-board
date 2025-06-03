@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useProgressBarSetting } from '../context/ProgressBarSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
@@ -10,9 +10,11 @@ import TaskItem from './TaskItem';
 
 interface UserTasksProps {
     userId: number;
+    windowHeight: number;
+    windowWidth: number;
 }
 
-const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
+const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth }) => {
     const { users, toggleTaskDone } = useUserContext();
     const currentUser = users && users.length > 0 ? users[userId] : { id: users.length.toString(), name: 'ユーザー', taskLists: [], color: '#007AFF' };
 
@@ -23,7 +25,6 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const timerRef = useRef<number | null>(null);
     const doneShowTime = 2000;
 
-    const { height, width } = useWindowDimensions();
     const { isVisible, clockSize, clockPosition } = useClockSetting();
     const { userCount } = useUserCountSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
@@ -36,14 +37,14 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const percent = total > 0 ? done / total : 0;
 
     // 時計の幅を取得
-    const clockSizePx = getClockSizePx(clockSize, height);
+    const clockSizePx = getClockSizePx(clockSize, windowHeight);
     const clockColumnSize = isVisible && userCount !== 3 ? clockSizePx : 0;
 
     // 定数定義
     const MAGIC_MIN_WIDTH = 100; // ユーザー数2、時計非表示の場合の`minWidth` => index.tsxにある
     const MAGIC_HEIGHT = 260; // マジックナンバー[ヘッダー、ユーザー名、タブなどの`margin`や`padding`や`gap`など適当な値]
     // タスクのカラム数
-    const CONTAINER_WIDTH = (width - clockColumnSize) / userCount;
+    const CONTAINER_WIDTH = (windowWidth - clockColumnSize) / userCount;
     const TASK_COLUMN = displayMode === 'single' ? 1 : CONTAINER_WIDTH > 1080 ? 3 : CONTAINER_WIDTH > 600 ? 2 : 1;
     // コンテナのpadding
     const CONTAINER_PADDING = 24;
@@ -52,7 +53,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     const TASK_LIST_GAP = 16;
     const TASK_LIST_GAP_SPACE = TASK_LIST_GAP * TASK_COLUMN;
     // タスクの高さ
-    const TASK_HEIGHT = height - MAGIC_HEIGHT;
+    const TASK_HEIGHT = windowHeight - MAGIC_HEIGHT;
     // タスクの枠線の幅
     const TASK_CORD_BORDER = 1;
     const TASK_BORDER_WIDTH = TASK_CORD_BORDER * 2;
@@ -62,12 +63,12 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId }) => {
     let itemMaxWidth: number;
     if (userCount === 2 && !isVisible) {
         // ユーザー表示2、時計非表示の場合のみ中央に余白あり
-        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize - MAGIC_MIN_WIDTH) / userCount;
+        itemMaxWidth = (windowWidth - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize - MAGIC_MIN_WIDTH) / userCount;
     } else if (displayMode === 'single') {
         // タスク単一表示
-        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
+        itemMaxWidth = (windowWidth - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / userCount;
     } else {
-        itemMaxWidth = (width - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / TASK_COLUMN;
+        itemMaxWidth = (windowWidth - TASK_COLUMN_SPACE - TASK_BORDER_SPACE - TASK_LIST_GAP_SPACE - clockColumnSize) / TASK_COLUMN;
     }
 
     // スクロール位置を左端に戻す

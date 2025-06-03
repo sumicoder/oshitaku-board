@@ -1,22 +1,25 @@
 import React from 'react';
-import { useWindowDimensions, View, ViewStyle } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useUserCountSetting } from '../context/UserCountSettingContext';
 import { getClockSizePx } from '../utils/clockSize';
 import Clock from './Clock';
 import DigitalClock from './DigitalClock';
 
+interface ClockAreaProps {
+    windowHeight: number;
+}
+
 // 時計表示専用コンポーネント
-const ClockArea: React.FC = () => {
+const ClockArea: React.FC<ClockAreaProps> = ({ windowHeight }) => {
     // 時計設定（グローバル）
     const { clockType, clockSize } = useClockSetting();
-    const { height } = useWindowDimensions();
     const { userCount } = useUserCountSetting();
 
     if (userCount === 3) return null;
 
     // サイズ計算
-    const clockSizePx = getClockSizePx(clockSize, height);
+    const clockSizePx = getClockSizePx(clockSize, windowHeight);
     if (!clockSizePx) return null;
     const clockPadding = 20;
     const clockAdjustedSize = clockSizePx - clockPadding * 2;

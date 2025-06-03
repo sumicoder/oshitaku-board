@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import ClockArea from './components/ClockArea';
 import UserTasks from './components/UserTasks';
 import { useClockSetting } from './context/ClockSettingContext';
@@ -8,6 +8,7 @@ import { useUserCountSetting } from './context/UserCountSettingContext';
 
 // メインページのコンポーネント
 export default function MainPage() {
+    const { height: windowHeight, width: windowWidth } = useWindowDimensions();
     const { isVisible, clockPosition } = useClockSetting();
     const { users } = useUserContext();
     const { userCount } = useUserCountSetting();
@@ -19,20 +20,20 @@ export default function MainPage() {
         if (clockPosition === 'left') {
             columns = [
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea />}
+                    {isVisible && <ClockArea windowHeight={windowHeight} />}
                 </View>,
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} />
+                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
         } else {
             // 'right'
             columns = [
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} />
+                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea />}
+                    {isVisible && <ClockArea windowHeight={windowHeight} />}
                 </View>,
             ];
         }
@@ -40,51 +41,51 @@ export default function MainPage() {
         if (clockPosition === 'left') {
             columns = [
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea />}
+                    {isVisible && <ClockArea windowHeight={windowHeight} />}
                 </View>,
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} />
+                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.col} key="user1">
-                    <UserTasks userId={1} />
+                    <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
         } else if (clockPosition === 'center') {
             columns = [
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} />
+                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={[styles.clockCol, { minWidth: 100 }]} key="clock">
-                    {isVisible ? <ClockArea /> : <View style={styles.colBorder} />}
+                    {isVisible ? <ClockArea windowHeight={windowHeight} /> : <View style={styles.colBorder} />}
                 </View>,
                 <View style={styles.col} key="user1">
-                    <UserTasks userId={1} />
+                    <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
         } else {
             // 'right'
             columns = [
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} />
+                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.col} key="user1">
-                    <UserTasks userId={1} />
+                    <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea />}
+                    {isVisible && <ClockArea windowHeight={windowHeight} />}
                 </View>,
             ];
         }
     } else if (visibleUsers.length === 3) {
         columns = [
             <View style={styles.col} key="user0">
-                <UserTasks userId={0} />
+                <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
             </View>,
             <View style={styles.col} key="user1">
-                <UserTasks userId={1} />
+                <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
             </View>,
             <View style={styles.col} key="user2">
-                <UserTasks userId={2} />
+                <UserTasks userId={2} windowHeight={windowHeight} windowWidth={windowWidth} />
             </View>,
         ];
     }
