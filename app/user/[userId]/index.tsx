@@ -105,7 +105,7 @@ const UserDetailScreen = () => {
             Alert.alert('タスク名を入力してください');
             return;
         }
-        editTask(userIndex, editTaskInfo.listIdx, editTaskInfo.taskIdx, {
+        editTask(userIndex, editTaskInfo.listIdx, editTaskInfo.task.id, {
             id: editTaskInfo.task.id,
             title: newTaskName.trim(),
             image: selectedImage,
@@ -115,7 +115,7 @@ const UserDetailScreen = () => {
         setEditTaskInfo(null);
     };
     // タスク削除
-    const handleDeleteTask = (listIdx: number, taskIdx: number) => {
+    const handleDeleteTask = (listIdx: number, taskIdx: string) => {
         Alert.alert('確認', 'このタスクを削除しますか？', [
             { text: 'キャンセル', style: 'cancel' },
             { text: '削除', style: 'destructive', onPress: () => deleteTask(userIndex, listIdx, taskIdx) },
@@ -212,7 +212,7 @@ const UserDetailScreen = () => {
                                     <TouchableOpacity onPress={() => handleOpenEditTaskModal(selectedTab, taskIdx, task)} style={{ marginRight: 4 }}>
                                         <Ionicons name="pencil" size={24} color={'#333'} />
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => handleDeleteTask(selectedTab, taskIdx)}>
+                                    <TouchableOpacity onPress={() => handleDeleteTask(selectedTab, task.id)}>
                                         <Ionicons name="trash" size={24} color="#f44" />
                                     </TouchableOpacity>
                                 </View>
