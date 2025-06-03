@@ -13,11 +13,7 @@ export default function ProgressBarSettingAccordion() {
         <SettingAccordion title="進行度バーの設定">
             {/* 表示/非表示トグル */}
             <View style={SettingStyles.row}>
-                <Text style={SettingStyles.label}>
-                    進行度を
-                    <br />
-                    表示
-                </Text>
+                <Text style={SettingStyles.label}>進行度を表示</Text>
                 <Switch value={isProgressBarVisible} onValueChange={setIsProgressBarVisible} />
             </View>
         </SettingAccordion>

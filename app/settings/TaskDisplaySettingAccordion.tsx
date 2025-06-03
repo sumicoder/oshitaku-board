@@ -4,13 +4,11 @@ import RadioButton from '../components/RadioButton';
 import SettingAccordion from '../components/SettingAccordion';
 import SwitchButton from '../components/SwitchButton';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
-import { useUserCountSetting } from '../context/UserCountSettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // タスク表示の設定アコーディオン
 export default function TaskDisplaySettingAccordion() {
     const { displayMode, setDisplayMode, showCompleted, setShowCompleted } = useTaskDisplaySetting();
-    const { userCount } = useUserCountSetting();
 
     // displayModeが変わったときに自動補正
     useEffect(() => {
@@ -27,7 +25,7 @@ export default function TaskDisplaySettingAccordion() {
                 </View>
             </View>
             <View style={SettingStyles.row}>
-                <Text style={SettingStyles.label}>完了タスク<br />を表示</Text>
+                <Text style={SettingStyles.label}>完了タスクを表示</Text>
                 <SwitchButton value={showCompleted} onValueChange={setShowCompleted} disabled={displayMode === 'single'} />
             </View>
         </SettingAccordion>
