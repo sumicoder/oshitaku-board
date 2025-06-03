@@ -12,3 +12,5 @@ export function getClockSizePx(clockSize: ClockSize, height: number): number {
             return 200;
     }
 }
+
+export default getClockSizePx;

@@ -9,3 +9,5 @@ export function hexToRgba(hex: string, alpha: number): string {
     const b = parseInt(c.substring(4, 6), 16);
     return `rgba(${r},${g},${b},${alpha})`;
 }
+
+export default hexToRgba;
