@@ -9,16 +9,16 @@ import { getClockSizePx } from '../utils/clockSize';
 import TaskItem from './TaskItem';
 
 interface UserTasksProps {
-    userId: number;
+    userId: string;
     windowHeight: number;
     windowWidth: number;
 }
 
 const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth }) => {
     const { users, toggleTaskDone } = useUserContext();
-    const currentUser = users && users.length > 0 ? users[userId] : { id: users.length.toString(), name: 'ユーザー', taskLists: [], color: '#007AFF' };
+    const currentUser = users.find((user) => user.id === userId) || { id: Math.random().toString(36).substring(2, 15), name: 'ユーザー', taskLists: [], color: '#007AFF' };
 
-    const [selectedTab, setSelectedTab] = useState(0);
+    const [selectedTab, setSelectedTab] = useState<string | null>(null);
     const scrollRef = useRef<ScrollView>(null);
     const [progressBarWidth, setProgressBarWidth] = useState(0);
     const [showDoneIdx, setShowDoneIdx] = useState<string | null>(null);
@@ -31,7 +31,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const { isProgressBarVisible } = useProgressBarSetting();
 
     // ユーザーのタスクを取得
-    const tasks = currentUser.taskLists[selectedTab]?.tasks;
+    const tasks = currentUser.taskLists.find((list) => list.id === selectedTab)?.tasks;
     const total = tasks?.length || 0;
     const done = tasks?.filter((t) => t.done).length || 0;
     const percent = total > 0 ? done / total : 0;
@@ -92,9 +92,13 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
             {/* タブUI */}
             <View style={styles.tabContainer}>
                 <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
-                    {currentUser.taskLists.map((list, idx) => (
-                        <TouchableOpacity key={idx} style={[styles.tab, { borderBottomColor: selectedTab === idx ? currentUser.color : 'transparent' }]} onPress={() => setSelectedTab(idx)}>
-                            <Text style={[styles.tabText, { fontWeight: selectedTab === idx ? 'bold' : 'normal', color: selectedTab === idx ? currentUser.color : '#333' }]}>{list.name}</Text>
+                    {currentUser.taskLists.map((list) => (
+                        <TouchableOpacity
+                            key={list.id}
+                            style={[styles.tab, { borderBottomColor: selectedTab === list.id ? currentUser.color : 'transparent' }]}
+                            onPress={() => setSelectedTab(list.id)}
+                        >
+                            <Text style={[styles.tabText, { fontWeight: selectedTab === list.id ? 'bold' : 'normal', color: selectedTab === list.id ? currentUser.color : '#333' }]}>{list.name}</Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
@@ -105,7 +109,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                 <Text style={styles.noTask}>タスクなし</Text>
             ) : (
                 <View style={styles.taskContainer}>
-                    {tasks.length === 0 ? (
+                    {tasks?.length === 0 ? (
                         <Text style={styles.noTask}>タスクなし</Text>
                     ) : displayMode === 'single' ? (
                         // 単一表示: 横並び・スナップ
@@ -122,12 +126,12 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                                     paddingBlockEnd: 0,
                                     flexDirection: 'row',
                                     height: '100%',
-                                    width: (itemMaxWidth + TASK_LIST_GAP_SPACE) * (tasks.length || 1),
+                                    width: (itemMaxWidth + TASK_LIST_GAP_SPACE) * (tasks?.length || 1),
                                 },
                             ]}
                         >
                             {(() => {
-                                return tasks.map((task) => (
+                                return tasks?.map((task) => (
                                     <TaskItem
                                         key={task.id}
                                         currentUser={currentUser}
@@ -141,7 +145,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                                             borderWidth: TASK_CORD_BORDER,
                                             borderRadius: 0,
                                         }}
-                                        onPress={() => toggleTaskDone(userId, selectedTab, task.id)}
+                                        onPress={() => toggleTaskDone(userId, selectedTab || '', task.id)}
                                     />
                                 ));
                             })()}
@@ -149,8 +153,8 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                     ) : (
                         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.taskScroll, { gap: TASK_LIST_GAP }]}>
                             {(() => {
-                                const undoneTasks = tasks.filter((task) => !task.done);
-                                if (undoneTasks.length === 0 && !showCompleted) {
+                                const undoneTasks = tasks?.filter((task) => !task.done);
+                                if (undoneTasks && undoneTasks.length === 0 && !showCompleted) {
                                     return (
                                         <View style={{ width: containerWidth, alignItems: 'center', justifyContent: 'center', paddingBlockStart: 32 }}>
                                             <Text style={{ fontSize: 28, color: '#22a', fontWeight: 'bold' }}>ぜんぶできたね！</Text>
@@ -161,7 +165,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                             {(() => {
                                 // 直前に"できた"にしたタスクがあればそれを3秒間表示
                                 if (showDoneIdx !== null) {
-                                    const doneTask = tasks.find((task) => task.id === showDoneIdx);
+                                    const doneTask = tasks?.find((task) => task.id === showDoneIdx);
                                     if (doneTask) {
                                         return (
                                             <TaskItem
@@ -178,7 +182,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                             {
                                 // 一覧表示
                                 tasks
-                                    .filter((task) => showCompleted || !task.done)
+                                    ?.filter((task) => showCompleted || !task.done)
                                     .map((task) => (
                                         <TaskItem
                                             key={task.id}
@@ -189,7 +193,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                                                 if (!showCompleted) {
                                                     setShowDoneIdx(task.id);
                                                 }
-                                                toggleTaskDone(userId, selectedTab, task.id);
+                                                toggleTaskDone(userId, selectedTab || '', task.id);
                                                 if (timerRef.current) {
                                                     clearTimeout(timerRef.current);
                                                 }

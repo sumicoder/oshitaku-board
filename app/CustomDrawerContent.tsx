@@ -28,8 +28,10 @@ export default function CustomDrawerContent() {
                     <TouchableOpacity
                         style={[styles.button, { backgroundColor: user.color }]}
                         onPress={() => {
-                            selectUser(idx);
-                            router.push(`/user/${idx}`);
+                            // ユーザー選択時にユーザーIDを文字列として渡す
+                            selectUser(user.id);
+                            // ユーザー詳細ページへのリンクをユーザーIDを含めて作成
+                            router.push(`/user/${user.id}`);
                         }}
                     >
                         <Text style={styles.buttonText}>編集</Text>

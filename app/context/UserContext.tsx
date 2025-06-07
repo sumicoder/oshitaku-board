@@ -32,42 +32,44 @@ export const iconList = ['🌞', '🦷', '🧼', '👕', '🍚', '🧑‍🎓', 
 
 type UserContextType = {
     users: User[];
-    selectedUserIndex: number;
+    selectedUserId: string | null;
     addUser: (name: string, color: string) => void;
-    selectUser: (index: number) => void;
-    addTaskList: (userIdx: number, listName: string) => void;
-    addTask: (userIdx: number, listIdx: number, task: Task) => void;
-    editTaskListName: (userIdx: number, listIdx: number, newName: string) => void;
-    deleteTaskList: (userIdx: number, listIdx: number) => void;
-    editTask: (userIdx: number, listIdx: number, taskIdx: string, newTask: Task) => void;
-    deleteTask: (userIdx: number, listIdx: number, taskIdx: string) => void;
-    toggleTaskDone: (userIdx: number, listIdx: number, taskIdx: string) => void;
-    editUser: (userIdx: number, newName: string, newColor: string) => void;
-    deleteUser: (userIdx: number) => void;
+    selectUser: (userId: string) => void;
+    addTaskList: (userId: string, listName: string) => void;
+    addTask: (userId: string, listId: string, task: Task) => void;
+    editTaskListName: (userId: string, listId: string, newName: string) => void;
+    deleteTaskList: (userId: string, listId: string) => void;
+    editTask: (userId: string, listId: string, taskId: string, newTask: Task) => void;
+    deleteTask: (userId: string, listId: string, taskId: string) => void;
+    toggleTaskDone: (userId: string, listId: string, taskId: string) => void;
+    editUser: (userId: string, newName: string, newColor: string) => void;
+    deleteUser: (userId: string) => void;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [users, serUser] = useState<User[]>([]);
-    const [selectedUserIndex, setSelectedUserIndex] = useState(0);
+    const [users, setUsers] = useState<User[]>([]);
+    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     // 初回マウント時にストレージから復元
     useEffect(() => {
         (async () => {
             const usersData = await AsyncStorage.getItem('users');
-            const selectedUserIndexData = await AsyncStorage.getItem('selectedUserIndex');
+            const selectedUserIdData = await AsyncStorage.getItem('selectedUserId');
             if (usersData) {
-                serUser(JSON.parse(usersData));
+                setUsers(JSON.parse(usersData));
             } else {
-                serUser([
+                setUsers([
                     { id: '0', name: 'ユーザー1', taskLists: initialTaskLists, color: '#FFD700' },
                     { id: '1', name: 'ユーザー2', taskLists: initialTaskLists, color: '#00BFFF' },
                 ]);
             }
-            if (selectedUserIndexData) {
-                setSelectedUserIndex(Number(selectedUserIndexData));
+            if (selectedUserIdData) {
+                setSelectedUserId(selectedUserIdData);
+            } else {
+                setSelectedUserId('0'); // デフォルトで最初のユーザー
             }
             setLoading(false);
         })();
@@ -78,143 +80,134 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         if (!loading) AsyncStorage.setItem('users', JSON.stringify(users));
     }, [users, loading]);
     useEffect(() => {
-        if (!loading) AsyncStorage.setItem('selectedUserIndex', String(selectedUserIndex));
-    }, [selectedUserIndex, loading]);
+        if (!loading && selectedUserId !== null) AsyncStorage.setItem('selectedUserId', String(selectedUserId));
+    }, [selectedUserId, loading]);
 
+    // ユーザー追加
     const addUser = (name: string, color: string) => {
-        serUser((prev) => [...prev, { id: String(prev.length + 1), name, taskLists: initialTaskLists, color }]);
+        setUsers((prev) => {
+            // idは一意なランダム値
+            const newId = Math.random().toString(36).substring(2, 15);
+            return [...prev, { id: newId, name, taskLists: initialTaskLists, color }];
+        });
     };
-    const selectUser = (index: number) => {
-        setSelectedUserIndex(index);
+    // ユーザー選択
+    const selectUser = (userId: string) => {
+        setSelectedUserId(userId);
     };
 
     // タスクリスト追加
-    const addTaskList = (userIdx: number, listName: string) => {
-        serUser((prev) => {
-            const next = prev.map((m, idx) =>
-                idx === userIdx && m.taskLists.length < 3 ? { ...m, taskLists: [...m.taskLists, { id: String(m.taskLists.length + 1), name: listName, tasks: [] }] } : m
-            );
-            return next;
-        });
+    const addTaskList = (userId: string, listName: string) => {
+        setUsers((prev) => prev.map((u) =>
+            u.id === userId && u.taskLists.length < 3
+                ? { ...u, taskLists: [...u.taskLists, { id: Math.random().toString(36).substring(2, 15), name: listName, tasks: [] }] }
+                : u
+        ));
     };
 
     // タスク追加
-    const addTask = (userIdx: number, listIdx: number, task: Task) => {
-        serUser((prev) => {
-            const next = prev.map((m, idx) =>
-                idx === userIdx
-                    ? {
-                          ...m,
-                          taskLists: m.taskLists.map((l, lidx) => (lidx === listIdx ? { ...l, tasks: [...l.tasks, { ...task, id: Math.random().toString(36).substring(2, 15) }] } : l)),
-                      }
-                    : m
-            );
-            return next;
-        });
+    const addTask = (userId: string, listId: string, task: Task) => {
+        setUsers((prev) => prev.map((u) =>
+            u.id === userId
+                ? {
+                    ...u,
+                    taskLists: u.taskLists.map((l) =>
+                        l.id === listId
+                            ? { ...l, tasks: [...l.tasks, { ...task, id: Math.random().toString(36).substring(2, 15) }] }
+                            : l
+                    ),
+                }
+                : u
+        ));
     };
 
     // タスクリスト名編集
-    const editTaskListName = (userIdx: number, listIdx: number, newName: string) => {
-        serUser((prev) =>
-            prev.map((m, idx) =>
-                idx === userIdx
-                    ? {
-                          ...m,
-                          taskLists: m.taskLists.map((l, lidx) => (lidx === listIdx ? { ...l, name: newName } : l)),
-                      }
-                    : m
-            )
-        );
+    const editTaskListName = (userId: string, listId: string, newName: string) => {
+        setUsers((prev) => prev.map((u) =>
+            u.id === userId
+                ? {
+                    ...u,
+                    taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, name: newName } : l)),
+                }
+                : u
+        ));
     };
 
     // タスクリスト削除
-    const deleteTaskList = (userIdx: number, listIdx: number) => {
-        serUser((prev) =>
-            prev.map((m, idx) =>
-                idx === userIdx
-                    ? {
-                          ...m,
-                          taskLists: m.taskLists.filter((_, lidx) => lidx !== listIdx),
-                      }
-                    : m
-            )
-        );
+    const deleteTaskList = (userId: string, listId: string) => {
+        setUsers((prev) => prev.map((u) =>
+            u.id === userId
+                ? {
+                    ...u,
+                    taskLists: u.taskLists.filter((l) => l.id !== listId),
+                }
+                : u
+        ));
     };
 
     // タスク編集
-    const editTask = (userIdx: number, listIdx: number, taskIdx: string, newTask: Task) => {
-        serUser((prev) =>
-            prev.map((m, idx) =>
-                idx === userIdx
-                    ? {
-                          ...m,
-                          taskLists: m.taskLists.map((l, lidx) =>
-                              lidx === listIdx
-                                  ? {
-                                        ...l,
-                                        tasks: l.tasks.map((t) => (t.id === taskIdx ? { ...t, ...newTask } : t)),
-                                    }
-                                  : l
-                          ),
-                      }
-                    : m
-            )
-        );
+    const editTask = (userId: string, listId: string, taskId: string, newTask: Task) => {
+        setUsers((prev) => prev.map((u) =>
+            u.id === userId
+                ? {
+                    ...u,
+                    taskLists: u.taskLists.map((l) =>
+                        l.id === listId
+                            ? { ...l, tasks: l.tasks.map((t) => (t.id === taskId ? { ...t, ...newTask } : t)) }
+                            : l
+                    ),
+                }
+                : u
+        ));
     };
 
     // タスク削除
-    const deleteTask = (userIdx: number, listIdx: number, taskIdx: string) => {
-        serUser((prev) =>
-            prev.map((m, idx) =>
-                idx === userIdx
-                    ? {
-                          ...m,
-                          taskLists: m.taskLists.map((l, lidx) =>
-                              lidx === listIdx
-                                  ? {
-                                        ...l,
-                                        tasks: l.tasks.filter((t) => t.id !== taskIdx),
-                                    }
-                                  : l
-                          ),
-                      }
-                    : m
-            )
-        );
+    const deleteTask = (userId: string, listId: string, taskId: string) => {
+        setUsers((prev) => prev.map((u) =>
+            u.id === userId
+                ? {
+                    ...u,
+                    taskLists: u.taskLists.map((l) =>
+                        l.id === listId
+                            ? { ...l, tasks: l.tasks.filter((t) => t.id !== taskId) }
+                            : l
+                    ),
+                }
+                : u
+        ));
     };
 
-    const toggleTaskDone = (userIdx: number, listIdx: number, taskIdx: string) => {
-        serUser((prev) =>
-            prev.map((m, idx) =>
-                idx === userIdx
-                    ? {
-                          ...m,
-                          taskLists: m.taskLists.map((l, lidx) =>
-                              lidx === listIdx
-                                  ? {
-                                        ...l,
-                                        tasks: l.tasks.map((t) => (t.id === taskIdx ? { ...t, done: !t.done } : t)),
-                                    }
-                                  : l
-                          ),
-                      }
-                    : m
-            )
-        );
+    // タスク完了トグル
+    const toggleTaskDone = (userId: string, listId: string, taskId: string) => {
+        setUsers((prev) => prev.map((u) =>
+            u.id === userId
+                ? {
+                    ...u,
+                    taskLists: u.taskLists.map((l) =>
+                        l.id === listId
+                            ? { ...l, tasks: l.tasks.map((t) => (t.id === taskId ? { ...t, done: !t.done } : t)) }
+                            : l
+                    ),
+                }
+                : u
+        ));
     };
 
     // ユーザー名・色編集
-    const editUser = (userIdx: number, newName: string, newColor: string) => {
-        serUser((prev) => prev.map((u, idx) => (idx === userIdx ? { ...u, name: newName, color: newColor } : u)));
+    const editUser = (userId: string, newName: string, newColor: string) => {
+        setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, name: newName, color: newColor } : u)));
     };
 
     // ユーザー削除
-    const deleteUser = (userIdx: number) => {
-        serUser((prev) => prev.filter((_, idx) => idx !== userIdx));
-        setSelectedUserIndex((prevIdx) => {
-            if (prevIdx === userIdx) return 0;
-            if (prevIdx > userIdx) return prevIdx - 1;
-            return prevIdx;
+    const deleteUser = (userId: string) => {
+        setUsers((prev) => prev.filter((u) => u.id !== userId));
+        setSelectedUserId((prevId) => {
+            if (prevId === userId) {
+                // 削除したユーザーが選択中なら先頭ユーザーに切り替え
+                const next = users.find((u) => u.id !== userId);
+                return next ? next.id : null;
+            }
+            return prevId;
         });
     };
 
@@ -224,7 +217,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         <UserContext.Provider
             value={{
                 users,
-                selectedUserIndex,
+                selectedUserId,
                 addUser,
                 selectUser,
                 addTaskList,

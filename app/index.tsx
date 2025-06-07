@@ -200,14 +200,14 @@ export default function MainPage() {
                     {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
                 </View>,
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
+                    <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
         } else {
             // 'right'
             columns = [
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
+                    <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.clockCol} key="clock">
                     {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
@@ -221,32 +221,32 @@ export default function MainPage() {
                     {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
                 </View>,
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
+                    <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.col} key="user1">
-                    <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
+                    <UserTasks userId={users[1].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
         } else if (clockPosition === 'center') {
             columns = [
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
+                    <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={[styles.clockCol, { minWidth: 100 }]} key="clock">
                     {isVisible ? <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} /> : <View style={styles.colBorder} />}
                 </View>,
                 <View style={styles.col} key="user1">
-                    <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
+                    <UserTasks userId={users[1].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
         } else {
             // 'right'
             columns = [
                 <View style={styles.col} key="user0">
-                    <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
+                    <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.col} key="user1">
-                    <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
+                    <UserTasks userId={users[1].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.clockCol} key="clock">
                     {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
@@ -256,13 +256,13 @@ export default function MainPage() {
     } else if (visibleUsers.length === 3) {
         columns = [
             <View style={styles.col} key="user0">
-                <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
+                <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
             </View>,
             <View style={styles.col} key="user1">
-                <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
+                <UserTasks userId={users[1].id} windowHeight={windowHeight} windowWidth={windowWidth} />
             </View>,
             <View style={styles.col} key="user2">
-                <UserTasks userId={2} windowHeight={windowHeight} windowWidth={windowWidth} />
+                <UserTasks userId={users[2].id} windowHeight={windowHeight} windowWidth={windowWidth} />
             </View>,
         ];
     }
