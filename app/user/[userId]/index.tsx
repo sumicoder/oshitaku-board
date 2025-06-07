@@ -18,7 +18,6 @@ const UserDetailScreen = () => {
 
     // ユーザー名編集用の状態
     const [newEditUserName, setNewEditUserName] = useState(currentUser.name);
-    const [editUserNameModalVisible, setEditUserNameModalVisible] = useState(false);
 
     // タスク追加モーダルの状態
     const [modalVisible, setModalVisible] = useState(false);
@@ -122,18 +121,16 @@ const UserDetailScreen = () => {
         ]);
     };
 
-    // ユーザー編集開始
-    const handleOpenEditUserNameModal = () => {
-        setNewEditUserName(currentUser.name);
-        setEditUserNameModalVisible(true);
-    };
-
     // ユーザー名編集確定
     const handleEditUserData = () => {
         if (currentUser && newEditUserName.trim()) {
             editUser(userIndex, newEditUserName.trim(), selectedColor);
-            setEditUserNameModalVisible(false);
         }
+    };
+    // 色変更
+    const handleColorChange = (color: string) => {
+        editUser(userIndex, currentUser.name, color);
+        setSelectedColor(color);
     };
     // ユーザー削除
     const handleDeleteUser = () => {
@@ -149,171 +146,160 @@ const UserDetailScreen = () => {
                 options={{
                     title: currentUser?.name || 'ユーザー詳細',
                     headerBackTitle: '戻る',
+                    headerTitleStyle: {
+                        fontSize: 24,
+                        color: currentUser?.color || '#fff',
+                        fontWeight: 'bold',
+                    },
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => {
                                 router.push(`/`);
                             }}
+                            style={{ marginLeft: 32, backgroundColor: currentUser?.color || '#fff', padding: 8 }}
                         >
-                            <Text>戻る</Text>
-                        </TouchableOpacity>
-                    ),
-                    headerRight: () => (
-                        <TouchableOpacity onPress={handleOpenEditUserNameModal}>
-                            <Text>編集</Text>
+                            <Text style={{ fontSize: 24, color: '#fff', fontWeight: 'bold' }}>戻る</Text>
                         </TouchableOpacity>
                     ),
                 }}
             />
             {currentUser ? (
-                <>
-                    <Text style={styles.title}>{currentUser.name} のタスクリスト</Text>
-                    <View style={styles.tabContainer}>
-                        <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
-                            {currentUser.taskLists.map((list, idx) => (
-                                <View key={idx} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <TouchableOpacity style={[styles.tab, { borderBottomColor: selectedTab === idx ? currentUser.color : 'transparent' }]} onPress={() => setSelectedTab(idx)}>
-                                        <Text style={[styles.tabText, { fontWeight: selectedTab === idx ? 'bold' : 'normal', color: selectedTab === idx ? currentUser.color : '#333' }]}>
-                                            {list.name}
-                                        </Text>
-                                    </TouchableOpacity>
-                                    {/* タスクリスト編集・削除ボタン */}
-                                    <TouchableOpacity onPress={() => handleOpenEditListModal(idx, list.name)} style={{ marginLeft: 4 }}>
-                                        <Ionicons name="pencil" size={24} color={'#333'} />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => handleDeleteList(idx)} style={{ marginLeft: 2 }}>
-                                        <Ionicons name="trash" size={24} color="#f44" />
-                                    </TouchableOpacity>
-                                </View>
-                            ))}
-                            {currentUser.taskLists.length < 3 && (
-                                <View style={{ marginLeft: 40 }}>
-                                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => handleAddTaskList()}>
-                                        <Ionicons name="add" size={24} color={'#333'} />
-                                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>タスクリストを追加</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
+                <View style={{ flex: 1, flexDirection: 'row', gap: 40 }}>
+                    <View style={{ flex: 0.4 }}>
+                        <ScrollView contentContainerStyle={styles.modalContent}>
+                            <Text style={styles.title}>ユーザー名を編集</Text>
+                            <TextInput style={styles.input} value={newEditUserName} onChangeText={setNewEditUserName} placeholder="ユーザー名" />
+                            <Text style={styles.title}>色を選択</Text>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                {colorList.map((color) => (
+                                    <TouchableOpacity
+                                        key={color}
+                                        style={[styles.colorButton, { backgroundColor: color }, selectedColor === color && styles.colorButtonSelected]}
+                                        onPress={() => handleColorChange(color)}
+                                    />
+                                ))}
+                            </View>
+                            <View style={{ flexDirection: 'row', marginTop: 40 }}>
+                                <TouchableOpacity style={styles.modalBtn} onPress={handleEditUserData}>
+                                    <Text style={{ color: '#fff', fontSize: 20 }}>保存</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ marginTop: 16 }}>
+                                <TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteUser}>
+                                    <Text style={{ color: '#fff', fontSize: 20 }}>ユーザーを削除</Text>
+                                </TouchableOpacity>
+                            </View>
                         </ScrollView>
                     </View>
-                    {/* タスク追加ボタン */}
-                    <TouchableOpacity style={[styles.addBtn, { backgroundColor: currentUser.color }]} onPress={() => handleOpenAddTaskModal(selectedTab)}>
-                        <Text style={styles.addBtnText}>＋ タスク追加</Text>
-                    </TouchableOpacity>
-                    {/* タスク一覧（TaskItemで表示） */}
-                    <View style={styles.taskList}>
-                        {currentUser.taskLists[selectedTab]?.tasks.length === 0 ? (
-                            <Text style={styles.noTask}>タスクなし</Text>
-                        ) : (
-                            currentUser.taskLists[selectedTab].tasks.map((task, taskIdx) => (
-                                <View key={taskIdx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                                    <TaskItem task={task} currentUser={currentUser} style={{ flex: 1, borderWidth: 1, marginRight: 8 }} onPress={() => {}} />
-                                    {/* 編集・削除ボタン */}
-                                    <TouchableOpacity onPress={() => handleOpenEditTaskModal(selectedTab, taskIdx, task)} style={{ marginRight: 4 }}>
-                                        <Ionicons name="pencil" size={24} color={'#333'} />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => handleDeleteTask(selectedTab, task.id)}>
-                                        <Ionicons name="trash" size={24} color="#f44" />
-                                    </TouchableOpacity>
-                                </View>
-                            ))
-                        )}
-                    </View>
-                    {/* タスクリスト名編集モーダル */}
-                    <Modal visible={editListIdx !== null} transparent animationType="fade">
-                        <View style={styles.modalOverlay}>
-                            <ScrollView contentContainerStyle={styles.modalContent}>
-                                <Text style={styles.modalTitle}>リスト名を編集</Text>
-                                <TextInput style={styles.input} value={editListName} onChangeText={setEditListName} placeholder="リスト名" />
-                                <View style={{ flexDirection: 'row', marginTop: 16 }}>
-                                    <TouchableOpacity style={styles.modalBtn} onPress={handleEditListName}>
-                                        <Text style={{ color: '#fff' }}>保存</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#aaa' }]} onPress={() => setEditListIdx(null)}>
-                                        <Text style={{ color: '#fff' }}>キャンセル</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </ScrollView>
-                        </View>
-                    </Modal>
-                    {/* タスク追加・編集モーダル（共通） */}
-                    <Modal visible={modalVisible} transparent animationType="slide">
-                        <View style={styles.modalOverlay}>
-                            <ScrollView contentContainerStyle={styles.modalContent}>
-                                <Text style={styles.modalTitle}>{editTaskInfo ? 'タスクを編集' : 'タスクを追加'}</Text>
-                                {/* タスク名入力 */}
-                                <TextInput style={styles.input} placeholder="タスク名" value={newTaskName} onChangeText={setNewTaskName} />
-                                {/* アイコン選択 */}
-                                <Text style={styles.modalTitle}>アイコン</Text>
-                                <View style={styles.modalWrap}>
-                                    {iconList.map((img) => (
-                                        <TouchableOpacity key={img} style={[styles.iconButton, selectedImage === img && styles.iconButtonSelected]} onPress={() => setSelectedImage(img)}>
-                                            <Text style={styles.iconText}>{img}</Text>
+                    <View style={{ flex: 0.6 }}>
+                        <Text style={styles.title}>{currentUser.name} のタスクリスト</Text>
+                        <View style={styles.tabContainer}>
+                            <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
+                                {currentUser.taskLists.map((list, idx) => (
+                                    <View key={idx} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <TouchableOpacity style={[styles.tab, { borderBottomColor: selectedTab === idx ? currentUser.color : 'transparent' }]} onPress={() => setSelectedTab(idx)}>
+                                            <Text style={[styles.tabText, { fontWeight: selectedTab === idx ? 'bold' : 'normal', color: selectedTab === idx ? currentUser.color : '#333' }]}>
+                                                {list.name}
+                                            </Text>
                                         </TouchableOpacity>
-                                    ))}
-                                </View>
-                                {/* 色選択 */}
-                                {/* <Text style={styles.modalTitle}>色</Text>
-                                <View style={styles.modalWrap}>
-                                    {colorList.map((color) => (
-                                        <TouchableOpacity
-                                            key={color}
-                                            style={[styles.colorButton, { backgroundColor: color }, selectedColor === color && styles.colorButtonSelected]}
-                                            onPress={() => setSelectedColor(color)}
-                                        />
-                                    ))}
-                                </View> */}
-                                {/* ボタン */}
-                                <View style={{ flexDirection: 'row', marginTop: 16 }}>
-                                    <TouchableOpacity style={styles.modalBtn} onPress={editTaskInfo ? handleEditTask : handleRegisterTask}>
-                                        <Text style={{ color: '#fff' }}>{editTaskInfo ? '保存' : '追加'}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={[styles.modalBtn, { backgroundColor: '#aaa' }]}
-                                        onPress={() => {
-                                            setModalVisible(false);
-                                            setEditTaskInfo(null);
-                                        }}
-                                    >
-                                        <Text style={{ color: '#fff' }}>キャンセル</Text>
-                                    </TouchableOpacity>
-                                </View>
+                                        {/* タスクリスト編集・削除ボタン */}
+                                        <TouchableOpacity onPress={() => handleOpenEditListModal(idx, list.name)} style={{ marginLeft: 4 }}>
+                                            <Ionicons name="pencil" size={24} color={'#333'} />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => handleDeleteList(idx)} style={{ marginLeft: 2 }}>
+                                            <Ionicons name="trash" size={24} color="#f44" />
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                                {currentUser.taskLists.length < 3 && (
+                                    <View style={{ marginLeft: 40 }}>
+                                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => handleAddTaskList()}>
+                                            <Ionicons name="add" size={24} color={'#333'} />
+                                            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>タスクリストを追加</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
                             </ScrollView>
                         </View>
-                    </Modal>
-                    {/* ユーザー編集モーダル */}
-                    <Modal visible={editUserNameModalVisible} transparent animationType="fade">
-                        <View style={styles.modalOverlay}>
-                            <ScrollView contentContainerStyle={styles.modalContent}>
-                                <Text style={styles.modalTitle}>ユーザー名を編集</Text>
-                                <TextInput style={styles.input} value={newEditUserName} onChangeText={setNewEditUserName} placeholder="ユーザー名" />
-                                <Text style={styles.modalTitle}>色を選択</Text>
-                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                                    {colorList.map((color) => (
-                                        <TouchableOpacity
-                                            key={color}
-                                            style={[styles.colorButton, { backgroundColor: color }, selectedColor === color && styles.colorButtonSelected]}
-                                            onPress={() => setSelectedColor(color)}
+                        {/* タスク追加ボタン */}
+                        <TouchableOpacity style={[styles.addBtn, { backgroundColor: currentUser?.color || '#007AFF' }]} onPress={() => handleOpenAddTaskModal(selectedTab)}>
+                            <Text style={styles.addBtnText}>＋ タスク追加</Text>
+                        </TouchableOpacity>
+                        {/* タスク一覧（TaskItemで表示） */}
+                        <View style={styles.taskList}>
+                            {currentUser.taskLists[selectedTab]?.tasks.length === 0 ? (
+                                <Text style={styles.noTask}>タスクなし</Text>
+                            ) : (
+                                currentUser.taskLists[selectedTab].tasks.map((task, taskIdx) => (
+                                    <View key={taskIdx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                                        <TaskItem
+                                            task={task}
+                                            currentUser={currentUser}
+                                            style={{ flex: 1, borderWidth: 1, marginRight: 24 }}
+                                            onPress={() => handleOpenEditTaskModal(selectedTab, taskIdx, task)}
+                                            editMode={true}
                                         />
-                                    ))}
-                                </View>
-                                <View style={{ flexDirection: 'row', marginTop: 40 }}>
-                                    <TouchableOpacity style={styles.modalBtn} onPress={handleEditUserData}>
-                                        <Text style={{ color: '#fff' }}>保存</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#aaa' }]} onPress={() => setEditUserNameModalVisible(false)}>
-                                        <Text style={{ color: '#fff' }}>キャンセル</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={{ marginTop: 16 }}>
-                                    <TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteUser}>
-                                        <Text style={{ color: '#fff' }}>ユーザーを削除</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </ScrollView>
+                                        {/* 削除ボタン */}
+                                        <TouchableOpacity style={{ marginRight: 20 }} onPress={() => handleDeleteTask(selectedTab, task.id)}>
+                                            <Ionicons name="trash" size={40} color="#f44" />
+                                        </TouchableOpacity>
+                                    </View>
+                                ))
+                            )}
                         </View>
-                    </Modal>
-                </>
+                        {/* タスクリスト名編集モーダル */}
+                        <Modal visible={editListIdx !== null} transparent animationType="fade">
+                            <View style={styles.modalOverlay}>
+                                <ScrollView contentContainerStyle={styles.modalContent}>
+                                    <Text style={styles.title}>リスト名を編集</Text>
+                                    <TextInput style={styles.input} value={editListName} onChangeText={setEditListName} placeholder="リスト名" />
+                                    <View style={{ flexDirection: 'row', marginTop: 16 }}>
+                                        <TouchableOpacity style={styles.modalBtn} onPress={handleEditListName}>
+                                            <Text style={{ color: '#fff', fontSize: 20 }}>保存</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#aaa' }]} onPress={() => setEditListIdx(null)}>
+                                            <Text style={{ color: '#fff', fontSize: 20 }}>キャンセル</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </ScrollView>
+                            </View>
+                        </Modal>
+                        {/* タスク追加・編集モーダル（共通） */}
+                        <Modal visible={modalVisible} transparent animationType="slide">
+                            <View style={styles.modalOverlay}>
+                                <ScrollView contentContainerStyle={styles.modalContent}>
+                                    <Text style={styles.title}>{editTaskInfo ? 'タスクを編集' : 'タスクを追加'}</Text>
+                                    {/* タスク名入力 */}
+                                    <TextInput style={styles.input} placeholder="タスク名" value={newTaskName} onChangeText={setNewTaskName} />
+                                    {/* アイコン選択 */}
+                                    <Text style={styles.title}>アイコン</Text>
+                                    <View style={styles.modalWrap}>
+                                        {iconList.map((img) => (
+                                            <TouchableOpacity key={img} style={[styles.iconButton, selectedImage === img && styles.iconButtonSelected]} onPress={() => setSelectedImage(img)}>
+                                                <Text style={styles.iconText}>{img}</Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                    {/* ボタン */}
+                                    <View style={{ flexDirection: 'row', marginTop: 16 }}>
+                                        <TouchableOpacity style={styles.modalBtn} onPress={editTaskInfo ? handleEditTask : handleRegisterTask}>
+                                            <Text style={{ color: '#fff', fontSize: 20 }}>{editTaskInfo ? '保存' : '追加'}</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={[styles.modalBtn, { backgroundColor: '#aaa' }]}
+                                            onPress={() => {
+                                                setModalVisible(false);
+                                                setEditTaskInfo(null);
+                                            }}
+                                        >
+                                            <Text style={{ color: '#fff', fontSize: 20 }}>キャンセル</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </ScrollView>
+                            </View>
+                        </Modal>
+                    </View>
+                </View>
             ) : (
                 <Text style={styles.errorText}>ユーザーが見つかりません</Text>
             )}
@@ -328,7 +314,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        marginBottom: 16,
+        marginVertical: 16,
     },
     errorText: {
         color: 'red',
@@ -383,24 +369,21 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 12,
         padding: 24,
-        width: 300,
         justifyContent: 'center',
         alignItems: 'center',
         marginVertical: 100,
-    },
-    modalTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBlockStart: 16,
+        marginHorizontal: 'auto',
+        width: '100%',
+        maxWidth: 400,
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,
-        padding: 8,
-        width: 200,
+        padding: 16,
+        width: 300,
         marginTop: 8,
-        fontSize: 16,
+        fontSize: 24,
     },
     modalBtn: {
         backgroundColor: '#007AFF',
@@ -418,19 +401,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f4ff',
         alignItems: 'center',
         justifyContent: 'center',
-        minWidth: 40,
-        minHeight: 40,
     },
     iconButtonSelected: {
         borderColor: '#007AFF',
         backgroundColor: '#c7d2fe',
     },
     iconText: {
-        fontSize: 20,
+        fontSize: 40,
     },
     colorButton: {
-        width: 32,
-        height: 32,
+        width: 56,
+        height: 56,
         borderRadius: 16,
         marginRight: 8,
         borderWidth: 2,

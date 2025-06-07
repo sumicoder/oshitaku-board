@@ -8,14 +8,15 @@ interface TaskItemProps {
     currentUser: User;
     style: ViewStyle;
     onPress: () => void;
+    editMode?: boolean;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, currentUser, style, onPress }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ task, currentUser, style, onPress, editMode }) => {
     return (
         <TouchableOpacity onPress={onPress} style={[styles.taskItem, style]}>
             <Text style={styles.taskIcon}>{task.image}</Text>
             <Text style={styles.taskTitle}>{task.title}</Text>
-            {task.done && (
+            {task.done && !editMode && (
                 <View style={[styles.overlay, { backgroundColor: hexToRgba(currentUser.color, 0.7) }]}>
                     <Text style={styles.overlayText}>できた！</Text>
                 </View>
