@@ -46,6 +46,7 @@ type UserContextType = {
     editUser: (userId: string, newName: string, newColor: string) => void;
     deleteUser: (userId: string) => void;
     moveUser: (userId: string, toIndex: number) => void;
+    setUsersOrder: (newOrder: User[]) => void;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -137,99 +138,93 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // タスクリスト追加
     const addTaskList = (userId: string, listName: string) => {
-        setUsers((prev) => prev.map((u) =>
-            u.id === userId && u.taskLists.length < 3
-                ? { ...u, taskLists: [...u.taskLists, { id: Math.random().toString(36).substring(2, 15), name: listName, tasks: [] }] }
-                : u
-        ));
+        setUsers((prev) =>
+            prev.map((u) => (u.id === userId && u.taskLists.length < 3 ? { ...u, taskLists: [...u.taskLists, { id: Math.random().toString(36).substring(2, 15), name: listName, tasks: [] }] } : u))
+        );
     };
 
     // タスク追加
     const addTask = (userId: string, listId: string, task: Task) => {
-        setUsers((prev) => prev.map((u) =>
-            u.id === userId
-                ? {
-                    ...u,
-                    taskLists: u.taskLists.map((l) =>
-                        l.id === listId
-                            ? { ...l, tasks: [...l.tasks, { ...task, id: Math.random().toString(36).substring(2, 15) }] }
-                            : l
-                    ),
-                }
-                : u
-        ));
+        setUsers((prev) =>
+            prev.map((u) =>
+                u.id === userId
+                    ? {
+                          ...u,
+                          taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, tasks: [...l.tasks, { ...task, id: Math.random().toString(36).substring(2, 15) }] } : l)),
+                      }
+                    : u
+            )
+        );
     };
 
     // タスクリスト名編集
     const editTaskListName = (userId: string, listId: string, newName: string) => {
-        setUsers((prev) => prev.map((u) =>
-            u.id === userId
-                ? {
-                    ...u,
-                    taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, name: newName } : l)),
-                }
-                : u
-        ));
+        setUsers((prev) =>
+            prev.map((u) =>
+                u.id === userId
+                    ? {
+                          ...u,
+                          taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, name: newName } : l)),
+                      }
+                    : u
+            )
+        );
     };
 
     // タスクリスト削除
     const deleteTaskList = (userId: string, listId: string) => {
-        setUsers((prev) => prev.map((u) =>
-            u.id === userId
-                ? {
-                    ...u,
-                    taskLists: u.taskLists.filter((l) => l.id !== listId),
-                }
-                : u
-        ));
+        setUsers((prev) =>
+            prev.map((u) =>
+                u.id === userId
+                    ? {
+                          ...u,
+                          taskLists: u.taskLists.filter((l) => l.id !== listId),
+                      }
+                    : u
+            )
+        );
     };
 
     // タスク編集
     const editTask = (userId: string, listId: string, taskId: string, newTask: Task) => {
-        setUsers((prev) => prev.map((u) =>
-            u.id === userId
-                ? {
-                    ...u,
-                    taskLists: u.taskLists.map((l) =>
-                        l.id === listId
-                            ? { ...l, tasks: l.tasks.map((t) => (t.id === taskId ? { ...t, ...newTask } : t)) }
-                            : l
-                    ),
-                }
-                : u
-        ));
+        setUsers((prev) =>
+            prev.map((u) =>
+                u.id === userId
+                    ? {
+                          ...u,
+                          taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, tasks: l.tasks.map((t) => (t.id === taskId ? { ...t, ...newTask } : t)) } : l)),
+                      }
+                    : u
+            )
+        );
     };
 
     // タスク削除
     const deleteTask = (userId: string, listId: string, taskId: string) => {
-        setUsers((prev) => prev.map((u) =>
-            u.id === userId
-                ? {
-                    ...u,
-                    taskLists: u.taskLists.map((l) =>
-                        l.id === listId
-                            ? { ...l, tasks: l.tasks.filter((t) => t.id !== taskId) }
-                            : l
-                    ),
-                }
-                : u
-        ));
+        setUsers((prev) =>
+            prev.map((u) =>
+                u.id === userId
+                    ? {
+                          ...u,
+                          taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, tasks: l.tasks.filter((t) => t.id !== taskId) } : l)),
+                      }
+                    : u
+            )
+        );
     };
 
     // タスク完了トグル
     const toggleTaskDone = (userId: string, listId: string, taskId: string) => {
-        setUsers((prev) => prev.map((u) =>
-            u.id === userId
-                ? {
-                    ...u,
-                    taskLists: u.taskLists.map((l) =>
-                        l.id === listId
-                            ? { ...l, tasks: l.tasks.map((t) => (t.id === taskId ? { ...t, done: !t.done } : t)) }
-                            : l
-                    ),
-                }
-                : u
-        ));
+        setUsers((prev) =>
+            prev.map((u) =>
+                u.id === userId
+                    ? {
+                          ...u,
+                          taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, tasks: l.tasks.map((t) => (t.id === taskId ? { ...t, done: !t.done } : t)) } : l)),
+                      }
+                    : u
+            )
+        );
     };
 
     // ユーザー名・色編集
@@ -253,13 +248,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     // ユーザー並べ替え
     const moveUser = (userId: string, toIndex: number) => {
         setUsers((prev) => {
-            const idx = prev.findIndex(u => u.id === userId);
+            const idx = prev.findIndex((u) => u.id === userId);
             if (idx === -1 || toIndex < 0 || toIndex >= prev.length) return prev;
             const newArr = [...prev];
             const [removed] = newArr.splice(idx, 1);
             newArr.splice(toIndex, 0, removed);
             return newArr;
         });
+    };
+
+    // ユーザー順を一括更新（ドラッグ&ドロップ用）
+    const setUsersOrder = (newOrder: User[]) => {
+        setUsers(newOrder);
     };
 
     if (loading) return null; // ローディングUI推奨
@@ -281,6 +281,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 editUser,
                 deleteUser,
                 moveUser,
+                setUsersOrder,
             }}
         >
             {children}

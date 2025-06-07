@@ -2,6 +2,8 @@ import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import DraggableFlatList from 'react-native-draggable-flatlist';
+import type { User } from './context/UserContext';
 import { colorList, useUserContext } from './context/UserContext';
 import ClockSettingAccordion from './settings/ClockSettingAccordion';
 import ProgressBarSettingAccordion from './settings/ProgressBarSettingAccordion';
@@ -11,7 +13,7 @@ import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
 export default function CustomDrawerContent() {
     const router = useRouter();
-    const { users, addUser, selectUser, moveUser } = useUserContext();
+    const { users, addUser, selectUser, moveUser, setUsersOrder } = useUserContext();
     const [modalVisible, setModalVisible] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [selectedColor, setSelectedColor] = useState(colorList[0]);
@@ -25,35 +27,38 @@ export default function CustomDrawerContent() {
             ) : (
                 <Text style={styles.sectionTitle}>ユーザーは3人までしか追加できません</Text>
             )}
-            {/* ユーザー一覧 */}
+            {/* ユーザー一覧（ドラッグ&ドロップ対応） */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
-            {users.map((user, idx) => (
-                <View key={user.name + idx} style={styles.userContainer}>
-                    <View>
-                        {/* 上へボタン */}
-                        <TouchableOpacity style={[styles.arrowBtn, idx === 0 && styles.arrowBtnDisabled]} onPress={() => moveUser(user.id, idx - 1)} disabled={idx === 0}>
-                            <AntDesign name="caretup" size={20} color={idx === 0 ? '#ccc' : '#007AFF'} />
+            <DraggableFlatList
+                data={users}
+                keyExtractor={(item) => item.id}
+                onDragEnd={({ data }: { data: User[] }) => setUsersOrder(data)}
+                renderItem={({ item, drag, isActive }: { item: User; drag: () => void; isActive: boolean }) => (
+                    <View style={[styles.userContainer, isActive && { backgroundColor: '#e0e7ff' }]} key={item.id}>
+                        {/* ドラッグハンドル */}
+                        <TouchableOpacity onLongPress={drag} style={styles.dragHandle}>
+                            <AntDesign name="bars" size={22} color="#888" />
                         </TouchableOpacity>
-                        {/* 下へボタン */}
-                        <TouchableOpacity style={[styles.arrowBtn, idx === users.length - 1 && styles.arrowBtnDisabled]} onPress={() => moveUser(user.id, idx + 1)} disabled={idx === users.length - 1}>
-                            <AntDesign name="caretdown" size={20} color={idx === users.length - 1 ? '#ccc' : '#007AFF'} />
-                        </TouchableOpacity>
+                        {/* ユーザー名 */}
+                        <Text style={[styles.userName]}>{item.name}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            {/* 編集ボタン */}
+                            <TouchableOpacity
+                                style={[styles.button, { backgroundColor: item.color }]}
+                                onPress={() => {
+                                    selectUser(item.id);
+                                    router.push(`/user/${item.id}`);
+                                }}
+                            >
+                                <Text style={styles.buttonText}>編集</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <Text style={[styles.userName]}>{user.name}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        {/* 編集ボタン */}
-                        <TouchableOpacity
-                            style={[styles.button, { backgroundColor: user.color }]}
-                            onPress={() => {
-                                selectUser(user.id);
-                                router.push(`/user/${user.id}`);
-                            }}
-                        >
-                            <Text style={styles.buttonText}>編集</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            ))}
+                )}
+                scrollEnabled={false}
+                activationDistance={10}
+                containerStyle={{ paddingBottom: 8 }}
+            />
             {/* ユーザー追加モーダル */}
             <Modal visible={modalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
@@ -201,5 +206,11 @@ const styles = StyleSheet.create({
     },
     arrowBtnDisabled: {
         opacity: 0.5,
+    },
+    dragHandle: {
+        padding: 6,
+        marginRight: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });
