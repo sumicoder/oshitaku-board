@@ -33,6 +33,11 @@ export default function MainPage() {
     const [isAppActive, setIsAppActive] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
 
+    useEffect(() => {
+        // 横向き（ランドスケープ）に固定
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+    }, []);
+
     // 初期サイズをストレージに保存
     useEffect(() => {
         // 初回インストール時のみ画面サイズを保存する
