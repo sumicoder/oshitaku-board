@@ -13,10 +13,6 @@ export default function MainPage() {
     const [reliableDimensions, setReliableDimensions] = useState<ScaledSize>(dimensions); // 各種設定を取得
     const appState = useRef(AppState.currentState);
 
-    useEffect(() => {
-        setReliableDimensions(dimensions);
-    }, [dimensions]);
-
     const { isVisible, clockType, clockSize, clockPosition } = useClockSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
     const { userCount } = useUserCountSetting();
@@ -30,10 +26,8 @@ export default function MainPage() {
         const handleAppStateChange = (nextAppState: string) => {
             if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
                 // アプリがフォアグラウンドに戻った時の処理
-                setTimeout(() => {
-                    console.log('アプリがフォアグラウンドに戻りました。画面サイズを更新します。');
-                    setReliableDimensions(dimensions);
-                }, 1000);
+                console.log('アプリがフォアグラウンドに戻りました。画面サイズを更新します。', dimensions);
+                setReliableDimensions(dimensions);
             }
             appState.current = nextAppState as AppStateStatus;
         };
@@ -41,6 +35,11 @@ export default function MainPage() {
         const subscription = AppState.addEventListener('change', handleAppStateChange);
         return () => subscription?.remove();
     }, []);
+
+    // 画面サイズが変更された時に最新のサイズを取得
+    useEffect(() => {
+        console.log('画面サイズが変更されました。', dimensions);
+    }, [dimensions, reliableDimensions]);
 
     // 設定変更時のログ
     useEffect(() => {
