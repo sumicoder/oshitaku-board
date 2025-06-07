@@ -44,8 +44,8 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const MAGIC_MIN_WIDTH = 100; // ユーザー数2、時計非表示の場合の`minWidth` => index.tsxにある
     const MAGIC_HEIGHT = 260; // マジックナンバー[ヘッダー、ユーザー名、タブなどの`margin`や`padding`や`gap`など適当な値]
     // タスクのカラム数
-    const CONTAINER_WIDTH = (windowWidth - clockColumnSize) / userCount;
-    const TASK_COLUMN = displayMode === 'single' ? 1 : CONTAINER_WIDTH > 1080 ? 3 : CONTAINER_WIDTH > 600 ? 2 : 1;
+    const containerWidth = (windowWidth - clockColumnSize) / userCount;
+    const TASK_COLUMN = displayMode === 'single' ? 1 : containerWidth > 1080 ? 3 : containerWidth > 600 ? 2 : 1;
     // コンテナのpadding
     const CONTAINER_PADDING = 24;
     const TASK_COLUMN_SPACE = displayMode === 'single' ? CONTAINER_PADDING * 2 * userCount : CONTAINER_PADDING * 2; // 画面左右のpadding
@@ -53,7 +53,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const TASK_LIST_GAP = 16;
     const TASK_LIST_GAP_SPACE = TASK_LIST_GAP * TASK_COLUMN;
     // タスクの高さ
-    const TASK_HEIGHT = windowHeight - MAGIC_HEIGHT;
+    const taskHeight = windowHeight - MAGIC_HEIGHT;
     // タスクの枠線の幅
     const TASK_CORD_BORDER = 1;
     const TASK_BORDER_WIDTH = TASK_CORD_BORDER * 2;
@@ -135,7 +135,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                                         style={{
                                             marginHorizontal: TASK_LIST_GAP_SPACE / 2,
                                             width: itemMaxWidth,
-                                            height: TASK_HEIGHT,
+                                            height: taskHeight,
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             borderWidth: TASK_CORD_BORDER,
@@ -152,7 +152,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                                 const undoneTasks = tasks.filter((task) => !task.done);
                                 if (undoneTasks.length === 0 && !showCompleted) {
                                     return (
-                                        <View style={{ width: CONTAINER_WIDTH, alignItems: 'center', justifyContent: 'center', paddingBlockStart: 32 }}>
+                                        <View style={{ width: containerWidth, alignItems: 'center', justifyContent: 'center', paddingBlockStart: 32 }}>
                                             <Text style={{ fontSize: 28, color: '#22a', fontWeight: 'bold' }}>ぜんぶできたね！</Text>
                                         </View>
                                     );
