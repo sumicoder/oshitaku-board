@@ -56,33 +56,54 @@ export default function MainPage() {
         saveInitialSizeIfNeeded();
     }, [longLength, shortLength]);
 
+    // --- 共通関数 ---
+    // 画面の向きに応じてwindowWidth/windowHeightをセット
+    function applyDimensionsByOrientation(
+        orientation: ScreenOrientation.Orientation | null,
+        longLength: number,
+        shortLength: number,
+        setWindowWidth: (v: number) => void,
+        setWindowHeight: (v: number) => void
+    ) {
+        if (orientation === 3 || orientation === 4) {
+            setWindowWidth(longLength);
+            setWindowHeight(shortLength);
+        } else if (orientation === 1) {
+            setWindowWidth(shortLength);
+            setWindowHeight(longLength);
+        }
+    }
+
+    // ストレージから画面サイズを復元
+    async function restoreDimensionsFromStorage(setWindowWidth: (v: number) => void, setWindowHeight: (v: number) => void) {
+        try {
+            const storedLong = await AsyncStorage.getItem('longLength');
+            const storedShort = await AsyncStorage.getItem('shortLength');
+            if (storedLong && storedShort) {
+                if (orientation === 3 || orientation === 4) {
+                    setWindowWidth(parseInt(storedLong));
+                    setWindowHeight(parseInt(storedShort));
+                } else if (orientation === 1) {
+                    setWindowWidth(parseInt(storedShort));
+                    setWindowHeight(parseInt(storedLong));
+                }
+                console.log('AsyncStorageから画面サイズを復元');
+            }
+        } catch (e) {
+            console.error('画面サイズのストレージ復元エラー', e);
+        }
+    }
+
     // orientationやdimensionsの変化時に、画面サイズが0ならストレージから復元
     useEffect(() => {
-        const restoreIfZero = async () => {
+        const update = async () => {
             if (longLength === 0 || shortLength === 0) {
-                try {
-                    const storedLong = await AsyncStorage.getItem('longLength');
-                    const storedShort = await AsyncStorage.getItem('shortLength');
-                    if (storedLong && storedShort) {
-                        setWindowWidth(parseInt(storedLong));
-                        setWindowHeight(parseInt(storedShort));
-                        console.log('orientation/dimensions: ストレージから画面サイズを復元', storedLong, storedShort);
-                        return;
-                    }
-                } catch (e) {
-                    console.error('orientation/dimensions: ストレージ復元エラー', e);
-                }
-            }
-            // 通常の向き反映
-            if (orientation === 3 || orientation === 4) {
-                setWindowWidth(longLength);
-                setWindowHeight(shortLength);
-            } else if (orientation === 1) {
-                setWindowWidth(shortLength);
-                setWindowHeight(longLength);
+                await restoreDimensionsFromStorage(setWindowWidth, setWindowHeight);
+            } else {
+                applyDimensionsByOrientation(orientation, longLength, shortLength, setWindowWidth, setWindowHeight);
             }
         };
-        if (orientation) restoreIfZero();
+        if (orientation) update();
     }, [dimensions, orientation, longLength, shortLength]);
 
     // アプリの状態変更を監視 フォアグランドになった時にストレージから値を取得
@@ -90,24 +111,12 @@ export default function MainPage() {
         const handleAppStateChange = async (nextAppState: string) => {
             if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
                 setIsAppActive(true);
-                // フォアグランドになった時に画面サイズが0ならストレージから復元
                 if (longLength === 0 || shortLength === 0) {
-                    try {
-                        const storedLong = await AsyncStorage.getItem('longLength');
-                        const storedShort = await AsyncStorage.getItem('shortLength');
-                        if (storedLong && storedShort) {
-                            setWindowWidth(parseInt(storedLong));
-                            setWindowHeight(parseInt(storedShort));
-                            console.log('appState: ストレージから画面サイズを復元', storedLong, storedShort);
-                        }
-                    } catch (e) {
-                        console.error('appState: ストレージ復元エラー', e);
-                    }
+                    await restoreDimensionsFromStorage(setWindowWidth, setWindowHeight);
                 }
             }
             appState.current = nextAppState as AppStateStatus;
         };
-
         const subscription = AppState.addEventListener('change', handleAppStateChange);
         return () => {
             subscription?.remove();
@@ -128,21 +137,6 @@ export default function MainPage() {
         };
     }, []);
 
-    // orientationとdimensionsに応じてreliableDimensionsを正しく更新
-    useEffect(() => {
-        if (!dimensions || !orientation) return;
-
-        if (orientation === 3 || orientation === 4) {
-            setWindowWidth(longLength);
-            setWindowHeight(shortLength);
-        } else if (orientation === 1) {
-            setWindowWidth(shortLength);
-            setWindowHeight(longLength);
-        }
-
-        return;
-    }, [dimensions, orientation]);
-
     // 設定変更時のログ
     useEffect(() => {
         console.log('時計設定変更:', { isVisible, clockType, clockSize, clockPosition });
@@ -160,53 +154,23 @@ export default function MainPage() {
     useEffect(() => {
         let timeout: number | null = null;
         const tryGetSize = async () => {
-            try {
-                if (windowWidth > 0 && windowHeight > 0) {
-                    setIsReady(true);
-                } else {
-                    // 画面サイズが0ならストレージから復元を試みる
-                    if (longLength === 0 || shortLength === 0) {
-                        try {
-                            const storedLong = await AsyncStorage.getItem('longLength');
-                            const storedShort = await AsyncStorage.getItem('shortLength');
-                            if (storedLong && storedShort) {
-                                setWindowWidth(parseInt(storedLong));
-                                setWindowHeight(parseInt(storedShort));
-                                console.log('tryGetSize: ストレージから画面サイズを復元', storedLong, storedShort);
-                            }
-                        } catch (e) {
-                            console.error('tryGetSize: ストレージ復元エラー', e);
-                        }
-                    }
-                    // 取得できなければリトライ
-                    timeout = setTimeout(() => {
-                        if (orientation === 3 || orientation === 4) {
-                            setWindowWidth(longLength);
-                            setWindowHeight(shortLength);
-                        } else if (orientation === 1) {
-                            setWindowWidth(shortLength);
-                            setWindowHeight(longLength);
-                        }
-                        setRetryCount((prev) => prev + 1);
-                    }, 300); // 300msごとにリトライ
+            if (windowWidth > 0 && windowHeight > 0) {
+                setIsReady(true);
+            } else {
+                if (longLength === 0 || shortLength === 0) {
+                    await restoreDimensionsFromStorage(setWindowWidth, setWindowHeight);
                 }
-            } catch (e) {
-                // 例外が出てもリトライ
                 timeout = setTimeout(() => {
-                    if (orientation === 3 || orientation === 4) {
-                        setWindowWidth(longLength);
-                        setWindowHeight(shortLength);
-                    } else if (orientation === 1) {
-                        setWindowWidth(shortLength);
-                        setWindowHeight(longLength);
-                    }
+                    applyDimensionsByOrientation(orientation, longLength, shortLength, setWindowWidth, setWindowHeight);
                     setRetryCount((prev) => prev + 1);
                 }, 300);
             }
         };
         tryGetSize();
         return () => {
-            if (timeout) clearTimeout(timeout);
+            if (timeout) {
+                clearTimeout(timeout);
+            }
         };
     }, [windowWidth, windowHeight, retryCount, isAppActive, orientation, longLength, shortLength]);
 
