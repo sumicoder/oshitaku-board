@@ -8,10 +8,11 @@ import DigitalClock from './DigitalClock';
 
 interface ClockAreaProps {
     windowHeight: number;
+    windowWidth: number;
 }
 
 // 時計表示専用コンポーネント
-const ClockArea: React.FC<ClockAreaProps> = ({ windowHeight }) => {
+const ClockArea: React.FC<ClockAreaProps> = ({ windowHeight, windowWidth }) => {
     // 時計設定（グローバル）
     const { clockType, clockSize } = useClockSetting();
     const { userCount } = useUserCountSetting();
@@ -19,7 +20,7 @@ const ClockArea: React.FC<ClockAreaProps> = ({ windowHeight }) => {
     if (userCount === 3) return null;
 
     // サイズ計算
-    const clockSizePx = getClockSizePx(clockSize, windowHeight);
+    const clockSizePx = getClockSizePx(clockSize, Math.min(windowHeight, windowWidth));
     if (!clockSizePx) return null;
     const clockPadding = 20;
     const clockAdjustedSize = clockSizePx - clockPadding * 2;

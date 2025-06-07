@@ -192,7 +192,7 @@ export default function MainPage() {
         if (clockPosition === 'left') {
             columns = [
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea windowHeight={windowHeight} />}
+                    {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
                 </View>,
                 <View style={styles.col} key="user0">
                     <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
@@ -205,7 +205,7 @@ export default function MainPage() {
                     <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea windowHeight={windowHeight} />}
+                    {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
                 </View>,
             ];
         }
@@ -213,7 +213,7 @@ export default function MainPage() {
         if (clockPosition === 'left') {
             columns = [
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea windowHeight={windowHeight} />}
+                    {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
                 </View>,
                 <View style={styles.col} key="user0">
                     <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
@@ -228,7 +228,7 @@ export default function MainPage() {
                     <UserTasks userId={0} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={[styles.clockCol, { minWidth: 100 }]} key="clock">
-                    {isVisible ? <ClockArea windowHeight={windowHeight} /> : <View style={styles.colBorder} />}
+                    {isVisible ? <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} /> : <View style={styles.colBorder} />}
                 </View>,
                 <View style={styles.col} key="user1">
                     <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
@@ -244,7 +244,7 @@ export default function MainPage() {
                     <UserTasks userId={1} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea windowHeight={windowHeight} />}
+                    {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
                 </View>,
             ];
         }

@@ -15,8 +15,6 @@ interface UserTasksProps {
 }
 
 const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth }) => {
-    console.log('windowWidth', windowWidth);
-
     const { users, toggleTaskDone } = useUserContext();
     const currentUser = users && users.length > 0 ? users[userId] : { id: users.length.toString(), name: 'ユーザー', taskLists: [], color: '#007AFF' };
 
@@ -39,7 +37,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const percent = total > 0 ? done / total : 0;
 
     // 時計の幅を取得
-    const clockSizePx = getClockSizePx(clockSize, windowHeight);
+    const clockSizePx = getClockSizePx(clockSize, Math.min(windowHeight, windowWidth));
     const clockColumnSize = isVisible && userCount !== 3 ? clockSizePx : 0;
 
     // 定数定義
