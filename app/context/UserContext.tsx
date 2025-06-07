@@ -62,8 +62,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 serUser(JSON.parse(usersData));
             } else {
                 serUser([
-                    { id: '1', name: 'ユーザー1', taskLists: initialTaskLists, color: '#FFD700' },
-                    { id: '2', name: 'ユーザー2', taskLists: initialTaskLists, color: '#00BFFF' },
+                    { id: '0', name: 'ユーザー1', taskLists: initialTaskLists, color: '#FFD700' },
+                    { id: '1', name: 'ユーザー2', taskLists: initialTaskLists, color: '#00BFFF' },
                 ]);
             }
             if (selectedUserIndexData) {

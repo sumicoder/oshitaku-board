@@ -10,7 +10,7 @@ import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
 export default function CustomDrawerContent() {
     const router = useRouter();
-    const { users, addUser, selectedUserIndex, selectUser } = useUserContext();
+    const { users, addUser, selectUser } = useUserContext();
     const [modalVisible, setModalVisible] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [selectedColor, setSelectedColor] = useState(colorList[0]);

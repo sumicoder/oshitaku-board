@@ -12,18 +12,20 @@ const UserDetailScreen = () => {
     // Contextからユーザー情報・タスクリスト並び替え関数を取得
     const { users, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask, editUser, deleteUser } = useUserContext();
 
-    // userIdはインデックスとして扱う
-    const userIndex = Number(userId);
-    const currentUser = users[userIndex];
+    // userId（string）で一致するユーザーを検索
+    const currentUser = users.find(u => u.id === userId);
+
+    // userIndexもidから取得（必要なら）
+    const userIndex = users.findIndex(u => u.id === userId);
 
     // ユーザー名編集用の状態
-    const [newEditUserName, setNewEditUserName] = useState(currentUser.name);
+    const [newEditUserName, setNewEditUserName] = useState(currentUser?.name || '');
 
     // タスク追加モーダルの状態
     const [modalVisible, setModalVisible] = useState(false);
     const [newTaskName, setNewTaskName] = useState('');
     const [selectedImage, setSelectedImage] = useState(iconList[0]);
-    const [selectedColor, setSelectedColor] = useState(currentUser.color);
+    const [selectedColor, setSelectedColor] = useState(currentUser?.color || '#fff');
     const [targetListIdx, setTargetListIdx] = useState<number | null>(null);
 
     // 編集用モーダル状態
@@ -129,7 +131,7 @@ const UserDetailScreen = () => {
     };
     // 色変更
     const handleColorChange = (color: string) => {
-        editUser(userIndex, currentUser.name, color);
+        editUser(userIndex, currentUser?.name || '', color);
         setSelectedColor(color);
     };
     // ユーザー削除
