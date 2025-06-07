@@ -18,10 +18,10 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const { users, toggleTaskDone } = useUserContext();
     const currentUser = users.find((user) => user.id === userId) || { id: Math.random().toString(36).substring(2, 15), name: 'ユーザー', taskLists: [], color: '#007AFF' };
 
-    const [selectedTab, setSelectedTab] = useState<string | null>(null);
+    const [selectedTab, setSelectedTab] = useState<string>(currentUser.taskLists[0].id);
     const scrollRef = useRef<ScrollView>(null);
     const [progressBarWidth, setProgressBarWidth] = useState(0);
-    const [showDoneIdx, setShowDoneIdx] = useState<string | null>(null);
+    const [showDoneId, setShowDoneId] = useState<string | null>(null);
     const timerRef = useRef<number | null>(null);
     const doneShowTime = 2000;
 
@@ -164,12 +164,12 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                             })()}
                             {(() => {
                                 // 直前に"できた"にしたタスクがあればそれを3秒間表示
-                                if (showDoneIdx !== null) {
-                                    const doneTask = tasks?.find((task) => task.id === showDoneIdx);
+                                if (showDoneId !== null) {
+                                    const doneTask = tasks?.find((task) => task.id === showDoneId);
                                     if (doneTask) {
                                         return (
                                             <TaskItem
-                                                key={showDoneIdx}
+                                                key={showDoneId}
                                                 currentUser={currentUser}
                                                 task={{ ...doneTask, done: true }}
                                                 style={{ maxWidth: itemMaxWidth, borderWidth: TASK_CORD_BORDER }}
@@ -191,14 +191,14 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                                             style={{ maxWidth: itemMaxWidth, borderWidth: TASK_CORD_BORDER }}
                                             onPress={() => {
                                                 if (!showCompleted) {
-                                                    setShowDoneIdx(task.id);
+                                                    setShowDoneId(task.id);
                                                 }
                                                 toggleTaskDone(userId, selectedTab || '', task.id);
                                                 if (timerRef.current) {
                                                     clearTimeout(timerRef.current);
                                                 }
                                                 timerRef.current = setTimeout(() => {
-                                                    setShowDoneIdx(null);
+                                                    setShowDoneId(null);
                                                 }, doneShowTime);
                                             }}
                                         />

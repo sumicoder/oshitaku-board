@@ -1,4 +1,5 @@
 import React from 'react';
+import { AntDesign } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Task, User } from '../context/UserContext';
 import { hexToRgba } from '../utils/hexToRgba';
@@ -17,8 +18,10 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, currentUser, style, onPress, 
             <Text style={styles.taskIcon}>{task.image}</Text>
             <Text style={styles.taskTitle}>{task.title}</Text>
             {task.done && !editMode && (
-                <View style={[styles.overlay, { backgroundColor: hexToRgba(currentUser.color, 0.7) }]}>
-                    <Text style={styles.overlayText}>できた！</Text>
+                <View style={[styles.overlay, { backgroundColor: hexToRgba(currentUser.color, 0.95) }]}>
+                    <Text style={styles.overlayText}>
+                        <AntDesign name="check" size={24} color="white" />
+                    </Text>
                 </View>
             )}
         </TouchableOpacity>

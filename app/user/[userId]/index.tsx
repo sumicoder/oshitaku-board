@@ -1,9 +1,9 @@
+import React, { useCallback, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import TaskItem from '../../components/TaskItem';
 import { colorList, iconList, useUserContext } from '../../context/UserContext';
+import TaskItem from '../../components/TaskItem';
 
 // ユーザー詳細ページのコンポーネント
 const UserDetailScreen = () => {
@@ -13,7 +13,7 @@ const UserDetailScreen = () => {
     const { users, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask, editUser, deleteUser } = useUserContext();
 
     // userId（string）で一致するユーザーを検索
-    const currentUser = users.find(u => u.id === userId);
+    const currentUser = users.find((u) => u.id === userId);
 
     // ユーザー名編集用の状態
     const [newEditUserName, setNewEditUserName] = useState(currentUser?.name || '');
@@ -196,7 +196,10 @@ const UserDetailScreen = () => {
                             <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
                                 {currentUser.taskLists.map((list) => (
                                     <View key={list.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <TouchableOpacity style={[styles.tab, { borderBottomColor: selectedTab === list.id ? currentUser.color : 'transparent' }]} onPress={() => setSelectedTab(list.id)}>
+                                        <TouchableOpacity
+                                            style={[styles.tab, { borderBottomColor: selectedTab === list.id ? currentUser.color : 'transparent' }]}
+                                            onPress={() => setSelectedTab(list.id)}
+                                        >
                                             <Text style={[styles.tabText, { fontWeight: selectedTab === list.id ? 'bold' : 'normal', color: selectedTab === list.id ? currentUser.color : '#333' }]}>
                                                 {list.name}
                                             </Text>
@@ -226,24 +229,26 @@ const UserDetailScreen = () => {
                         </TouchableOpacity>
                         {/* タスク一覧（TaskItemで表示） */}
                         <View style={styles.taskList}>
-                            {currentUser.taskLists.find(list => list.id === selectedTab)?.tasks.length === 0 ? (
+                            {currentUser.taskLists.find((list) => list.id === selectedTab)?.tasks.length === 0 ? (
                                 <Text style={styles.noTask}>タスクなし</Text>
                             ) : (
-                                currentUser.taskLists.find(list => list.id === selectedTab)?.tasks.map((task, taskIdx) => (
-                                    <View key={taskIdx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                                        <TaskItem
-                                            task={task}
-                                            currentUser={currentUser}
-                                            style={{ flex: 1, borderWidth: 1, marginRight: 24 }}
-                                            onPress={() => handleOpenEditTaskModal(selectedTab || '', taskIdx, task)}
-                                            editMode={true}
-                                        />
-                                        {/* 削除ボタン */}
-                                        <TouchableOpacity style={{ marginRight: 20 }} onPress={() => handleDeleteTask(selectedTab || '', task.id)}>
-                                            <Ionicons name="trash" size={40} color="#f44" />
-                                        </TouchableOpacity>
-                                    </View>
-                                ))
+                                currentUser.taskLists
+                                    .find((list) => list.id === selectedTab)
+                                    ?.tasks.map((task, taskIdx) => (
+                                        <View key={taskIdx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                                            <TaskItem
+                                                task={task}
+                                                currentUser={currentUser}
+                                                style={{ flex: 1, borderWidth: 1, marginRight: 24 }}
+                                                onPress={() => handleOpenEditTaskModal(selectedTab || '', taskIdx, task)}
+                                                editMode={true}
+                                            />
+                                            {/* 削除ボタン */}
+                                            <TouchableOpacity style={{ marginRight: 20 }} onPress={() => handleDeleteTask(selectedTab || '', task.id)}>
+                                                <Ionicons name="trash" size={40} color="#f44" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    ))
                             )}
                         </View>
                         {/* タスクリスト名編集モーダル */}

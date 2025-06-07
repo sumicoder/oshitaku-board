@@ -108,7 +108,9 @@ export default function MainPage() {
                 applyDimensionsByOrientation(orientation, longLength, shortLength, setWindowWidth, setWindowHeight);
             }
         };
-        if (orientation) update();
+        if (orientation) {
+            update();
+        }
     }, [dimensions, orientation, longLength, shortLength]);
 
     // アプリの状態変更を監視 フォアグランドになった時にストレージから値を取得

@@ -16,9 +16,9 @@ export default function CustomDrawerContent() {
     const [selectedColor, setSelectedColor] = useState(colorList[0]);
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            {/* メンバー追加ボタン */}
+            {/* ユーザー追加ボタン */}
             <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-                <Text style={styles.addBtnText}>＋ メンバー追加</Text>
+                <Text style={styles.addBtnText}>＋ ユーザー追加</Text>
             </TouchableOpacity>
             {/* ユーザー一覧 */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
@@ -38,11 +38,11 @@ export default function CustomDrawerContent() {
                     </TouchableOpacity>
                 </View>
             ))}
-            {/* メンバー追加モーダル */}
+            {/* ユーザー追加モーダル */}
             <Modal visible={modalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
                     <ScrollView contentContainerStyle={styles.modalContent}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>メンバー名を入力</Text>
+                        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>ユーザー名を入力</Text>
                         <TextInput style={styles.input} placeholder="名前" value={newUserName} onChangeText={setNewUserName} />
                         <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 12 }}>色を選択</Text>
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
