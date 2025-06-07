@@ -17,9 +17,13 @@ export default function CustomDrawerContent() {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {/* ユーザー追加ボタン */}
-            <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-                <Text style={styles.addBtnText}>＋ ユーザー追加</Text>
-            </TouchableOpacity>
+            {users.length < 3 ? (
+                <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
+                    <Text style={styles.addBtnText}>＋ ユーザー追加</Text>
+                </TouchableOpacity>
+            ) : (
+                <Text style={styles.sectionTitle}>ユーザーは3人までしか追加できません</Text>
+            )}
             {/* ユーザー一覧 */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
             {users.map((user, idx) => (
@@ -125,10 +129,11 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     userName: {
-        fontSize: 16,
+        fontSize: 20,
         color: '#222',
     },
     userContainer: {
+        paddingInlineStart: 20,
         marginHorizontal: 16,
         marginVertical: 12,
         flexDirection: 'row',
