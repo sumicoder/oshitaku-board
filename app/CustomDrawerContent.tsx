@@ -1,3 +1,4 @@
+import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -10,7 +11,7 @@ import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
 export default function CustomDrawerContent() {
     const router = useRouter();
-    const { users, addUser, selectUser } = useUserContext();
+    const { users, addUser, selectUser, moveUser } = useUserContext();
     const [modalVisible, setModalVisible] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [selectedColor, setSelectedColor] = useState(colorList[0]);
@@ -28,18 +29,29 @@ export default function CustomDrawerContent() {
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
             {users.map((user, idx) => (
                 <View key={user.name + idx} style={styles.userContainer}>
+                    <View>
+                        {/* 上へボタン */}
+                        <TouchableOpacity style={[styles.arrowBtn, idx === 0 && styles.arrowBtnDisabled]} onPress={() => moveUser(user.id, idx - 1)} disabled={idx === 0}>
+                            <AntDesign name="caretup" size={20} color={idx === 0 ? '#ccc' : '#007AFF'} />
+                        </TouchableOpacity>
+                        {/* 下へボタン */}
+                        <TouchableOpacity style={[styles.arrowBtn, idx === users.length - 1 && styles.arrowBtnDisabled]} onPress={() => moveUser(user.id, idx + 1)} disabled={idx === users.length - 1}>
+                            <AntDesign name="caretdown" size={20} color={idx === users.length - 1 ? '#ccc' : '#007AFF'} />
+                        </TouchableOpacity>
+                    </View>
                     <Text style={[styles.userName]}>{user.name}</Text>
-                    <TouchableOpacity
-                        style={[styles.button, { backgroundColor: user.color }]}
-                        onPress={() => {
-                            // ユーザー選択時にユーザーIDを文字列として渡す
-                            selectUser(user.id);
-                            // ユーザー詳細ページへのリンクをユーザーIDを含めて作成
-                            router.push(`/user/${user.id}`);
-                        }}
-                    >
-                        <Text style={styles.buttonText}>編集</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        {/* 編集ボタン */}
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: user.color }]}
+                            onPress={() => {
+                                selectUser(user.id);
+                                router.push(`/user/${user.id}`);
+                            }}
+                        >
+                            <Text style={styles.buttonText}>編集</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             ))}
             {/* ユーザー追加モーダル */}
@@ -139,6 +151,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
     },
     button: {
         paddingHorizontal: 12,
@@ -181,5 +195,11 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 20,
         marginHorizontal: 8,
+    },
+    arrowBtn: {
+        padding: 6,
+    },
+    arrowBtnDisabled: {
+        opacity: 0.5,
     },
 });

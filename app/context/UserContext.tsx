@@ -44,6 +44,7 @@ type UserContextType = {
     toggleTaskDone: (userId: string, listId: string, taskId: string) => void;
     editUser: (userId: string, newName: string, newColor: string) => void;
     deleteUser: (userId: string) => void;
+    moveUser: (userId: string, toIndex: number) => void;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -211,6 +212,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
+    // ユーザー並べ替え
+    const moveUser = (userId: string, toIndex: number) => {
+        setUsers((prev) => {
+            const idx = prev.findIndex(u => u.id === userId);
+            if (idx === -1 || toIndex < 0 || toIndex >= prev.length) return prev;
+            const newArr = [...prev];
+            const [removed] = newArr.splice(idx, 1);
+            newArr.splice(toIndex, 0, removed);
+            return newArr;
+        });
+    };
+
     if (loading) return null; // ローディングUI推奨
 
     return (
@@ -229,6 +242,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 toggleTaskDone,
                 editUser,
                 deleteUser,
+                moveUser,
             }}
         >
             {children}
