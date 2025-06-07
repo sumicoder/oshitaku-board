@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 import { initialTaskLists } from '../data/taskInitialData';
 
 // タスク型
@@ -83,6 +84,43 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (!loading && selectedUserId !== null) AsyncStorage.setItem('selectedUserId', String(selectedUserId));
     }, [selectedUserId, loading]);
+
+    // アプリがアクティブになった時に日付を比較し、異なれば全タスクdoneをfalseにリセット
+    useEffect(() => {
+        const handleAppStateChange = async (nextAppState: string) => {
+            if (nextAppState === 'active') {
+                try {
+                    // ストレージから前回保存日付を取得
+                    const lastDate = await AsyncStorage.getItem('lastCheckedDate');
+                    // 今日の日付（YYYY-MM-DD）
+                    const today = new Date().toISOString().slice(0, 10);
+                    if (lastDate === null || lastDate !== today) {
+                        // 日付が異なれば全タスクdoneをfalseにリセット
+                        setUsers((prev) =>
+                            prev.map((u) => ({
+                                ...u,
+                                taskLists: u.taskLists.map((l) => ({
+                                    ...l,
+                                    tasks: l.tasks.map((t) => ({ ...t, done: false })),
+                                })),
+                            }))
+                        );
+                        // 日付をストレージに保存
+                        await AsyncStorage.setItem('lastCheckedDate', today);
+                    }
+                } catch (e) {
+                    console.error('日付チェック・リセットエラー', e);
+                }
+            }
+        };
+        // AppStateの監視
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+        // 初回マウント時にも一度チェック
+        handleAppStateChange('active');
+        return () => {
+            subscription?.remove();
+        };
+    }, []);
 
     // ユーザー追加
     const addUser = (name: string, color: string) => {
