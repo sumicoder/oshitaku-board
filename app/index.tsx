@@ -1,5 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import React, { useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus, ScaledSize, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { AppState, AppStateStatus, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import ClockArea from './components/ClockArea';
 import UserTasks from './components/UserTasks';
 import { useClockSetting } from './context/ClockSettingContext';
@@ -10,8 +12,16 @@ import { useUserCountSetting } from './context/UserCountSettingContext';
 // メインページのコンポーネント
 export default function MainPage() {
     const dimensions = useWindowDimensions();
-    const [reliableDimensions, setReliableDimensions] = useState<ScaledSize>(dimensions); // 各種設定を取得
+    const width = dimensions.width;
+    const height = dimensions.height;
+    const shortLength = Math.min(width, height);
+    const longLength = Math.max(width, height);
+
+    const [windowWidth, setWindowWidth] = useState<number>(longLength);
+    const [windowHeight, setWindowHeight] = useState<number>(shortLength);
+
     const appState = useRef(AppState.currentState);
+    const [orientation, setOrientation] = useState<ScreenOrientation.Orientation | null>(null);
 
     const { isVisible, clockType, clockSize, clockPosition } = useClockSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
@@ -19,27 +29,119 @@ export default function MainPage() {
     const { users } = useUserContext();
     const visibleUsers = users.slice(0, userCount);
 
-    const { height: windowHeight, width: windowWidth } = reliableDimensions;
+    const [isReady, setIsReady] = useState(false);
+    const [isAppActive, setIsAppActive] = useState(false);
+    const [retryCount, setRetryCount] = useState(0);
 
-    // アプリの状態変更を監視
+    // 初期サイズをストレージに保存
     useEffect(() => {
-        const handleAppStateChange = (nextAppState: string) => {
+        // 初回インストール時のみ画面サイズを保存する
+        const saveInitialSizeIfNeeded = async () => {
+            try {
+                const hasSaved = await AsyncStorage.getItem('hasSavedInitialSize');
+                if (!hasSaved) {
+                    // まだ保存していなければ保存
+                    await AsyncStorage.setItem('longLength', longLength.toString());
+                    await AsyncStorage.setItem('shortLength', shortLength.toString());
+                    await AsyncStorage.setItem('hasSavedInitialSize', 'true');
+                    console.log('初回起動時の画面サイズを保存しました');
+                } else {
+                    // 2回目以降は何もしない
+                    console.log('画面サイズは既に保存済みです');
+                }
+            } catch (e) {
+                console.error('初回画面サイズ保存エラー', e);
+            }
+        };
+        saveInitialSizeIfNeeded();
+    }, [longLength, shortLength]);
+
+    // orientationやdimensionsの変化時に、画面サイズが0ならストレージから復元
+    useEffect(() => {
+        const restoreIfZero = async () => {
+            if (longLength === 0 || shortLength === 0) {
+                try {
+                    const storedLong = await AsyncStorage.getItem('longLength');
+                    const storedShort = await AsyncStorage.getItem('shortLength');
+                    if (storedLong && storedShort) {
+                        setWindowWidth(parseInt(storedLong));
+                        setWindowHeight(parseInt(storedShort));
+                        console.log('orientation/dimensions: ストレージから画面サイズを復元', storedLong, storedShort);
+                        return;
+                    }
+                } catch (e) {
+                    console.error('orientation/dimensions: ストレージ復元エラー', e);
+                }
+            }
+            // 通常の向き反映
+            if (orientation === 3 || orientation === 4) {
+                setWindowWidth(longLength);
+                setWindowHeight(shortLength);
+            } else if (orientation === 1) {
+                setWindowWidth(shortLength);
+                setWindowHeight(longLength);
+            }
+        };
+        if (orientation) restoreIfZero();
+    }, [dimensions, orientation, longLength, shortLength]);
+
+    // アプリの状態変更を監視 フォアグランドになった時にストレージから値を取得
+    useEffect(() => {
+        const handleAppStateChange = async (nextAppState: string) => {
             if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-                // アプリがフォアグラウンドに戻った時の処理
-                console.log('アプリがフォアグラウンドに戻りました。画面サイズを更新します。', dimensions);
-                setReliableDimensions(dimensions);
+                setIsAppActive(true);
+                // フォアグランドになった時に画面サイズが0ならストレージから復元
+                if (longLength === 0 || shortLength === 0) {
+                    try {
+                        const storedLong = await AsyncStorage.getItem('longLength');
+                        const storedShort = await AsyncStorage.getItem('shortLength');
+                        if (storedLong && storedShort) {
+                            setWindowWidth(parseInt(storedLong));
+                            setWindowHeight(parseInt(storedShort));
+                            console.log('appState: ストレージから画面サイズを復元', storedLong, storedShort);
+                        }
+                    } catch (e) {
+                        console.error('appState: ストレージ復元エラー', e);
+                    }
+                }
             }
             appState.current = nextAppState as AppStateStatus;
         };
 
         const subscription = AppState.addEventListener('change', handleAppStateChange);
-        return () => subscription?.remove();
+        return () => {
+            subscription?.remove();
+        };
+    }, [longLength, shortLength]);
+
+    // 画面の向きを取得
+    useEffect(() => {
+        const subscription = ScreenOrientation.addOrientationChangeListener((evt) => {
+            setOrientation(evt.orientationInfo.orientation);
+        });
+        // 初期取得
+        ScreenOrientation.getOrientationAsync().then((ori) => {
+            setOrientation(ori);
+        });
+        return () => {
+            ScreenOrientation.removeOrientationChangeListener(subscription);
+        };
     }, []);
 
-    // 画面サイズが変更された時に最新のサイズを取得
+    // orientationとdimensionsに応じてreliableDimensionsを正しく更新
     useEffect(() => {
-        console.log('画面サイズが変更されました。', dimensions);
-    }, [dimensions, reliableDimensions]);
+        if (!dimensions || !orientation) return;
+
+        if (orientation === 3 || orientation === 4) {
+            setWindowWidth(longLength);
+            setWindowHeight(shortLength);
+        } else if (orientation === 1) {
+            setWindowWidth(shortLength);
+            setWindowHeight(longLength);
+        }
+
+        return;
+    }, [dimensions, orientation]);
 
     // 設定変更時のログ
     useEffect(() => {
@@ -53,6 +155,65 @@ export default function MainPage() {
     useEffect(() => {
         console.log('表示人数設定変更:', { userCount });
     }, [userCount]);
+
+    // 画面サイズ取得のリトライ処理。0のときはストレージからも復元を試みる
+    useEffect(() => {
+        let timeout: number | null = null;
+        const tryGetSize = async () => {
+            try {
+                if (windowWidth > 0 && windowHeight > 0) {
+                    setIsReady(true);
+                } else {
+                    // 画面サイズが0ならストレージから復元を試みる
+                    if (longLength === 0 || shortLength === 0) {
+                        try {
+                            const storedLong = await AsyncStorage.getItem('longLength');
+                            const storedShort = await AsyncStorage.getItem('shortLength');
+                            if (storedLong && storedShort) {
+                                setWindowWidth(parseInt(storedLong));
+                                setWindowHeight(parseInt(storedShort));
+                                console.log('tryGetSize: ストレージから画面サイズを復元', storedLong, storedShort);
+                            }
+                        } catch (e) {
+                            console.error('tryGetSize: ストレージ復元エラー', e);
+                        }
+                    }
+                    // 取得できなければリトライ
+                    timeout = setTimeout(() => {
+                        if (orientation === 3 || orientation === 4) {
+                            setWindowWidth(longLength);
+                            setWindowHeight(shortLength);
+                        } else if (orientation === 1) {
+                            setWindowWidth(shortLength);
+                            setWindowHeight(longLength);
+                        }
+                        setRetryCount((prev) => prev + 1);
+                    }, 300); // 300msごとにリトライ
+                }
+            } catch (e) {
+                // 例外が出てもリトライ
+                timeout = setTimeout(() => {
+                    if (orientation === 3 || orientation === 4) {
+                        setWindowWidth(longLength);
+                        setWindowHeight(shortLength);
+                    } else if (orientation === 1) {
+                        setWindowWidth(shortLength);
+                        setWindowHeight(longLength);
+                    }
+                    setRetryCount((prev) => prev + 1);
+                }, 300);
+            }
+        };
+        tryGetSize();
+        return () => {
+            if (timeout) clearTimeout(timeout);
+        };
+    }, [windowWidth, windowHeight, retryCount, isAppActive, orientation, longLength, shortLength]);
+
+    // 取得できなければ何も描画しない
+    if (!isReady) {
+        return null;
+    }
 
     // 並び順を決定
     let columns: React.ReactNode[] = [];

@@ -15,6 +15,8 @@ interface UserTasksProps {
 }
 
 const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth }) => {
+    console.log('windowWidth', windowWidth);
+
     const { users, toggleTaskDone } = useUserContext();
     const currentUser = users && users.length > 0 ? users[userId] : { id: users.length.toString(), name: 'ユーザー', taskLists: [], color: '#007AFF' };
 
