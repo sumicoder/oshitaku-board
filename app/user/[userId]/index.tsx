@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { colorList, iconList, useUserContext } from '../../context/UserContext';
 import TaskItem from '../../components/TaskItem';
+import { colorList, iconList, useUserContext } from '../../context/UserContext';
 
 // ユーザー詳細ページのコンポーネント
 const UserDetailScreen = () => {
@@ -14,6 +14,12 @@ const UserDetailScreen = () => {
 
     // userId（string）で一致するユーザーを検索
     const currentUser = users.find((u) => u.id === userId);
+
+    useEffect(() => {
+        if (!currentUser) {
+            router.push('/');
+        }
+    }, [currentUser]);
 
     // ユーザー名編集用の状態
     const [newEditUserName, setNewEditUserName] = useState(currentUser?.name || '');
@@ -153,7 +159,7 @@ const UserDetailScreen = () => {
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => {
-                                router.push(`/`);
+                                router.push('/');
                             }}
                             style={{ marginLeft: 32, backgroundColor: currentUser?.color || '#fff', padding: 8 }}
                         >
@@ -162,7 +168,7 @@ const UserDetailScreen = () => {
                     ),
                 }}
             />
-            {currentUser ? (
+            {currentUser && (
                 <View style={{ flex: 1, flexDirection: 'row', gap: 40 }}>
                     <View style={{ flex: 0.4 }}>
                         <ScrollView contentContainerStyle={styles.modalContent}>
@@ -304,8 +310,6 @@ const UserDetailScreen = () => {
                         </Modal>
                     </View>
                 </View>
-            ) : (
-                <Text style={styles.errorText}>ユーザーが見つかりません</Text>
             )}
         </ScrollView>
     );
