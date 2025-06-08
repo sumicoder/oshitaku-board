@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useProgressBarSetting } from '../context/ProgressBarSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
@@ -15,7 +16,7 @@ interface UserTasksProps {
 }
 
 const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth }) => {
-    const { users, toggleTaskDone } = useUserContext();
+    const { users, toggleTaskDone, selectUser } = useUserContext();
     const currentUser = users.find((user) => user.id === userId) || { id: Math.random().toString(36).substring(2, 15), name: 'ユーザー', taskLists: [], color: '#007AFF' };
 
     const [selectedTab, setSelectedTab] = useState<string>(currentUser.taskLists[0].id);
@@ -82,12 +83,19 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
         <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
             {/* ユーザー名表示 */}
             {currentUser && (
-                <View style={styles.userName} onLayout={(e) => setProgressBarWidth(e.nativeEvent.layout.width)}>
-                    <Text style={[styles.userNameText, { color: currentUser.color }]}>{currentUser.name}</Text>
-                    {isProgressBarVisible && (
-                        <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: currentUser.color, zIndex: -1, transform: [{ translateX: (-1 + percent) * progressBarWidth }] }} />
-                    )}
-                </View>
+                <TouchableOpacity
+                    onPress={() => {
+                        selectUser(userId);
+                        router.push(`/user/${userId}`);
+                    }}
+                >
+                    <View style={styles.userName} onLayout={(e) => setProgressBarWidth(e.nativeEvent.layout.width)}>
+                        <Text style={[styles.userNameText, { color: currentUser.color }]}>{currentUser.name}</Text>
+                        {isProgressBarVisible && (
+                            <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: currentUser.color, zIndex: -1, transform: [{ translateX: (-1 + percent) * progressBarWidth }] }} />
+                        )}
+                    </View>
+                </TouchableOpacity>
             )}
             {/* タブUI */}
             <View style={styles.tabContainer}>

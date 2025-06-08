@@ -9,6 +9,7 @@ import { colorList, iconList, useUserContext } from '../../context/UserContext';
 const UserDetailScreen = () => {
     // expo-routerからuserIdを取得
     const { userId } = useLocalSearchParams();
+
     // Contextからユーザー情報・タスクリスト並び替え関数を取得
     const { users, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask, editUser, deleteUser } = useUserContext();
 
@@ -37,7 +38,23 @@ const UserDetailScreen = () => {
     const [editTaskInfo, setEditTaskInfo] = useState<{ listId: string; taskIdx: number; task: any } | null>(null);
 
     // タブUIの状態
-    const [selectedTab, setSelectedTab] = useState<string | null>(null);
+    const [selectedTab, setSelectedTab] = useState<string>(currentUser?.taskLists[0]?.id || '');
+
+    // userIdやcurrentUserが変わった時に、編集用のstateを新しいユーザー情報で初期化する
+    useEffect(() => {
+        // currentUserが変わった時に編集用stateを初期化
+        setNewEditUserName(currentUser?.name || '');
+        setSelectedColor(currentUser?.color || '#fff');
+        setSelectedTab(currentUser?.taskLists[0]?.id || '');
+        // 必要なら他のstateもリセット
+        setModalVisible(false);
+        setEditListId(null);
+        setEditListName('');
+        setEditTaskInfo(null);
+        setNewTaskName('');
+        setSelectedImage(iconList[0]);
+        setTargetListIdx(null);
+    }, [userId, currentUser]);
 
     // タスクリスト追加ハンドラ
     const handleAddTaskList = useCallback(() => {
