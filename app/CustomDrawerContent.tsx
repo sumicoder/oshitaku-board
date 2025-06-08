@@ -138,7 +138,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     sectionTitle: {
-        fontSize: 15,
+        fontSize: 18,
+        textAlign: 'center',
         fontWeight: 'bold',
         marginTop: 24,
         marginBottom: 8,

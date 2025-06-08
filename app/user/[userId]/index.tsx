@@ -106,11 +106,10 @@ const UserDetailScreen = () => {
     };
     // タスクリスト削除
     const handleDeleteList = (listId: string) => {
-        // Alert.alert('確認', 'このタスクリストを削除しますか？', [
-        //     { text: 'キャンセル', style: 'cancel' },
-        //     { text: '削除', style: 'destructive', onPress: () => deleteTaskList(userIndex, listIdx) },
-        // ]);
-        deleteTaskList(currentUser?.id || '', listId);
+        Alert.alert('確認', 'このタスクリストを削除しますか？', [
+            { text: 'キャンセル', style: 'cancel' },
+            { text: '削除', style: 'destructive', onPress: () => deleteTaskList(currentUser?.id || '', listId) },
+        ]);
     };
     // タスク編集開始
     const handleOpenEditTaskModal = (listId: string, taskIdx: number, task: any) => {

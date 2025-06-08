@@ -8,8 +8,8 @@ const SettingStyles = StyleSheet.create({
         paddingVertical: 2,
     },
     label: {
-        width: 80,
-        fontSize: 14,
+        width: 100,
+        fontSize: 16,
         fontWeight: '600',
         color: '#222',
     },
@@ -47,7 +47,7 @@ const SettingStyles = StyleSheet.create({
         backgroundColor: '#007AFF',
     },
     radioLabel: {
-        fontSize: 11,
+        fontSize: 16,
         color: '#333',
     },
     radioLabelSelected: {
