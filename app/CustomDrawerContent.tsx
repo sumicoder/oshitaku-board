@@ -1,87 +1,87 @@
+import { AntDesign } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { RelativePathString, usePathname, useRouter } from 'expo-router';
 import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useUserContext } from './context/UserContext';
+import DraggableFlatList from 'react-native-draggable-flatlist';
+import type { User } from './context/UserContext';
+import { colorList, useUserContext } from './context/UserContext';
 import ClockSettingAccordion from './settings/ClockSettingAccordion';
-import PeopleCountSettingAccordion from './settings/PeopleCountSettingAccordion';
 import ProgressBarSettingAccordion from './settings/ProgressBarSettingAccordion';
 import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion';
-
-// ページリンク情報の配列
-const pageLinks = [
-    { path: '/', label: 'ホーム' },
-    { path: '/user', label: 'ユーザー一覧' },
-    // { path: '/(tabs)', label: 'タブ' },
-];
+import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
 export default function CustomDrawerContent() {
     const router = useRouter();
-    const pathname = usePathname();
-    const { members, selectedUserIndex, addMember, selectUser } = useUserContext();
+    const { users, addUser, selectUser, moveUser, setUsersOrder } = useUserContext();
     const [modalVisible, setModalVisible] = useState(false);
-    const [newMemberName, setNewMemberName] = useState('');
-
-    // ページ遷移用リンクの共通関数
-    const handleLinkPress = (path: string) => {
-        if (pathname !== path) {
-            router.push(path as RelativePathString);
-        }
-    };
-
+    const [newUserName, setNewUserName] = useState('');
+    const [selectedColor, setSelectedColor] = useState(colorList[0]);
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            {/* ページ遷移リンク */}
-            {pageLinks.map((link) => (
-                <TouchableOpacity
-                    key={link.path}
-                    style={[styles.linkRow, pathname === link.path && styles.activeLinkRow]}
-                    onPress={() => handleLinkPress(link.path)}
-                    disabled={pathname === link.path} // 現在ページはタップ不可
-                >
-                    <Text style={[styles.linkText, pathname === link.path && styles.activeLinkText]}>{link.label}</Text>
+            {/* ユーザー追加ボタン */}
+            {users.length < 3 ? (
+                <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
+                    <Text style={styles.addBtnText}>＋ ユーザー追加</Text>
                 </TouchableOpacity>
-            ))}
-
-            {/* メンバー追加ボタン */}
-            <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-                <Text style={styles.addBtnText}>＋ メンバー追加</Text>
-            </TouchableOpacity>
-            {/* ユーザー一覧 */}
+            ) : (
+                <Text style={styles.sectionTitle}>ユーザーは3人までしか追加できません</Text>
+            )}
+            {/* ユーザー一覧（ドラッグ&ドロップ対応） */}
             <Text style={styles.sectionTitle}>ユーザー一覧</Text>
-            {members.map((member, idx) => (
-                <View key={member.name + idx} style={styles.userContainer}>
-                    <TouchableOpacity
-                        style={[styles.userRow, idx === selectedUserIndex && styles.selectedUserRow]}
-                        onPress={() => {
-                            selectUser(idx);
-                        }}
-                    >
-                        <Text style={[styles.userName, idx === selectedUserIndex && styles.selectedUserName]}>{member.name}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            router.push(`/user/${selectedUserIndex}`);
-                        }}
-                    >
-                        <Text style={styles.buttonText}>編集</Text>
-                    </TouchableOpacity>
-                </View>
-            ))}
-            {/* メンバー追加モーダル */}
+            <DraggableFlatList
+                data={users}
+                keyExtractor={(item) => item.id}
+                onDragEnd={({ data }: { data: User[] }) => setUsersOrder(data)}
+                renderItem={({ item, drag, isActive }: { item: User; drag: () => void; isActive: boolean }) => (
+                    <View style={[styles.userContainer, isActive && { backgroundColor: '#e0e7ff' }]} key={item.id}>
+                        {/* ドラッグハンドル */}
+                        <TouchableOpacity onLongPress={drag} style={styles.dragHandle}>
+                            <AntDesign name="bars" size={22} color="#888" />
+                        </TouchableOpacity>
+                        {/* ユーザー名 */}
+                        <Text style={[styles.userName]}>{item.name}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            {/* 編集ボタン */}
+                            <TouchableOpacity
+                                style={[styles.button, { backgroundColor: item.color }]}
+                                onPress={() => {
+                                    selectUser(item.id);
+                                    router.push(`/user/${item.id}`);
+                                }}
+                            >
+                                <Text style={styles.buttonText}>編集</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )}
+                scrollEnabled={false}
+                activationDistance={10}
+                containerStyle={{ paddingBottom: 8 }}
+            />
+            {/* ユーザー追加モーダル */}
             <Modal visible={modalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
-                    <ScrollView contentContainerStyle={{ ...styles.modalContent, alignItems: 'center' }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>メンバー名を入力</Text>
-                        <TextInput style={styles.input} placeholder="名前" value={newMemberName} onChangeText={setNewMemberName} />
+                    <ScrollView contentContainerStyle={styles.modalContent}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>ユーザー名を入力</Text>
+                        <TextInput style={styles.input} placeholder="名前" value={newUserName} onChangeText={setNewUserName} />
+                        <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 12 }}>色を選択</Text>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                            {colorList.map((color) => (
+                                <TouchableOpacity
+                                    key={color}
+                                    style={[styles.colorButton, { backgroundColor: color }, selectedColor === color && styles.colorButtonSelected]}
+                                    onPress={() => setSelectedColor(color)}
+                                />
+                            ))}
+                        </View>
                         <View style={{ flexDirection: 'row', marginTop: 12 }}>
                             <TouchableOpacity
                                 style={styles.modalBtn}
                                 onPress={() => {
-                                    if (newMemberName.trim()) {
-                                        addMember(newMemberName.trim());
-                                        setNewMemberName('');
+                                    if (newUserName.trim()) {
+                                        addUser(newUserName.trim(), selectedColor);
+                                        setNewUserName('');
                                         setModalVisible(false);
                                     }
                                 }}
@@ -99,7 +99,7 @@ export default function CustomDrawerContent() {
             <ClockSettingAccordion />
             <ProgressBarSettingAccordion />
             <TaskDisplaySettingAccordion />
-            <PeopleCountSettingAccordion />
+            <UserCountSettingAccordion />
         </ScrollView>
     );
 }
@@ -109,63 +109,6 @@ const styles = StyleSheet.create({
     container: {
         paddingTop: 40,
         paddingBottom: 40,
-    },
-    linkRow: {
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-    },
-    activeLinkRow: {
-        backgroundColor: '#e6f0ff',
-    },
-    linkText: {
-        fontSize: 16,
-        color: '#007AFF',
-    },
-    activeLinkText: {
-        color: '#0051a8',
-        fontWeight: 'bold',
-    },
-    sectionTitle: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        marginTop: 24,
-        marginBottom: 8,
-        marginLeft: 16,
-        color: '#333',
-    },
-    userRow: {
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-    },
-    selectedUserRow: {
-        backgroundColor: '#e0e7ff',
-    },
-    userName: {
-        fontSize: 16,
-        color: '#222',
-    },
-    userContainer: {
-        marginTop: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    button: {
-        backgroundColor: '#007AFF',
-        padding: 12,
-        borderRadius: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    selectedUserName: {
-        color: '#007AFF',
-        fontWeight: 'bold',
     },
     addBtn: {
         margin: 16,
@@ -182,15 +125,54 @@ const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     modalContent: {
         backgroundColor: '#fff',
         borderRadius: 12,
         padding: 24,
+        marginVertical: 100,
+        width: 300,
         alignItems: 'center',
-        width: 280,
+        justifyContent: 'center',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        marginTop: 24,
+        marginBottom: 8,
+        marginLeft: 16,
+        color: '#333',
+    },
+    userName: {
+        fontSize: 20,
+        color: '#222',
+    },
+    userContainer: {
+        paddingInlineStart: 20,
+        marginHorizontal: 16,
+        marginVertical: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+    },
+    button: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    selectedUserName: {
+        color: '#007AFF',
+        fontWeight: 'bold',
     },
     input: {
         borderWidth: 1,
@@ -201,6 +183,18 @@ const styles = StyleSheet.create({
         marginTop: 12,
         fontSize: 16,
     },
+    colorButton: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        marginRight: 8,
+        borderWidth: 2,
+        borderColor: '#ccc',
+    },
+    colorButtonSelected: {
+        borderColor: '#007AFF',
+        borderWidth: 3,
+    },
     modalBtn: {
         backgroundColor: '#007AFF',
         borderRadius: 8,
@@ -208,32 +202,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         marginHorizontal: 8,
     },
-    taskListRow: {
-        flexDirection: 'row',
+    arrowBtn: {
+        padding: 6,
+    },
+    arrowBtnDisabled: {
+        opacity: 0.5,
+    },
+    dragHandle: {
+        padding: 6,
+        marginRight: 8,
         alignItems: 'center',
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-    },
-    taskListNameBtn: {
-        flex: 1,
-    },
-    taskListName: {
-        fontSize: 16,
-        color: '#222',
-    },
-    editBtn: {
-        padding: 8,
-    },
-    editBtnText: {
-        color: '#007AFF',
-        fontSize: 16,
-    },
-    deleteBtn: {
-        padding: 8,
-    },
-    deleteBtnText: {
-        color: '#f44',
-        fontSize: 16,
+        justifyContent: 'center',
     },
 });
