@@ -19,7 +19,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, currentUser, style, onPress, 
             <Text style={styles.taskTitle}>{task.title}</Text>
             {task.done && !editMode && (
                 <View style={[styles.overlay, { backgroundColor: hexToRgba(currentUser.color, 0.95) }]}>
-                    <Text style={styles.overlayText}>{renderIcon({ name: 'check', type: 'AntDesign' }, 24, 'white')}</Text>
+                    <Text style={styles.overlayText}>{renderIcon({ name: 'check', type: 'AntDesign' }, 32, 'white')}</Text>
                 </View>
             )}
         </TouchableOpacity>
@@ -39,6 +39,10 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     taskIcon: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
         marginRight: 16,
         flexShrink: 0,
     },

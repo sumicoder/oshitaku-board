@@ -16,7 +16,7 @@ export default function TaskDisplaySettingAccordion() {
     }, [displayMode, setShowCompleted]);
 
     return (
-        <SettingAccordion title="タスク表示の設定">
+        <SettingAccordion title="おしたく表示の設定">
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>表示方法</Text>
                 <View style={SettingStyles.radioGroup}>
@@ -25,7 +25,7 @@ export default function TaskDisplaySettingAccordion() {
                 </View>
             </View>
             <View style={SettingStyles.row}>
-                <Text style={SettingStyles.label}>完了タスクを表示</Text>
+                <Text style={SettingStyles.label}>完了した      「やること」を表示</Text>
                 <SwitchButton value={showCompleted} onValueChange={setShowCompleted} disabled={displayMode === 'single'} />
             </View>
         </SettingAccordion>

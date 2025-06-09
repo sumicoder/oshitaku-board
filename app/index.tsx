@@ -155,7 +155,7 @@ export default function MainPage() {
     }, [isVisible, clockType, clockSize, clockPosition]);
 
     useEffect(() => {
-        console.log('タスク表示設定変更:', { displayMode, showCompleted });
+        console.log('やること表示設定変更:', { displayMode, showCompleted });
     }, [displayMode, showCompleted]);
 
     useEffect(() => {

@@ -138,11 +138,11 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
 
             {/* 選択中のタスクリストのみ表示 */}
             {currentUser.taskLists.length === 0 ? (
-                <Text style={styles.noTask}>タスクなし</Text>
+                <Text style={styles.noTask}>「やること」の登録がありません</Text>
             ) : (
                 <View style={styles.taskContainer}>
                     {tasks?.length === 0 ? (
-                        <Text style={styles.noTask}>タスクなし</Text>
+                        <Text style={styles.noTask}>「やること」の登録がありません</Text>
                     ) : displayMode === 'single' ? (
                         // 単一表示: 横並び・スナップ
                         <ScrollView

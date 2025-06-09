@@ -77,11 +77,11 @@ const UserDetailScreen = () => {
     const handleAddTaskList = useCallback(() => {
         if (!currentUser) return;
         if (currentUser.taskLists.length >= 3) {
-            Alert.alert('タスクリストは最大3つまでです');
+            Alert.alert('お支度ボードは最大3つまでです');
             return;
         }
         // 仮のリスト名（本来はモーダルで入力）
-        addTaskList(currentUser.id, `新しいリスト${currentUser.taskLists.length + 1}`);
+        addTaskList(currentUser.id, `新しいお支度ボード${currentUser.taskLists.length + 1}`);
     }, [currentUser, addTaskList]);
 
     // タスク追加ハンドラ（モーダルを開く）
@@ -96,7 +96,7 @@ const UserDetailScreen = () => {
     const handleRegisterTask = useCallback(() => {
         if (!currentUser || targetListIdx === null) return;
         if (!newTaskName.trim()) {
-            Alert.alert('タスク名を入力してください');
+            Alert.alert('「やること」名を入力してください');
             return;
         }
         addTask(currentUser?.id || '', targetListIdx.toString(), {
@@ -123,7 +123,7 @@ const UserDetailScreen = () => {
     };
     // タスクリスト削除
     const handleDeleteList = (listId: string) => {
-        Alert.alert('確認', 'このタスクリストを削除しますか？', [
+        Alert.alert('確認', 'このお支度ボードを削除しますか？', [
             { text: 'キャンセル', style: 'cancel' },
             { text: '削除', style: 'destructive', onPress: () => deleteTaskList(currentUser?.id || '', listId) },
         ]);
@@ -139,7 +139,7 @@ const UserDetailScreen = () => {
     const handleEditTask = () => {
         if (!currentUser || !editTaskInfo) return;
         if (!newTaskName.trim()) {
-            Alert.alert('タスク名を入力してください');
+            Alert.alert('「やること」名を入力してください');
             return;
         }
         editTask(currentUser?.id || '', editTaskInfo.listId, editTaskInfo.task.id, {
@@ -153,7 +153,7 @@ const UserDetailScreen = () => {
     };
     // タスク削除
     const handleDeleteTask = (listId: string, taskIdx: string) => {
-        Alert.alert('確認', 'このタスクを削除しますか？', [
+        Alert.alert('確認', 'この「やること」を削除しますか？', [
             { text: 'キャンセル', style: 'cancel' },
             { text: '削除', style: 'destructive', onPress: () => deleteTask(currentUser?.id || '', listId, taskIdx) },
         ]);
@@ -207,7 +207,7 @@ const UserDetailScreen = () => {
                         <ScrollView contentContainerStyle={styles.modalContent}>
                             <Text style={styles.title}>ユーザー名を編集</Text>
                             <TextInput style={styles.input} value={newEditUserName} onChangeText={setNewEditUserName} placeholder="ユーザー名" />
-                            <Text style={styles.title}>色を選択</Text>
+                            <Text style={styles.title}>色を選択してください</Text>
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                                 {colorList.map((color) => (
                                     <TouchableOpacity
@@ -230,7 +230,7 @@ const UserDetailScreen = () => {
                         </ScrollView>
                     </View>
                     <View style={{ flex: 0.6 }}>
-                        <Text style={styles.title}>{currentUser.name} のタスクリスト</Text>
+                        <Text style={styles.title}>{currentUser.name} のお支度ボード</Text>
                         <View style={styles.tabContainer}>
                             <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
                                 {currentUser.taskLists &&
@@ -260,7 +260,7 @@ const UserDetailScreen = () => {
                                     <View style={{ marginLeft: 40 }}>
                                         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => handleAddTaskList()}>
                                             <Ionicons name="add" size={24} color={'#333'} />
-                                            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>タスクリストを追加</Text>
+                                            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>お支度ボードを追加</Text>
                                         </TouchableOpacity>
                                     </View>
                                 )}
@@ -269,13 +269,13 @@ const UserDetailScreen = () => {
                         {/* タスク追加ボタン */}
                         {currentUser.taskLists && currentUser.taskLists.length > 0 && (
                             <TouchableOpacity style={[styles.addBtn, { backgroundColor: currentUser?.color || '#007AFF' }]} onPress={() => handleOpenAddTaskModal(selectedTab || '')}>
-                                <Text style={styles.addBtnText}>＋ タスク追加</Text>
+                                <Text style={styles.addBtnText}>＋ 「やること」追加</Text>
                             </TouchableOpacity>
                         )}
                         {/* タスク一覧（TaskItemで表示） */}
                         <View style={styles.taskList}>
                             {!currentUser.taskLists || currentUser.taskLists.length === 0 || !currentUser.taskLists.find((list) => list.id === selectedTab) ? (
-                                <Text style={styles.noTask}>タスクなし</Text>
+                                <Text style={styles.noTask}>「やること」の登録がありません</Text>
                             ) : (
                                 currentUser.taskLists
                                     .find((list) => list.id === selectedTab)
@@ -300,8 +300,8 @@ const UserDetailScreen = () => {
                         <Modal visible={editListId !== null} transparent animationType="fade">
                             <View style={styles.modalOverlay}>
                                 <ScrollView contentContainerStyle={styles.modalContent}>
-                                    <Text style={styles.title}>リスト名を編集</Text>
-                                    <TextInput style={styles.input} value={editListName} onChangeText={setEditListName} placeholder="リスト名" />
+                                    <Text style={styles.title}>お支度ボード名を編集</Text>
+                                    <TextInput style={styles.input} value={editListName} onChangeText={setEditListName} placeholder="お支度ボード名" />
                                     <View style={{ flexDirection: 'row', marginTop: 16 }}>
                                         <TouchableOpacity style={styles.modalBtn} onPress={handleEditListName}>
                                             <Text style={{ color: '#fff', fontSize: 20 }}>保存</Text>
@@ -317,9 +317,9 @@ const UserDetailScreen = () => {
                         <Modal visible={modalVisible} transparent animationType="slide">
                             <View style={styles.modalOverlay}>
                                 <ScrollView contentContainerStyle={styles.modalContent}>
-                                    <Text style={styles.title}>{editTaskInfo ? 'タスクを編集' : 'タスクを追加'}</Text>
-                                    {/* タスク名入力 */}
-                                    <TextInput style={styles.input} placeholder="タスク名" value={newTaskName} onChangeText={setNewTaskName} />
+                                    <Text style={styles.title}>{editTaskInfo ? '「やること」を編集' : '「やること」を追加'}</Text>
+                                    {/* 「やること」名入力 */}
+                                    <TextInput style={styles.input} placeholder="「やること」名" value={newTaskName} onChangeText={setNewTaskName} />
                                     {/* アイコン選択 */}
                                     <Text style={styles.title}>アイコン</Text>
                                     <View style={styles.modalWrap}>

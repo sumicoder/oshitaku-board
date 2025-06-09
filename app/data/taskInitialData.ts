@@ -34,7 +34,7 @@ export const initialTaskLists: TaskList[] = [
             { id:'19', title: 'よるごはんをたべる', image: { name: 'food-turkey', type: 'MaterialCommunityIcons' }, done: false },
             { id:'20', title: 'はみがきをする', image: { name: 'toothbrush', type: 'MaterialCommunityIcons' }, done: false },
             { id:'21', title: 'トイレにいく', image: { name: 'toilet', type: 'MaterialCommunityIcons' }, done: false },
-            { id:'22', title: 'パジャマをきる', image: { name: 'tshirt', type: 'MaterialCommunityIcons' }, done: false },
+            { id:'22', title: 'パジャマをきる', image: { name: 'tshirt', type: 'FontAwesome5' }, done: false },
             { id:'23', title: 'おやすみ', image: { name: 'moon', type: 'Feather' }, done: false },
             { id:'24', title: 'ならいごとのしゅくだい', image: { name: 'book', type: 'Feather' }, done: false },
         ],
