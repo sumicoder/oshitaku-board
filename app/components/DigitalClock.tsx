@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         backgroundColor: 'rgba(255,255,255,0.7)',
         borderRadius: 12,
-        paddingHorizontal: 16,
+        paddingHorizontal: 2,
         paddingVertical: 8,
     },
 });
