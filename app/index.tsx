@@ -198,7 +198,7 @@ export default function MainPage() {
         columns = [
             <View style={[styles.col, { gap: 20 }]} key="empty">
                 <Text style={{ fontSize: 24, fontWeight: 'bold', paddingHorizontal: 20 }}>ユーザーが設定されていません</Text>
-                <TouchableOpacity style={{ marginLeft: 32, backgroundColor: '#007AFF', padding: 8 }} onPress={() => setModalVisible(true)}>
+                <TouchableOpacity style={{ backgroundColor: '#007AFF', padding: 8 }} onPress={() => setModalVisible(true)}>
                     <Text style={{ fontSize: 24, fontWeight: 'bold', paddingHorizontal: 20, color: '#fff' }}>ユーザーを設定する</Text>
                 </TouchableOpacity>
                 {/* ユーザー追加モーダル */}

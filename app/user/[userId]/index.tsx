@@ -25,7 +25,7 @@ const UserDetailScreen = () => {
                     onPress={() => {
                         router.push('/');
                     }}
-                    style={{ marginLeft: 32, backgroundColor: currentUser?.color || '#fff', padding: 8 }}
+                    style={{ backgroundColor: currentUser?.color || '#fff', padding: 8 }}
                 >
                     <Text style={{ fontSize: 24, fontWeight: 'bold', paddingHorizontal: 20 }}>戻る</Text>
                 </TouchableOpacity>
