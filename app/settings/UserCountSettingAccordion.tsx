@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import RadioButton from '../components/RadioButton';
 import SettingAccordion from '../components/SettingAccordion';
@@ -14,6 +14,13 @@ export default function UserCountSettingAccordion() {
     // 最大3つまで
     const maxCount = Math.min(users.length, 3);
     const options = Array.from({ length: maxCount }, (_, i) => i + 1);
+
+    // usersが変わった時やuserCountが変わった時に必ず1にリセット
+    useEffect(() => {
+        if (userCount !== 1) {
+            setUserCount(1);
+        }
+    }, [users.length]); // users.lengthが変わった時に1に戻す
 
     return (
         <SettingAccordion title="表示人数の設定">
