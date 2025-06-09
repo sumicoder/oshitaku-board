@@ -17,6 +17,22 @@ const UserDetailScreen = () => {
     // userId（string）で一致するユーザーを検索
     const currentUser = users.find((u) => u.id === userId);
 
+    if (!currentUser?.taskLists) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 }}>
+                <Text style={styles.errorText}>ユーザーが見つかりません</Text>
+                <TouchableOpacity
+                    onPress={() => {
+                        router.push('/');
+                    }}
+                    style={{ marginLeft: 32, backgroundColor: currentUser?.color || '#fff', padding: 8 }}
+                >
+                    <Text style={{ fontSize: 24, fontWeight: 'bold', paddingHorizontal: 20 }}>戻る</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
     useEffect(() => {
         if (!currentUser) {
             router.push('/');
@@ -46,8 +62,8 @@ const UserDetailScreen = () => {
         // currentUserが変わった時に編集用stateを初期化
         setNewEditUserName(currentUser?.name || '');
         setSelectedColor(currentUser?.color || '#fff');
-        setSelectedTab(currentUser?.taskLists[0]?.id || '');
-        // 必要なら他のstateもリセット
+        // タスクリストが存在する場合のみselectedTabをセット
+        setSelectedTab(currentUser?.taskLists && currentUser.taskLists.length > 0 ? currentUser.taskLists[0].id : '');
         setModalVisible(false);
         setEditListId(null);
         setEditListName('');
@@ -217,26 +233,30 @@ const UserDetailScreen = () => {
                         <Text style={styles.title}>{currentUser.name} のタスクリスト</Text>
                         <View style={styles.tabContainer}>
                             <ScrollView horizontal contentContainerStyle={styles.tabScroll}>
-                                {currentUser.taskLists.map((list) => (
-                                    <View key={list.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <TouchableOpacity
-                                            style={[styles.tab, { borderBottomColor: selectedTab === list.id ? currentUser.color : 'transparent' }]}
-                                            onPress={() => setSelectedTab(list.id)}
-                                        >
-                                            <Text style={[styles.tabText, { fontWeight: selectedTab === list.id ? 'bold' : 'normal', color: selectedTab === list.id ? currentUser.color : '#333' }]}>
-                                                {list.name}
-                                            </Text>
-                                        </TouchableOpacity>
-                                        {/* タスクリスト編集・削除ボタン */}
-                                        <TouchableOpacity onPress={() => handleOpenEditListModal(list.id, list.name)} style={{ marginLeft: 4 }}>
-                                            <Ionicons name="pencil" size={24} color={'#333'} />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => handleDeleteList(list.id)} style={{ marginLeft: 2 }}>
-                                            <Ionicons name="trash" size={24} color="#f44" />
-                                        </TouchableOpacity>
-                                    </View>
-                                ))}
-                                {currentUser.taskLists.length < 3 && (
+                                {currentUser.taskLists &&
+                                    currentUser.taskLists.length > 0 &&
+                                    currentUser.taskLists.map((list) => (
+                                        <View key={list.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <TouchableOpacity
+                                                style={[styles.tab, { borderBottomColor: selectedTab === list.id ? currentUser.color : 'transparent' }]}
+                                                onPress={() => setSelectedTab(list.id)}
+                                            >
+                                                <Text
+                                                    style={[styles.tabText, { fontWeight: selectedTab === list.id ? 'bold' : 'normal', color: selectedTab === list.id ? currentUser.color : '#333' }]}
+                                                >
+                                                    {list.name}
+                                                </Text>
+                                            </TouchableOpacity>
+                                            {/* タスクリスト編集・削除ボタン */}
+                                            <TouchableOpacity onPress={() => handleOpenEditListModal(list.id, list.name)} style={{ marginLeft: 4 }}>
+                                                <Ionicons name="pencil" size={24} color={'#333'} />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => handleDeleteList(list.id)} style={{ marginLeft: 2 }}>
+                                                <Ionicons name="trash" size={24} color="#f44" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    ))}
+                                {currentUser.taskLists && currentUser.taskLists.length < 3 && (
                                     <View style={{ marginLeft: 40 }}>
                                         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => handleAddTaskList()}>
                                             <Ionicons name="add" size={24} color={'#333'} />
@@ -247,12 +267,14 @@ const UserDetailScreen = () => {
                             </ScrollView>
                         </View>
                         {/* タスク追加ボタン */}
-                        <TouchableOpacity style={[styles.addBtn, { backgroundColor: currentUser?.color || '#007AFF' }]} onPress={() => handleOpenAddTaskModal(selectedTab || '')}>
-                            <Text style={styles.addBtnText}>＋ タスク追加</Text>
-                        </TouchableOpacity>
+                        {currentUser.taskLists && currentUser.taskLists.length > 0 && (
+                            <TouchableOpacity style={[styles.addBtn, { backgroundColor: currentUser?.color || '#007AFF' }]} onPress={() => handleOpenAddTaskModal(selectedTab || '')}>
+                                <Text style={styles.addBtnText}>＋ タスク追加</Text>
+                            </TouchableOpacity>
+                        )}
                         {/* タスク一覧（TaskItemで表示） */}
                         <View style={styles.taskList}>
-                            {currentUser.taskLists.find((list) => list.id === selectedTab)?.tasks.length === 0 ? (
+                            {!currentUser.taskLists || currentUser.taskLists.length === 0 || !currentUser.taskLists.find((list) => list.id === selectedTab) ? (
                                 <Text style={styles.noTask}>タスクなし</Text>
                             ) : (
                                 currentUser.taskLists
@@ -304,15 +326,10 @@ const UserDetailScreen = () => {
                                         {iconList.map((icon, idx) => (
                                             <TouchableOpacity
                                                 key={icon.type + icon.name + idx}
-                                                style={[
-                                                    styles.iconButton,
-                                                    selectedImage && selectedImage.type === icon.type && selectedImage.name === icon.name && styles.iconButtonSelected,
-                                                ]}
+                                                style={[styles.iconButton, selectedImage && selectedImage.type === icon.type && selectedImage.name === icon.name && styles.iconButtonSelected]}
                                                 onPress={() => setSelectedImage(icon)}
                                             >
-                                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                                    {renderIcon(icon, 40, '#333')}
-                                                </View>
+                                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>{renderIcon(icon, 40, '#333')}</View>
                                             </TouchableOpacity>
                                         ))}
                                     </View>

@@ -15,7 +15,7 @@ interface TaskItemProps {
 const TaskItem: React.FC<TaskItemProps> = ({ task, currentUser, style, onPress, editMode }) => {
     return (
         <TouchableOpacity onPress={onPress} style={[styles.taskItem, style]}>
-            <View style={styles.taskIcon}>{renderIcon({ name: task.image.name, type: task.image.type }, 32, '#333')}</View>
+            <View style={styles.taskIcon}>{renderIcon({ name: task.image.name || 'home', type: task.image.type || 'AntDesign' }, 32, '#333')}</View>
             <Text style={styles.taskTitle}>{task.title}</Text>
             {task.done && !editMode && (
                 <View style={[styles.overlay, { backgroundColor: hexToRgba(currentUser.color, 0.95) }]}>

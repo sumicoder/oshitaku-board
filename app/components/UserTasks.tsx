@@ -19,7 +19,31 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const { users, toggleTaskDone, selectUser } = useUserContext();
     const currentUser = users.find((user) => user.id === userId) || { id: Math.random().toString(36).substring(2, 15), name: 'ユーザー', taskLists: [], color: '#007AFF' };
 
-    const [selectedTab, setSelectedTab] = useState<string>(currentUser.taskLists[0].id);
+    if (currentUser?.taskLists.length === 0) {
+        // タスクリストがない場合の表示
+        return (
+            <View style={styles.container}>
+                {/* ユーザー名表示 */}
+                {currentUser && (
+                    <TouchableOpacity
+                        onPress={() => {
+                            selectUser(userId);
+                            router.push(`/user/${userId}`);
+                        }}
+                    >
+                        <View style={styles.userName}>
+                            <Text style={[styles.userNameText, { color: currentUser.color }]}>{currentUser.name}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
+                {/* タブUI */}
+                <View style={[styles.tabContainer, { marginBlockStart: 40 }]}>
+                    <Text style={styles.noTask}>タスクリストがありません</Text>
+                </View>
+            </View>
+        );
+    }
+    const [selectedTab, setSelectedTab] = useState<string>(currentUser.taskLists[0].id || '');
     const scrollRef = useRef<ScrollView>(null);
     const [progressBarWidth, setProgressBarWidth] = useState(0);
     const [showDoneId, setShowDoneId] = useState<string | null>(null);

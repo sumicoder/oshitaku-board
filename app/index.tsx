@@ -1,12 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import React, { useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { AppState, AppStateStatus, Modal, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { TextInput } from 'react-native-gesture-handler';
 import ClockArea from './components/ClockArea';
 import UserTasks from './components/UserTasks';
 import { useClockSetting } from './context/ClockSettingContext';
 import { useTaskDisplaySetting } from './context/TaskDisplaySettingContext';
-import { useUserContext } from './context/UserContext';
+import { colorList, useUserContext } from './context/UserContext';
 import { useUserCountSetting } from './context/UserCountSettingContext';
 
 // メインページのコンポーネント
@@ -26,12 +28,15 @@ export default function MainPage() {
     const { isVisible, clockType, clockSize, clockPosition } = useClockSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
     const { userCount } = useUserCountSetting();
-    const { users } = useUserContext();
+    const { users, addUser } = useUserContext();
     const visibleUsers = users.slice(0, userCount);
 
     const [isReady, setIsReady] = useState(false);
     const [isAppActive, setIsAppActive] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [newUserName, setNewUserName] = useState('');
+    const [selectedColor, setSelectedColor] = useState(colorList[0]);
 
     useEffect(() => {
         // 横向き（ランドスケープ）に固定
@@ -191,8 +196,47 @@ export default function MainPage() {
     if (users.length === 0) {
         // ユーザーがいない場合の処理
         columns = [
-            <View style={styles.col} key="empty">
-                <Text>ユーザーが設定されていません</Text>
+            <View style={[styles.col, { gap: 20 }]} key="empty">
+                <Text style={{ fontSize: 24, fontWeight: 'bold', paddingHorizontal: 20 }}>ユーザーが設定されていません</Text>
+                <TouchableOpacity style={{ marginLeft: 32, backgroundColor: '#007AFF', padding: 8 }} onPress={() => setModalVisible(true)}>
+                    <Text style={{ fontSize: 24, fontWeight: 'bold', paddingHorizontal: 20, color: '#fff' }}>ユーザーを設定する</Text>
+                </TouchableOpacity>
+                {/* ユーザー追加モーダル */}
+                <Modal visible={modalVisible} transparent animationType="slide">
+                    <View style={styles.modalOverlay}>
+                        <ScrollView contentContainerStyle={styles.modalContent}>
+                            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>ユーザー名を入力</Text>
+                            <TextInput style={styles.input} placeholder="名前" value={newUserName} onChangeText={setNewUserName} />
+                            <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 12 }}>色を選択</Text>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                {colorList.map((color) => (
+                                    <TouchableOpacity
+                                        key={color}
+                                        style={[styles.colorButton, { backgroundColor: color }, selectedColor === color && styles.colorButtonSelected]}
+                                        onPress={() => setSelectedColor(color)}
+                                    />
+                                ))}
+                            </View>
+                            <View style={{ flexDirection: 'row', marginTop: 12 }}>
+                                <TouchableOpacity
+                                    style={styles.modalBtn}
+                                    onPress={() => {
+                                        if (newUserName.trim()) {
+                                            addUser(newUserName.trim(), selectedColor);
+                                            setNewUserName('');
+                                            setModalVisible(false);
+                                        }
+                                    }}
+                                >
+                                    <Text style={{ color: '#fff' }}>追加</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#aaa' }]} onPress={() => setModalVisible(false)}>
+                                    <Text style={{ color: '#fff' }}>キャンセル</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </ScrollView>
+                    </View>
+                </Modal>
             </View>,
         ];
     } else if (visibleUsers.length === 1) {
@@ -299,5 +343,48 @@ const styles = StyleSheet.create({
         top: 0,
         bottom: 0,
         transform: [{ translateX: '-50%' }],
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 24,
+        marginVertical: 100,
+        width: 300,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 8,
+        width: 200,
+        marginTop: 12,
+        fontSize: 16,
+    },
+    colorButton: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        marginRight: 8,
+        borderWidth: 2,
+        borderColor: '#ccc',
+    },
+    colorButtonSelected: {
+        borderColor: '#007AFF',
+        borderWidth: 3,
+    },
+    modalBtn: {
+        backgroundColor: '#007AFF',
+        borderRadius: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        marginHorizontal: 8,
     },
 });
