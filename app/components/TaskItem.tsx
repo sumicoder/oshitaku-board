@@ -1,8 +1,8 @@
 import React from 'react';
-import { AntDesign } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Task, User } from '../context/UserContext';
 import { hexToRgba } from '../utils/hexToRgba';
+import { renderIcon } from '../utils/renderIcon';
 
 interface TaskItemProps {
     task: Task;
@@ -15,13 +15,11 @@ interface TaskItemProps {
 const TaskItem: React.FC<TaskItemProps> = ({ task, currentUser, style, onPress, editMode }) => {
     return (
         <TouchableOpacity onPress={onPress} style={[styles.taskItem, style]}>
-            <Text style={styles.taskIcon}>{task.image}</Text>
+            <View style={styles.taskIcon}>{renderIcon({ name: task.image.name, type: task.image.type }, 32, '#333')}</View>
             <Text style={styles.taskTitle}>{task.title}</Text>
             {task.done && !editMode && (
                 <View style={[styles.overlay, { backgroundColor: hexToRgba(currentUser.color, 0.95) }]}>
-                    <Text style={styles.overlayText}>
-                        <AntDesign name="check" size={24} color="white" />
-                    </Text>
+                    <Text style={styles.overlayText}>{renderIcon({ name: 'check', type: 'AntDesign' }, 24, 'white')}</Text>
                 </View>
             )}
         </TouchableOpacity>
@@ -41,7 +39,6 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     taskIcon: {
-        fontSize: 24,
         marginRight: 16,
         flexShrink: 0,
     },

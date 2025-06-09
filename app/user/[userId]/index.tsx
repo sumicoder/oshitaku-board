@@ -3,7 +3,8 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import TaskItem from '../../components/TaskItem';
-import { colorList, iconList, useUserContext } from '../../context/UserContext';
+import { colorList, Icon, iconList, useUserContext } from '../../context/UserContext';
+import { renderIcon } from '../../utils/renderIcon';
 
 // ユーザー詳細ページのコンポーネント
 const UserDetailScreen = () => {
@@ -28,7 +29,7 @@ const UserDetailScreen = () => {
     // タスク追加モーダルの状態
     const [modalVisible, setModalVisible] = useState(false);
     const [newTaskName, setNewTaskName] = useState('');
-    const [selectedImage, setSelectedImage] = useState(iconList[0]);
+    const [selectedImage, setSelectedImage] = useState<Icon>(iconList[0]);
     const [selectedColor, setSelectedColor] = useState(currentUser?.color || '#fff');
     const [targetListIdx, setTargetListIdx] = useState<string | null>(null);
 
@@ -300,9 +301,18 @@ const UserDetailScreen = () => {
                                     {/* アイコン選択 */}
                                     <Text style={styles.title}>アイコン</Text>
                                     <View style={styles.modalWrap}>
-                                        {iconList.map((img) => (
-                                            <TouchableOpacity key={img} style={[styles.iconButton, selectedImage === img && styles.iconButtonSelected]} onPress={() => setSelectedImage(img)}>
-                                                <Text style={styles.iconText}>{img}</Text>
+                                        {iconList.map((icon, idx) => (
+                                            <TouchableOpacity
+                                                key={icon.type + icon.name + idx}
+                                                style={[
+                                                    styles.iconButton,
+                                                    selectedImage && selectedImage.type === icon.type && selectedImage.name === icon.name && styles.iconButtonSelected,
+                                                ]}
+                                                onPress={() => setSelectedImage(icon)}
+                                            >
+                                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                                    {renderIcon(icon, 40, '#333')}
+                                                </View>
                                             </TouchableOpacity>
                                         ))}
                                     </View>

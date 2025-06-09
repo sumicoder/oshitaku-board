@@ -7,7 +7,7 @@ import { initialTaskLists } from '../data/taskInitialData';
 export type Task = {
     id: string;
     title: string;
-    image: string;
+    image: Icon;
     done: boolean;
 };
 
@@ -16,6 +16,12 @@ export type TaskList = {
     id: string;
     name: string;
     tasks: Task[];
+};
+
+// アイコン型
+export type Icon = {
+    name: string;
+    type: string;
 };
 
 // ユーザー型
@@ -28,8 +34,39 @@ export type User = {
 
 // 色リスト
 export const colorList = ['#FFD700', '#00BFFF', '#FF69B4', '#90EE90', '#FFA500', '#FF6347', '#8A2BE2', '#00CED1', '#FFB6C1', '#A9A9A9'];
-// アイコンリスト
-export const iconList = ['🌞', '🦷', '🧼', '👕', '🍚', '🧑‍🎓', '🎒', '🚪', '🏠', '🛁', '🛏️', '📚', '🎨', '🎮', '🍽️', '🦁', '🐻', '🐼', '🐰', '🐶', '🐱'];
+// 汎用的なアイコン30種類のリスト
+export const iconList = [
+    { name: 'home', type: 'AntDesign' },
+    { name: 'user', type: 'AntDesign' },
+    { name: 'star', type: 'AntDesign' },
+    { name: 'checkcircle', type: 'AntDesign' },
+    { name: 'smileo', type: 'AntDesign' },
+    { name: 'coffee', type: 'FontAwesome' },
+    { name: 'bath', type: 'FontAwesome' },
+    { name: 'book', type: 'FontAwesome' },
+    { name: 'palette', type: 'MaterialIcons' },
+    { name: 'videogame-asset', type: 'MaterialIcons' },
+    { name: 'shopping-cart', type: 'Feather' },
+    { name: 'calendar', type: 'Feather' },
+    { name: 'bell', type: 'Feather' },
+    { name: 'camera', type: 'Feather' },
+    { name: 'music', type: 'Feather' },
+    { name: 'gift', type: 'Feather' },
+    { name: 'heart', type: 'FontAwesome' },
+    { name: 'car', type: 'FontAwesome' },
+    { name: 'cutlery', type: 'FontAwesome' },
+    { name: 'paw', type: 'FontAwesome' },
+    { name: 'bicycle', type: 'FontAwesome' },
+    { name: 'umbrella', type: 'FontAwesome' },
+    { name: 'leaf', type: 'FontAwesome' },
+    { name: 'plane', type: 'FontAwesome' },
+    { name: 'sun', type: 'Feather' },
+    { name: 'moon', type: 'Feather' },
+    { name: 'cloud', type: 'Feather' },
+    { name: 'map', type: 'Feather' },
+    { name: 'key', type: 'Feather' },
+    { name: 'lock', type: 'Feather' },
+];
 
 type UserContextType = {
     users: User[];
