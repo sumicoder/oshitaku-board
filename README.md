@@ -1,50 +1,37 @@
-# Welcome to your Expo app 👋
+# お支度ボード
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+お支度ボードは、子どもたちが毎日の準備や「やること」を楽しく、わかりやすく管理できるアプリです。
 
-## Get started
+## 主な機能
+- 「やること」の追加・編集・削除
+- 「やること」の進捗管理
+- 「やること」の表示切り替え
+    - 複数表示・単一表示
+- 「お支度ボード」の追加・編集・削除
+- ユーザーの追加・編集・削除
+- ユーザーごとのテーマカラー変更
+- ユーザーの並べ替え
+- ユーザーの表示切り替え
+    - 1人・複数人（3人まで）
+- 時計の表示切り替え
+    - 表示・非表示
+    - アナログ・デジタル
+    - サイズ（大・中・小）
+    - 表示位置（左・真ん中・右）
+- 日付の変化で「やること」リセット
 
-1. Install dependencies
+## 利用シーン
+- 朝の身支度や夜の準備など、日常のルーティン管理
+- 自主性や達成感を育むサポート
 
-   ```bash
-   npm install
-   ```
+## 特徴
+- 様々なビューを設定可能！
+- 親子で使いやすいシンプルなデザイン！
+- 直感的な操作で小さなお子さまでも使いやすい！
+- 進捗が一目でわかるインターフェース！
+- 兄弟姉妹で一緒に使える！
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+お支度ボードで、毎日の準備をもっと楽しく、スムーズにしましょう！
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
