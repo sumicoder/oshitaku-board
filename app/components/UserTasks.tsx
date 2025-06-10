@@ -70,7 +70,16 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const MAGIC_HEIGHT = 260; // マジックナンバー[ヘッダー、ユーザー名、タブなどの`margin`や`padding`や`gap`など適当な値]
     // タスクのカラム数
     const containerWidth = (windowWidth - clockColumnSize) / userCount;
-    const TASK_COLUMN = displayMode === 'single' ? 1 : containerWidth > 1080 ? 3 : containerWidth > 600 ? 2 : 1;
+    let TASK_COLUMN;
+    if (displayMode === 'single') {
+        TASK_COLUMN = 1;
+    } else if (containerWidth > 1080) {
+        TASK_COLUMN = 3;
+    } else if (containerWidth > 780) {
+        TASK_COLUMN = 2;
+    } else {
+        TASK_COLUMN = 1;
+    }
     // コンテナのpadding
     const CONTAINER_PADDING = 24;
     const TASK_COLUMN_SPACE = displayMode === 'single' ? CONTAINER_PADDING * 2 * userCount : CONTAINER_PADDING * 2; // 画面左右のpadding
