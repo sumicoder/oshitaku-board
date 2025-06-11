@@ -49,7 +49,7 @@ export default function MainPage() {
         const saveInitialSizeIfNeeded = async () => {
             try {
                 const hasSaved = await AsyncStorage.getItem('hasSavedInitialSize');
-                if (!hasSaved) {
+                if (!hasSaved && longLength > 0 && shortLength > 0) {
                     // まだ保存していなければ保存
                     await AsyncStorage.setItem('longLength', longLength.toString());
                     await AsyncStorage.setItem('shortLength', shortLength.toString());
