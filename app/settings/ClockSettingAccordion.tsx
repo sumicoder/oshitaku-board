@@ -1,62 +1,75 @@
-import React, { useState } from 'react';
-import { Switch, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { Text, View } from 'react-native';
+import RadioButton from '../components/RadioButton';
 import SettingAccordion from '../components/SettingAccordion';
+import SwitchButton from '../components/SwitchButton';
+import { ClockPosition, useClockSetting } from '../context/ClockSettingContext';
+import { useUserCountSetting } from '../context/UserCountSettingContext';
 import SettingStyles from '../styles/SettingStyles';
 
 // 時計の設定アコーディオン
 export default function ClockSettingAccordion() {
-    // 時計の表示/非表示
-    const [isVisible, setIsVisible] = useState(true);
-    // アナログ or デジタル
-    const [clockType, setClockType] = useState<'analog' | 'digital'>('analog');
-    // サイズ（大中小）
-    const [clockSize, setClockSize] = useState<'large' | 'medium' | 'small'>('medium');
-    // 位置（右・左・真ん中）
-    const [clockPosition, setClockPosition] = useState<'left' | 'center' | 'right'>('right');
+    const { isVisible, setIsVisible, clockType, setClockType, clockSize, setClockSize, clockPosition, setClockPosition } = useClockSetting();
+    const { userCount } = useUserCountSetting();
+
+    // 選択肢を動的に
+    const options = [
+        { label: '左', value: 'left', disabled: userCount === 2 || userCount === 3 },
+        { label: '真ん中', value: 'center', disabled: userCount === 1 || userCount === 3 },
+        { label: '右', value: 'right', disabled: userCount === 2 || userCount === 3 },
+    ];
+
+    // userCountやclockPositionが変わったときに自動補正
+    useEffect(() => {
+        if (userCount === 1) {
+            if (clockPosition === 'center' || clockPosition === undefined || clockPosition === null || clockPosition === '') {
+                setClockPosition('left'); // または 'right'
+            }
+        } else if (userCount === 2) {
+            if (clockPosition !== 'center') {
+                setClockPosition('center');
+            }
+        } else if (userCount === 3) {
+            if (clockPosition !== undefined && clockPosition !== null && clockPosition !== '') {
+                setClockPosition(''); // 未選択状態
+            }
+            if (isVisible) setIsVisible(false); // 時計を必ず非表示
+        }
+    }, [userCount, clockPosition, setClockPosition, isVisible, setIsVisible]);
 
     return (
         <SettingAccordion title="時計の設定">
             {/* 表示/非表示トグル */}
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>時計を表示</Text>
-                <Switch value={isVisible} onValueChange={setIsVisible} />
+                <SwitchButton value={isVisible} onValueChange={setIsVisible} disabled={userCount === 3} />
             </View>
             {/* アナログ/デジタル選択 */}
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>タイプ</Text>
                 <View style={SettingStyles.radioGroup}>
-                    <RadioButton label="アナログ" selected={clockType === 'analog'} onPress={() => setClockType('analog')} />
-                    <RadioButton label="デジタル" selected={clockType === 'digital'} onPress={() => setClockType('digital')} />
+                    <RadioButton label="アナログ" selected={clockType === 'analog'} onPress={() => setClockType('analog')} disabled={!isVisible} />
+                    <RadioButton label="デジタル" selected={clockType === 'digital'} onPress={() => setClockType('digital')} disabled={!isVisible} />
                 </View>
             </View>
             {/* サイズ選択 */}
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>サイズ</Text>
                 <View style={SettingStyles.radioGroup}>
-                    <RadioButton label="大" selected={clockSize === 'large'} onPress={() => setClockSize('large')} />
-                    <RadioButton label="中" selected={clockSize === 'medium'} onPress={() => setClockSize('medium')} />
-                    <RadioButton label="小" selected={clockSize === 'small'} onPress={() => setClockSize('small')} />
+                    <RadioButton label="大" selected={clockSize === 'large'} onPress={() => setClockSize('large')} disabled={!isVisible} />
+                    <RadioButton label="中" selected={clockSize === 'medium'} onPress={() => setClockSize('medium')} disabled={!isVisible} />
+                    <RadioButton label="小" selected={clockSize === 'small'} onPress={() => setClockSize('small')} disabled={!isVisible} />
                 </View>
             </View>
             {/* 位置選択 */}
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>位置</Text>
                 <View style={SettingStyles.radioGroup}>
-                    <RadioButton label="左" selected={clockPosition === 'left'} onPress={() => setClockPosition('left')} />
-                    <RadioButton label="真ん中" selected={clockPosition === 'center'} onPress={() => setClockPosition('center')} />
-                    <RadioButton label="右" selected={clockPosition === 'right'} onPress={() => setClockPosition('right')} />
+                    {options.map((opt) => (
+                        <RadioButton key={opt.value} label={opt.label} selected={clockPosition === opt.value} onPress={() => setClockPosition(opt.value as ClockPosition)} disabled={opt.disabled || !isVisible} />
+                    ))}
                 </View>
             </View>
         </SettingAccordion>
-    );
-}
-
-// ラジオボタン用コンポーネント
-function RadioButton({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
-    return (
-        <TouchableOpacity style={[SettingStyles.radioButton, selected && SettingStyles.radioButtonSelected]} onPress={onPress}>
-            <View style={[SettingStyles.radioCircle, selected && SettingStyles.radioCircleSelected]} />
-            <Text style={[SettingStyles.radioLabel, selected && SettingStyles.radioLabelSelected]}>{label}</Text>
-        </TouchableOpacity>
     );
 }

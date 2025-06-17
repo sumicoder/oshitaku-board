@@ -1,11 +1,24 @@
+import React from 'react';
 import { Drawer } from 'expo-router/drawer';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ClockSettingProvider from './context/ClockSettingContext';
+import ProgressBarSettingProvider from './context/ProgressBarSettingContext';
+import TaskDisplaySettingProvider from './context/TaskDisplaySettingContext';
+import UserProvider from './context/UserContext';
+import UserCountSettingProvider from './context/UserCountSettingContext';
 import CustomDrawerContent from './CustomDrawerContent';
 
 export default function Layout() {
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
-            <Drawer drawerContent={() => <CustomDrawerContent />} />
-        </GestureHandlerRootView>
+        <ClockSettingProvider>
+            <ProgressBarSettingProvider>
+                <TaskDisplaySettingProvider>
+                    <UserProvider>
+                        <UserCountSettingProvider>
+                            <Drawer drawerContent={() => <CustomDrawerContent />} />
+                        </UserCountSettingProvider>
+                    </UserProvider>
+                </TaskDisplaySettingProvider>
+            </ProgressBarSettingProvider>
+        </ClockSettingProvider>
     );
 }

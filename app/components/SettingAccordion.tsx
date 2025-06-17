@@ -1,5 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // アコーディオンのprops型
@@ -23,19 +23,10 @@ export default function SettingAccordion({ title, children, defaultOpen = false 
         <View style={styles.accordionContainer}>
             <TouchableOpacity style={styles.header} onPress={toggleAccordion} activeOpacity={0.8}>
                 <Text style={styles.headerText}>{title}</Text>
-                <Ionicons
-                    name={open ? 'chevron-down' : 'chevron-forward'}
-                    size={18}
-                    color="#007AFF"
-                />
+                <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={18} color="#007AFF" />
             </TouchableOpacity>
             {open && (
-                <ScrollView
-                    style={styles.content}
-                    contentContainerStyle={styles.contentContainer}
-                    horizontal={false}
-                    showsVerticalScrollIndicator={true}
-                >
+                <ScrollView contentContainerStyle={styles.contentContainer} horizontal={false} showsVerticalScrollIndicator={true}>
                     {children}
                 </ScrollView>
             )}
@@ -76,4 +67,4 @@ const styles = StyleSheet.create({
     contentContainer: {
         flexGrow: 1,
     },
-}); 
+});
