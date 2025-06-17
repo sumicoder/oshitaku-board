@@ -48,17 +48,17 @@ export default function ClockSettingAccordion() {
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>タイプ</Text>
                 <View style={SettingStyles.radioGroup}>
-                    <RadioButton label="アナログ" selected={clockType === 'analog'} onPress={() => setClockType('analog')} />
-                    <RadioButton label="デジタル" selected={clockType === 'digital'} onPress={() => setClockType('digital')} />
+                    <RadioButton label="アナログ" selected={clockType === 'analog'} onPress={() => setClockType('analog')} disabled={!isVisible} />
+                    <RadioButton label="デジタル" selected={clockType === 'digital'} onPress={() => setClockType('digital')} disabled={!isVisible} />
                 </View>
             </View>
             {/* サイズ選択 */}
             <View style={SettingStyles.row}>
                 <Text style={SettingStyles.label}>サイズ</Text>
                 <View style={SettingStyles.radioGroup}>
-                    <RadioButton label="大" selected={clockSize === 'large'} onPress={() => setClockSize('large')} />
-                    <RadioButton label="中" selected={clockSize === 'medium'} onPress={() => setClockSize('medium')} />
-                    <RadioButton label="小" selected={clockSize === 'small'} onPress={() => setClockSize('small')} />
+                    <RadioButton label="大" selected={clockSize === 'large'} onPress={() => setClockSize('large')} disabled={!isVisible} />
+                    <RadioButton label="中" selected={clockSize === 'medium'} onPress={() => setClockSize('medium')} disabled={!isVisible} />
+                    <RadioButton label="小" selected={clockSize === 'small'} onPress={() => setClockSize('small')} disabled={!isVisible} />
                 </View>
             </View>
             {/* 位置選択 */}
@@ -66,7 +66,7 @@ export default function ClockSettingAccordion() {
                 <Text style={SettingStyles.label}>位置</Text>
                 <View style={SettingStyles.radioGroup}>
                     {options.map((opt) => (
-                        <RadioButton key={opt.value} label={opt.label} selected={clockPosition === opt.value} onPress={() => setClockPosition(opt.value as ClockPosition)} disabled={opt.disabled} />
+                        <RadioButton key={opt.value} label={opt.label} selected={clockPosition === opt.value} onPress={() => setClockPosition(opt.value as ClockPosition)} disabled={opt.disabled || !isVisible} />
                     ))}
                 </View>
             </View>

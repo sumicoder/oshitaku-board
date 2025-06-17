@@ -19,7 +19,31 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const { users, toggleTaskDone, selectUser } = useUserContext();
     const currentUser = users.find((user) => user.id === userId) || { id: Math.random().toString(36).substring(2, 15), name: 'ユーザー', taskLists: [], color: '#007AFF' };
 
-    const [selectedTab, setSelectedTab] = useState<string>(currentUser.taskLists[0].id);
+    if (currentUser?.taskLists.length === 0) {
+        // タスクリストがない場合の表示
+        return (
+            <View style={styles.container}>
+                {/* ユーザー名表示 */}
+                {currentUser && (
+                    <TouchableOpacity
+                        onPress={() => {
+                            selectUser(userId);
+                            router.push(`/user/${userId}`);
+                        }}
+                    >
+                        <View style={styles.userName}>
+                            <Text style={[styles.userNameText, { color: currentUser.color }]}>{currentUser.name}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
+                {/* タブUI */}
+                <View style={[styles.tabContainer, { marginBlockStart: 40 }]}>
+                    <Text style={styles.noTask}>タスクリストがありません</Text>
+                </View>
+            </View>
+        );
+    }
+    const [selectedTab, setSelectedTab] = useState<string>(currentUser.taskLists[0].id || '');
     const scrollRef = useRef<ScrollView>(null);
     const [progressBarWidth, setProgressBarWidth] = useState(0);
     const [showDoneId, setShowDoneId] = useState<string | null>(null);
@@ -46,7 +70,16 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
     const MAGIC_HEIGHT = 260; // マジックナンバー[ヘッダー、ユーザー名、タブなどの`margin`や`padding`や`gap`など適当な値]
     // タスクのカラム数
     const containerWidth = (windowWidth - clockColumnSize) / userCount;
-    const TASK_COLUMN = displayMode === 'single' ? 1 : containerWidth > 1080 ? 3 : containerWidth > 600 ? 2 : 1;
+    let TASK_COLUMN;
+    if (displayMode === 'single') {
+        TASK_COLUMN = 1;
+    } else if (containerWidth > 1080) {
+        TASK_COLUMN = 3;
+    } else if (containerWidth > 780) {
+        TASK_COLUMN = 2;
+    } else {
+        TASK_COLUMN = 1;
+    }
     // コンテナのpadding
     const CONTAINER_PADDING = 24;
     const TASK_COLUMN_SPACE = displayMode === 'single' ? CONTAINER_PADDING * 2 * userCount : CONTAINER_PADDING * 2; // 画面左右のpadding
@@ -114,11 +147,11 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
 
             {/* 選択中のタスクリストのみ表示 */}
             {currentUser.taskLists.length === 0 ? (
-                <Text style={styles.noTask}>タスクなし</Text>
+                <Text style={styles.noTask}>「やること」の登録がありません</Text>
             ) : (
                 <View style={styles.taskContainer}>
                     {tasks?.length === 0 ? (
-                        <Text style={styles.noTask}>タスクなし</Text>
+                        <Text style={styles.noTask}>「やること」の登録がありません</Text>
                     ) : displayMode === 'single' ? (
                         // 単一表示: 横並び・スナップ
                         <ScrollView

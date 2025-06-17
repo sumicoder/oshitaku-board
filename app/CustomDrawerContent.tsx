@@ -1,7 +1,8 @@
 import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import * as Linking from 'expo-linking';
 import React, { useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import type { User } from './context/UserContext';
 import { colorList, useUserContext } from './context/UserContext';
@@ -17,6 +18,15 @@ export default function CustomDrawerContent() {
     const [modalVisible, setModalVisible] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [selectedColor, setSelectedColor] = useState(colorList[0]);
+
+    const handleOpenLink = () => {
+        Alert.alert('応援ありがとうございます！', '開発者を応援するために外部リンクを開きますがよろしいですか？', [
+            { text: 'コーヒーを奢りに行く', style: 'default', onPress: () => Linking.openURL('https://buymeacoffee.com/codecrane') },
+            { text: 'レビューを書く', style: 'default', onPress: () => Linking.openURL('https://apps.apple.com/app/id6749811733') },
+            { text: 'キャンセル', style: 'cancel' },
+        ]);
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {/* ユーザー追加ボタン */}
@@ -100,6 +110,9 @@ export default function CustomDrawerContent() {
             <ProgressBarSettingAccordion />
             <TaskDisplaySettingAccordion />
             <UserCountSettingAccordion />
+            <TouchableOpacity style={styles.supportBanner} onPress={handleOpenLink}>
+                <Text style={styles.supportBannerText}>☕ 開発者を応援する</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 }
@@ -213,5 +226,19 @@ const styles = StyleSheet.create({
         marginRight: 8,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    supportBanner: {
+        marginHorizontal: 16,
+        marginBlockStart: 32,
+        paddingVertical: 16,
+        borderRadius: 12,
+        backgroundColor: '#ffe066',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    supportBannerText: {
+        color: '#7c4d00',
+        fontWeight: 'bold',
+        fontSize: 18,
     },
 });
