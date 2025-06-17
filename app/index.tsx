@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import React, { useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus, Modal, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import { TextInput } from 'react-native-gesture-handler';
+import { ActivityIndicator, AppState, AppStateStatus, Modal, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import ClockArea from './components/ClockArea';
 import UserTasks from './components/UserTasks';
 import { useClockSetting } from './context/ClockSettingContext';
@@ -165,17 +164,23 @@ export default function MainPage() {
     // 画面サイズ取得のリトライ処理。0のときはストレージからも復元を試みる
     useEffect(() => {
         let timeout: number | null = null;
+        const maxRetry = 30; // 最大リトライ回数（約9秒）
         const tryGetSize = async () => {
             if (windowWidth > 0 && windowHeight > 0) {
                 setIsReady(true);
-            } else {
+            } else if (retryCount < maxRetry) {
+                // 取得できていなければストレージからも復元を試みる
                 if (longLength === 0 || shortLength === 0) {
                     await restoreDimensionsFromStorage(setWindowWidth, setWindowHeight);
                 }
+                // 300ms後に再度取得を試みる
                 timeout = setTimeout(() => {
                     applyDimensionsByOrientation(orientation, longLength, shortLength, setWindowWidth, setWindowHeight);
-                    setRetryCount((prev) => prev + 1);
+                    setRetryCount((prev) => prev + 1); // これでuseEffectが再発火
                 }, 300);
+            } else {
+                // 上限に達した場合も一応描画は行う
+                setIsReady(true);
             }
         };
         tryGetSize();
@@ -186,9 +191,14 @@ export default function MainPage() {
         };
     }, [windowWidth, windowHeight, retryCount, isAppActive, orientation, longLength, shortLength]);
 
-    // 取得できなければ何も描画しない
+    // 取得できなければローディングインジケーターを表示
     if (!isReady) {
-        return null;
+        return (
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <ActivityIndicator size="large" color="#007AFF" />
+                <Text>画面サイズを取得中...</Text>
+            </View>
+        );
     }
 
     // 並び順を決定
