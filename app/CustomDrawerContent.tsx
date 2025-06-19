@@ -1,8 +1,7 @@
 import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import * as Linking from 'expo-linking';
 import React, { useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import type { User } from './context/UserContext';
 import { colorList, useUserContext } from './context/UserContext';
@@ -14,18 +13,10 @@ import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
 export default function CustomDrawerContent() {
     const router = useRouter();
-    const { users, addUser, selectUser, moveUser, setUsersOrder } = useUserContext();
+    const { users, addUser, selectUser, setUsersOrder } = useUserContext();
     const [modalVisible, setModalVisible] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [selectedColor, setSelectedColor] = useState(colorList[0]);
-
-    const handleOpenLink = () => {
-        Alert.alert('応援ありがとうございます！', '開発者を応援するために外部リンクを開きますがよろしいですか？', [
-            { text: 'コーヒーを奢りに行く', style: 'default', onPress: () => Linking.openURL('https://buymeacoffee.com/codecrane') },
-            { text: 'レビューを書く', style: 'default', onPress: () => Linking.openURL('https://apps.apple.com/app/id6749811733') },
-            { text: 'キャンセル', style: 'cancel' },
-        ]);
-    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -110,9 +101,6 @@ export default function CustomDrawerContent() {
             <ProgressBarSettingAccordion />
             <TaskDisplaySettingAccordion />
             <UserCountSettingAccordion />
-            <TouchableOpacity style={styles.supportBanner} onPress={handleOpenLink}>
-                <Text style={styles.supportBannerText}>☕ 開発者を応援する</Text>
-            </TouchableOpacity>
         </ScrollView>
     );
 }
