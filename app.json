@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.codecranetsuru.oshitakuboard",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIDeviceFamily": [2]
       }
     },
     "android": {
