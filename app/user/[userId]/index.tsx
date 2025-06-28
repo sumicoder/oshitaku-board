@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import TaskItem from '../../components/TaskItem';
 import { colorList, Icon, iconList, useUserContext } from '../../context/UserContext';
+import { getBackButtonFontSize } from '../../utils/deviceUtils';
 import { renderIcon } from '../../utils/renderIcon';
 
 // ユーザー詳細ページのコンポーネント
@@ -27,7 +28,7 @@ const UserDetailScreen = () => {
                     }}
                     style={{ backgroundColor: currentUser?.color || '#fff', padding: 8 }}
                 >
-                    <Text style={{ fontSize: 24, fontWeight: 'bold', paddingHorizontal: 20 }}>戻る</Text>
+                    <Text style={{ fontSize: getBackButtonFontSize(), fontWeight: 'bold', paddingHorizontal: 20 }}>戻る</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -196,7 +197,7 @@ const UserDetailScreen = () => {
                             }}
                             style={{ marginLeft: 32, backgroundColor: currentUser?.color || '#fff', padding: 8 }}
                         >
-                            <Text style={{ fontSize: 24, color: '#fff', fontWeight: 'bold' }}>戻る</Text>
+                            <Text style={{ fontSize: getBackButtonFontSize(), color: '#fff', fontWeight: 'bold' }}>戻る</Text>
                         </TouchableOpacity>
                     ),
                 }}
@@ -432,7 +433,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 8,
         padding: 16,
-        width: 300,
+        width: '100%',
         marginTop: 8,
         fontSize: 24,
     },
