@@ -15,12 +15,12 @@ export default function UserCountSettingAccordion() {
     const maxCount = Math.min(users.length, 3);
     const options = Array.from({ length: maxCount }, (_, i) => i + 1);
 
-    // usersが変わった時やuserCountが変わった時に必ず1にリセット
+    // userCountがusers数を超えた場合のみ調整
     useEffect(() => {
-        if (userCount !== 1) {
-            setUserCount(1);
+        if (userCount > maxCount) {
+            setUserCount(maxCount);
         }
-    }, [users.length]); // users.lengthが変わった時に1に戻す
+    }, [users.length, userCount, maxCount]); // users.lengthまたはuserCountが変わった時にチェック
 
     return (
         <SettingAccordion title="表示人数の設定">
