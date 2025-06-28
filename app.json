@@ -10,19 +10,12 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "isTabletOnly": true,
       "bundleIdentifier": "com.codecranetsuru.oshitakuboard",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "UIDeviceFamily": [2]
       }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.codecranetsuru.oshitakuboard"
     },
     "web": {
       "bundler": "metro",
