@@ -2,7 +2,7 @@
   "expo": {
     "name": "やることボード",
     "slug": "oshitaku-board",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "oshitakuboard",
@@ -12,7 +12,10 @@
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "UIDeviceFamily": [1, 2]
+        "UIDeviceFamily": [
+          1,
+          2
+        ]
       }
     },
     "web": {
@@ -40,6 +43,9 @@
       "eas": {
         "projectId": "943ee8a5-626d-462c-be94-9fc7b8ad263f"
       }
+    },
+    "android": {
+      "package": "com.codecranetsuru.oshitakuboard"
     }
   }
 }
