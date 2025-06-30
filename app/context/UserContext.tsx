@@ -84,6 +84,7 @@ type UserContextType = {
     deleteUser: (userId: string) => void;
     moveUser: (userId: string, toIndex: number) => void;
     setUsersOrder: (newOrder: User[]) => void;
+    reorderTasks: (userId: string, listId: string, newTasks: Task[]) => void;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -299,6 +300,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUsers(newOrder);
     };
 
+    // タスクの順序を変更（ドラッグ&ドロップ用）
+    const reorderTasks = (userId: string, listId: string, newTasks: Task[]) => {
+        setUsers((prev) =>
+            prev.map((u) =>
+                u.id === userId
+                    ? {
+                          ...u,
+                          taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, tasks: newTasks } : l)),
+                      }
+                    : u
+            )
+        );
+    };
+
     if (loading) return null; // ローディングUI推奨
 
     return (
@@ -319,6 +334,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 deleteUser,
                 moveUser,
                 setUsersOrder,
+                reorderTasks,
             }}
         >
             {children}
