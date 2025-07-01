@@ -338,10 +338,10 @@ const UserDetailScreen = () => {
                         {/* タスクリスト名編集モーダル */}
                         <Modal visible={editListId !== null} transparent animationType="fade">
                             <View style={styles.modalOverlay}>
-                                <ScrollView contentContainerStyle={styles.modalContent}>
+                                <ScrollView contentContainerStyle={[styles.modalContent,{maxWidth: 600}]}>
                                     <Text style={styles.title}>お支度ボード名を編集</Text>
-                                    <TextInput style={styles.input} value={editListName} onChangeText={setEditListName} placeholder="お支度ボード名" />
-                                    <View style={{ flexDirection: 'row', marginTop: 16 }}>
+                                    <TextInput style={[styles.input,{width: 540}]} value={editListName} onChangeText={setEditListName} placeholder="お支度ボード名" />
+                                    <View style={{ flexDirection: 'row', marginTop: 40 }}>
                                         <TouchableOpacity style={styles.modalBtn} onPress={handleEditListName}>
                                             <Text style={{ color: '#fff', fontSize: 20 }}>保存</Text>
                                         </TouchableOpacity>
@@ -355,10 +355,10 @@ const UserDetailScreen = () => {
                         {/* タスク追加・編集モーダル（共通） */}
                         <Modal visible={modalVisible} transparent animationType="slide">
                             <View style={styles.modalOverlay}>
-                                <ScrollView contentContainerStyle={styles.modalContent}>
+                                <ScrollView contentContainerStyle={[styles.modalContent,{maxWidth: 610}]}>
                                     <Text style={styles.title}>{editTaskInfo ? '「やること」を編集' : '「やること」を追加'}</Text>
                                     {/* 「やること」名入力 */}
-                                    <TextInput style={styles.input} placeholder="「やること」名" value={newTaskName} onChangeText={setNewTaskName} />
+                                    <TextInput style={[styles.input,{width: 540}]} placeholder="「やること」名" value={newTaskName} onChangeText={setNewTaskName} />
                                     {/* アイコン選択 */}
                                     <Text style={styles.title}>アイコン</Text>
                                     <View style={styles.modalWrap}>
