@@ -2,7 +2,7 @@
   "expo": {
     "name": "やることボード",
     "slug": "oshitaku-board",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "oshitakuboard",
@@ -16,7 +16,8 @@
           1,
           2
         ]
-      }
+      },
+      "bundleIdentifier": "com.codecranetsuru.oshitakuboard"
     },
     "web": {
       "bundler": "metro",
