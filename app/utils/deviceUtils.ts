@@ -54,4 +54,13 @@ export const getResponsiveFontSize = (phoneSize: number, tabletSize: number) => 
  */
 export const getBackButtonFontSize = () => {
     return getResponsiveFontSize(16, 24);
+};
+
+// デフォルトエクスポート（警告回避用）
+export default {
+    getDeviceType,
+    isTablet,
+    isPhone,
+    getResponsiveFontSize,
+    getBackButtonFontSize,
 }; 

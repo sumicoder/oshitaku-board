@@ -8,6 +8,7 @@ import { colorList, useUserContext } from './context/UserContext';
 import ClockSettingAccordion from './settings/ClockSettingAccordion';
 import ProgressBarSettingAccordion from './settings/ProgressBarSettingAccordion';
 import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion';
+import TaskResetSettingAccordion from './settings/TaskResetSettingAccordion';
 import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
@@ -100,6 +101,7 @@ export default function CustomDrawerContent() {
             <ClockSettingAccordion />
             <ProgressBarSettingAccordion />
             <TaskDisplaySettingAccordion />
+            <TaskResetSettingAccordion />
             <UserCountSettingAccordion />
         </ScrollView>
     );

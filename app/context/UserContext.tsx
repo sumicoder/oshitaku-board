@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { initialTaskLists } from '../data/taskInitialData';
+import { registerTaskResetBackgroundFetch, manualTaskReset, checkAndResetTasks } from '../utils/taskResetScheduler';
 
 // タスク型
 export type Task = {
@@ -99,6 +100,7 @@ type UserContextType = {
     moveUser: (userId: string, toIndex: number) => void;
     setUsersOrder: (newOrder: User[]) => void;
     reorderTasks: (userId: string, listId: string, newTasks: Task[]) => void;
+    resetAllTasks: () => Promise<boolean>;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -138,17 +140,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         if (!loading && selectedUserId !== null) AsyncStorage.setItem('selectedUserId', String(selectedUserId));
     }, [selectedUserId, loading]);
 
-    // アプリがアクティブになった時に日付を比較し、異なれば全タスクdoneをfalseにリセット
+    // バックグラウンドタスクの登録とアプリ起動時のリセットチェック
     useEffect(() => {
+        // バックグラウンドタスクを登録
+        registerTaskResetBackgroundFetch();
+
+        // アプリがアクティブになった時にリセット状態をチェック
         const handleAppStateChange = async (nextAppState: string) => {
             if (nextAppState === 'active') {
                 try {
-                    // ストレージから前回保存日付を取得
-                    const lastDate = await AsyncStorage.getItem('lastCheckedDate');
-                    // 今日の日付（YYYY-MM-DD）
-                    const today = new Date().toISOString().slice(0, 10);
-                    if (lastDate === null || lastDate !== today) {
-                        // 日付が異なれば全タスクdoneをfalseにリセット
+                    // リセット時刻チェックを実行
+                    const wasReset = await checkAndResetTasks();
+                    if (wasReset) {
+                        // リセットが実行された場合は状態を更新
                         setUsers((prev) =>
                             prev.map((u) => ({
                                 ...u,
@@ -158,11 +162,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                                 })),
                             }))
                         );
-                        // 日付をストレージに保存
-                        await AsyncStorage.setItem('lastCheckedDate', today);
                     }
                 } catch (e) {
-                    console.error('日付チェック・リセットエラー', e);
+                    console.error('リセットチェックエラー', e);
                 }
             }
         };
@@ -328,6 +330,30 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         );
     };
 
+    // 全タスクを手動リセット
+    const resetAllTasks = async () => {
+        try {
+            const success = await manualTaskReset();
+            if (success) {
+                // 状態を更新
+                setUsers((prev) =>
+                    prev.map((u) => ({
+                        ...u,
+                        taskLists: u.taskLists.map((l) => ({
+                            ...l,
+                            tasks: l.tasks.map((t) => ({ ...t, done: false })),
+                        })),
+                    }))
+                );
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('手動リセットエラー:', error);
+            return false;
+        }
+    };
+
     if (loading) return null; // ローディングUI推奨
 
     return (
@@ -349,6 +375,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 moveUser,
                 setUsersOrder,
                 reorderTasks,
+                resetAllTasks,
             }}
         >
             {children}
