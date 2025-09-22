@@ -42,7 +42,7 @@ export default function Home() {
                   <FontAwesomeIcon icon={faClipboardList} className="text-white text-sm w-5" />
                 </div>
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600">
-                  お支度ボード
+                  やることボード
                 </h1>
               </div>
             </div>
@@ -82,7 +82,7 @@ export default function Home() {
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-4">
             <span className="text-yellow-600 font-semibold">
-              お支度ボード
+              やることボード
             </span>
             は、子どもたちが<br className="sm:hidden" />毎日の準備や「やること」を<br />
             <span className="text-orange-600 font-bold">楽しく</span>、
@@ -154,7 +154,7 @@ export default function Home() {
               <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
                 <FontAwesomeIcon icon={faClipboardList} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8" />
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">お支度ボード</h3>
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">やることボード</h3>
               <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed">
                 複数のボードを作成・管理して、<br className="sm:hidden" /><span className="text-yellow-600 font-bold">用途別</span>に使い分け
               </p>
@@ -242,7 +242,7 @@ export default function Home() {
               特徴
             </h2>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 px-4">
-              お支度ボードの<br className="sm:hidden" /><span className="text-orange-600 font-bold">魅力</span>をご紹介！
+              やることボードの<br className="sm:hidden" /><span className="text-orange-600 font-bold">魅力</span>をご紹介！
             </p>
           </div>
           
@@ -291,7 +291,7 @@ export default function Home() {
             <FontAwesomeIcon icon={faStar} className="text-white text-4xl sm:text-6xl lg:text-8xl w-16 sm:w-20 lg:w-24" />
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 sm:mb-8 leading-tight px-4">
-            お支度ボードで、<br className="sm:hidden" />毎日の準備を<br />
+            やることボードで、<br className="sm:hidden" />毎日の準備を<br />
             <span className="text-yellow-200">もっと楽しく</span>、<br className="sm:hidden" />
             <span className="text-yellow-300">スムーズに</span>しましょう！
           </h2>
@@ -321,7 +321,7 @@ export default function Home() {
                 <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                   <FontAwesomeIcon icon={faClipboardList} className="text-white text-sm w-5" />
                 </div>
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-400">お支度ボード</h3>
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-400">やることボード</h3>
               </div>
               <p className="text-gray-400 text-sm sm:text-base lg:text-lg">毎日のやることを<br className="sm:hidden" />これひとつで</p>
             </div>
@@ -340,7 +340,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-700 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-400">
-            <p className="text-sm sm:text-base lg:text-lg">&copy; 2024 お支度ボード - Code Crane. All rights reserved.</p>
+            <p className="text-sm sm:text-base lg:text-lg">&copy; 2025 やることボード - Code Crane. All rights reserved.</p>
           </div>
         </div>
       </footer>

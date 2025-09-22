@@ -35,7 +35,7 @@ export default function PrivacyPolicy() {
                   <FontAwesomeIcon icon={faClipboardList} className="text-white text-sm w-5" />
                 </div>
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600">
-                  お支度ボード
+                  やることボード
                 </h1>
               </Link>
             </div>
@@ -175,13 +175,7 @@ export default function PrivacyPolicy() {
                 9. お問い合わせ窓口
               </h2>
               <div className="text-gray-700 space-y-2 sm:space-y-3">
-                <p className="text-sm sm:text-base lg:text-lg">プライバシーポリシーに関するご意見、ご質問、苦情、<br className="sm:hidden" />開示等のお申し出は、<br className="sm:hidden" /><a href="https://code-crane.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">Code Craneホームページ</a> または<br className="sm:hidden" />下記メールアドレスまでご連絡ください。</p>
-                <div className="bg-blue-100 p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 border-blue-300 mt-2 sm:mt-4">
-                  <p className="text-sm sm:text-base lg:text-lg font-semibold text-blue-800">
-                    <FontAwesomeIcon icon={faEnvelope} className="mr-2 w-4" />
-                    メールアドレス：<br className="sm:hidden" />k.tsuruhama@code-crane.com
-                  </p>
-                </div>
+                <p className="text-sm sm:text-base lg:text-lg">プライバシーポリシーに関するご意見、ご質問、苦情、<br className="sm:hidden" />開示等のお申し出は、<br className="sm:hidden" /><a href="https://code-crane.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">Code Craneホームページ</a> または<br className="sm:hidden" />下記お問い合わせフォームまでご連絡ください。</p>
                 <div className="bg-yellow-100 p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 border-yellow-300 mt-2 sm:mt-4">
                   <p className="text-sm sm:text-base lg:text-lg font-semibold text-yellow-800">
                     <FontAwesomeIcon icon={faEnvelope} className="mr-2 w-4" />
@@ -218,7 +212,7 @@ export default function PrivacyPolicy() {
       {/* Footer */}
       <footer className="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-6 sm:py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm sm:text-base lg:text-lg text-gray-400">&copy; 2024 お支度ボード - Code Crane. All rights reserved.</p>
+          <p className="text-sm sm:text-base lg:text-lg text-gray-400">&copy; 2025 やることボード - Code Crane. All rights reserved.</p>
         </div>
       </footer>
     </div>
