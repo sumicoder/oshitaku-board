@@ -39,7 +39,7 @@ export default function Home() {
             <div className="flex items-center">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                  <FontAwesomeIcon icon={faClipboardList} className="text-white text-sm w-5" />
+                  <FontAwesomeIcon icon={faClipboardList} className="text-white text-sm w-5 h-auto aspect-square" />
                 </div>
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600">
                   やることボード
@@ -68,7 +68,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-6 sm:mb-8">
             <div className="inline-block p-3 sm:p-4 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-full shadow-lg mb-4 sm:mb-6">
-              <FontAwesomeIcon icon={faStar} className="text-yellow-600 text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12" />
+              <FontAwesomeIcon icon={faStar} className="text-yellow-600 text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
             </div>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
@@ -96,7 +96,7 @@ export default function Home() {
               className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-xl sm:rounded-2xl text-base sm:text-lg lg:text-xl font-bold hover:from-yellow-600 hover:to-orange-700 transition-colors shadow-xl"
             >
               <span className="flex items-center justify-center space-x-2 sm:space-x-3">
-                <FontAwesomeIcon icon={faMobileAlt} className="text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8" />
+                <FontAwesomeIcon icon={faMobileAlt} className="text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
                 <span>App Storeで<br className="sm:hidden" />ダウンロード</span>
               </span>
             </a>
@@ -109,7 +109,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 sm:mb-16">
             <div className="inline-block p-3 sm:p-4 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-full shadow-lg mb-4 sm:mb-6">
-              <FontAwesomeIcon icon={faChartBar} className="text-yellow-600 text-xl sm:text-2xl lg:text-3xl w-6 sm:w-8 lg:w-10" />
+              <FontAwesomeIcon icon={faChartBar} className="text-yellow-600 text-xl sm:text-2xl lg:text-3xl w-6 sm:w-8 lg:w-10 h-auto aspect-square" />
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-yellow-600">
               主な機能
@@ -122,7 +122,7 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="bg-gradient-to-br from-yellow-100 to-orange-200 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-lg border-4 border-yellow-300">
               <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-                <FontAwesomeIcon icon={faTasks} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8" />
+                <FontAwesomeIcon icon={faTasks} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
               </div>
               <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">やること管理</h3>
               <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed">
@@ -132,7 +132,7 @@ export default function Home() {
 
             <div className="bg-gradient-to-br from-orange-100 to-red-200 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-lg border-4 border-orange-300">
               <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-orange-400 to-red-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-                <FontAwesomeIcon icon={faUsers} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8" />
+                <FontAwesomeIcon icon={faUsers} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
               </div>
               <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">複数ユーザー対応</h3>
               <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed">
@@ -142,7 +142,7 @@ export default function Home() {
 
             <div className="bg-gradient-to-br from-red-100 to-pink-200 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-lg border-4 border-red-300">
               <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-red-400 to-pink-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-                <FontAwesomeIcon icon={faClock} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8" />
+                <FontAwesomeIcon icon={faClock} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
               </div>
               <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">時計表示</h3>
               <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed">
@@ -152,7 +152,7 @@ export default function Home() {
 
             <div className="bg-gradient-to-br from-yellow-100 to-orange-200 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-lg border-4 border-yellow-300">
               <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-                <FontAwesomeIcon icon={faClipboardList} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8" />
+                <FontAwesomeIcon icon={faClipboardList} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
               </div>
               <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">やることボード</h3>
               <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed">
@@ -162,7 +162,7 @@ export default function Home() {
 
             <div className="bg-gradient-to-br from-orange-100 to-red-200 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-lg border-4 border-orange-300">
               <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-orange-400 to-red-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-                <FontAwesomeIcon icon={faPalette} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8" />
+                <FontAwesomeIcon icon={faPalette} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
               </div>
               <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">テーマカラー</h3>
               <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed">
@@ -172,7 +172,7 @@ export default function Home() {
 
             <div className="bg-gradient-to-br from-red-100 to-pink-200 p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-lg border-4 border-red-300">
               <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-red-400 to-pink-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-                <FontAwesomeIcon icon={faSyncAlt} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8" />
+                <FontAwesomeIcon icon={faSyncAlt} className="text-white text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
               </div>
               <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">自動リセット</h3>
               <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed">
@@ -193,7 +193,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-12 sm:mb-16">
             <div className="inline-block p-3 sm:p-4 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-full shadow-lg mb-4 sm:mb-6">
-              <FontAwesomeIcon icon={faHome} className="text-yellow-600 text-xl sm:text-2xl lg:text-3xl w-6 sm:w-8 lg:w-10" />
+              <FontAwesomeIcon icon={faHome} className="text-yellow-600 text-xl sm:text-2xl lg:text-3xl w-6 sm:w-8 lg:w-10 h-auto aspect-square" />
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-yellow-600">
               利用シーン
@@ -207,7 +207,7 @@ export default function Home() {
             <div className="bg-white/80 backdrop-blur-sm p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-2xl border-4 border-yellow-300">
               <div className="flex items-center mb-6 sm:mb-8">
                 <div className="w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mr-4 sm:mr-6 shadow-lg">
-                  <FontAwesomeIcon icon={faSun} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12" />
+                  <FontAwesomeIcon icon={faSun} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
                 </div>
                 <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">朝の身支度</h3>
               </div>
@@ -219,7 +219,7 @@ export default function Home() {
             <div className="bg-white/80 backdrop-blur-sm p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-2xl border-4 border-orange-300">
               <div className="flex items-center mb-6 sm:mb-8">
                 <div className="w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mr-4 sm:mr-6 shadow-lg">
-                  <FontAwesomeIcon icon={faMoon} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12" />
+                  <FontAwesomeIcon icon={faMoon} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
                 </div>
                 <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">夜の準備</h3>
               </div>
@@ -236,7 +236,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 sm:mb-16">
             <div className="inline-block p-3 sm:p-4 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-full shadow-lg mb-4 sm:mb-6">
-              <FontAwesomeIcon icon={faStar} className="text-yellow-600 text-xl sm:text-2xl lg:text-3xl w-6 sm:w-8 lg:w-10" />
+              <FontAwesomeIcon icon={faStar} className="text-yellow-600 text-xl sm:text-2xl lg:text-3xl w-6 sm:w-8 lg:w-10 h-auto aspect-square" />
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-yellow-600">
               特徴
@@ -249,28 +249,28 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="text-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-xl">
-                <FontAwesomeIcon icon={faPalette} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12" />
+                <FontAwesomeIcon icon={faPalette} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
               </div>
               <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 sm:mb-4">様々なビューを<br className="sm:hidden" />設定可能！</h3>
             </div>
 
             <div className="text-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-orange-400 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-xl">
-                <FontAwesomeIcon icon={faHeart} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12" />
+                <FontAwesomeIcon icon={faHeart} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
               </div>
               <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 sm:mb-4">親子で使いやすい<br className="sm:hidden" />シンプルなデザイン！</h3>
             </div>
 
             <div className="text-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-red-400 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-xl">
-                <FontAwesomeIcon icon={faChild} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12" />
+                <FontAwesomeIcon icon={faChild} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
               </div>
               <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 sm:mb-4">直感的な操作で<br className="sm:hidden" />小さなお子さまでも<br className="sm:hidden" />使いやすい！</h3>
             </div>
 
             <div className="text-center">
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-xl">
-                <FontAwesomeIcon icon={faEye} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12" />
+                <FontAwesomeIcon icon={faEye} className="text-white text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
               </div>
               <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 sm:mb-4">進捗が一目でわかる<br className="sm:hidden" />インターフェース！</h3>
             </div>
@@ -288,7 +288,7 @@ export default function Home() {
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
           <div className="mb-6 sm:mb-8">
-            <FontAwesomeIcon icon={faStar} className="text-white text-4xl sm:text-6xl lg:text-8xl w-16 sm:w-20 lg:w-24" />
+            <FontAwesomeIcon icon={faStar} className="text-white text-4xl sm:text-6xl lg:text-8xl w-16 sm:w-20 lg:w-24 h-auto aspect-square" />
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 sm:mb-8 leading-tight px-4">
             やることボードで、<br className="sm:hidden" />毎日の準備を<br />
@@ -305,7 +305,7 @@ export default function Home() {
             className="bg-white text-orange-600 px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 rounded-2xl sm:rounded-3xl text-lg sm:text-xl lg:text-2xl font-bold hover:bg-gray-100 transition-colors shadow-2xl inline-block"
           >
             <span className="flex items-center justify-center space-x-3 sm:space-x-4">
-              <FontAwesomeIcon icon={faMobileAlt} className="text-xl sm:text-2xl lg:text-3xl w-6 sm:w-8 lg:w-10" />
+              <FontAwesomeIcon icon={faMobileAlt} className="text-xl sm:text-2xl lg:text-3xl w-6 sm:w-8 lg:w-10 h-auto aspect-square" />
               <span>App Storeで<br className="sm:hidden" />ダウンロード</span>
             </span>
           </a>
@@ -319,7 +319,7 @@ export default function Home() {
             <div className="mb-4 md:mb-0">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                  <FontAwesomeIcon icon={faClipboardList} className="text-white text-sm w-5" />
+                  <FontAwesomeIcon icon={faClipboardList} className="text-white text-sm w-5 h-auto aspect-square" />
                 </div>
                 <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-400">やることボード</h3>
               </div>
