@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faClipboardList, 
@@ -65,41 +66,66 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="mb-6 sm:mb-8">
-            <div className="inline-block p-3 sm:p-4 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-full shadow-lg mb-4 sm:mb-6">
-              <FontAwesomeIcon icon={faStar} className="text-yellow-600 text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* 左側: テキストコンテンツ */}
+            <div className="text-center lg:text-left">
+              <div className="mb-6 sm:mb-8">
+                <div className="inline-block p-3 sm:p-4 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-full shadow-lg mb-4 sm:mb-6">
+                  <FontAwesomeIcon icon={faStar} className="text-yellow-600 text-2xl sm:text-3xl lg:text-4xl w-8 sm:w-10 lg:w-12 h-auto aspect-square" />
+                </div>
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
+                <span className="text-yellow-600">
+                  毎日のやることを
+                </span>
+                <br />
+                <span className="text-orange-500">
+                  これひとつで
+                </span>
+              </h1>
+              <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-6 sm:mb-8 leading-relaxed">
+                <span className="text-yellow-600 font-semibold">
+                  やることボード
+                </span>
+                は、子どもたちが<br />
+                毎日の準備や「やること」を<br />
+                <span className="text-orange-600 font-bold">楽しく</span>、
+                <span className="text-red-600 font-bold">わかりやすく</span><br className="sm:hidden" />管理できるアプリです！
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center lg:justify-start">
+                <a
+                  href="https://apps.apple.com/jp/app/%E3%82%84%E3%82%8B%E3%81%93%E3%81%A8%E3%83%9C%E3%83%BC%E3%83%89/id6747373489"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-xl sm:rounded-2xl text-base sm:text-lg lg:text-xl font-bold hover:from-yellow-600 hover:to-orange-700 transition-colors shadow-xl"
+                >
+                  <span className="flex items-center justify-center space-x-2 sm:space-x-3">
+                    <FontAwesomeIcon icon={faMobileAlt} className="text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
+                    <span>App Storeで<br className="sm:hidden" />ダウンロード</span>
+                  </span>
+                </a>
+              </div>
             </div>
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
-            <span className="text-yellow-600">
-              毎日のやることを
-            </span>
-            <br />
-            <span className="text-orange-500">
-              これひとつで
-            </span>
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-4">
-            <span className="text-yellow-600 font-semibold">
-              やることボード
-            </span>
-            は、子どもたちが<br className="sm:hidden" />毎日の準備や「やること」を<br />
-            <span className="text-orange-600 font-bold">楽しく</span>、
-            <span className="text-red-600 font-bold">わかりやすく</span><br className="sm:hidden" />管理できるアプリです！
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center px-4">
-            <a
-              href="https://apps.apple.com/jp/app/%E3%82%84%E3%82%8B%E3%81%93%E3%81%A8%E3%83%9C%E3%83%BC%E3%83%89/id6747373489"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-xl sm:rounded-2xl text-base sm:text-lg lg:text-xl font-bold hover:from-yellow-600 hover:to-orange-700 transition-colors shadow-xl"
-            >
-              <span className="flex items-center justify-center space-x-2 sm:space-x-3">
-                <FontAwesomeIcon icon={faMobileAlt} className="text-lg sm:text-xl lg:text-2xl w-6 sm:w-7 lg:w-8 h-auto aspect-square" />
-                <span>App Storeで<br className="sm:hidden" />ダウンロード</span>
-              </span>
-            </a>
+            
+            {/* 右側: fv画像 */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                <div className="bg-gradient-to-br from-yellow-100 to-orange-200 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl border-4 border-yellow-300">
+                  <Image
+                    src="/fv.png"
+                    alt="やることボード アプリ"
+                    width={400}
+                    height={400}
+                    className="w-full max-w-sm sm:max-w-md lg:max-w-lg h-auto rounded-2xl shadow-lg"
+                    priority
+                  />
+                </div>
+                {/* 装飾要素 */}
+                <div className="absolute -top-4 -right-4 w-8 h-8 bg-yellow-400 rounded-full animate-bounce"></div>
+                <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
