@@ -67,10 +67,6 @@ export default function MainPage() {
                     await AsyncStorage.setItem('longLength', longLength.toString());
                     await AsyncStorage.setItem('shortLength', shortLength.toString());
                     await AsyncStorage.setItem('hasSavedInitialSize', 'true');
-                    console.log('初回起動時の画面サイズを保存しました');
-                } else {
-                    // 2回目以降は何もしない
-                    console.log('画面サイズは既に保存済みです');
                 }
             } catch (e) {
                 console.error('初回画面サイズ保存エラー', e);
@@ -110,7 +106,6 @@ export default function MainPage() {
                     setWindowWidth(parseInt(storedShort));
                     setWindowHeight(parseInt(storedLong));
                 }
-                console.log('AsyncStorageから画面サイズを復元');
             }
         } catch (e) {
             console.error('画面サイズのストレージ復元エラー', e);
@@ -161,19 +156,6 @@ export default function MainPage() {
             ScreenOrientation.removeOrientationChangeListener(subscription);
         };
     }, []);
-
-    // 設定変更時のログ
-    useEffect(() => {
-        console.log('時計設定変更:', { isVisible, clockType, clockSize, clockPosition });
-    }, [isVisible, clockType, clockSize, clockPosition]);
-
-    useEffect(() => {
-        console.log('やること表示設定変更:', { displayMode, showCompleted });
-    }, [displayMode, showCompleted]);
-
-    useEffect(() => {
-        console.log('表示人数設定変更:', { userCount });
-    }, [userCount]);
 
     // 画面サイズ取得のリトライ処理。0のときはストレージからも復元を試みる
     useEffect(() => {

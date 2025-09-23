@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { initialTaskLists } from '../data/taskInitialData';
-import { registerTaskResetBackgroundFetch, manualTaskReset, checkAndResetTasks } from '../utils/taskResetScheduler';
+import { manualTaskReset, checkAndResetTasks } from '../utils/taskResetScheduler';
 
 // タスク型
 export type Task = {
@@ -142,9 +142,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // バックグラウンドタスクの登録とアプリ起動時のリセットチェック
     useEffect(() => {
-        // バックグラウンドタスクを登録
-        registerTaskResetBackgroundFetch();
-
         // アプリがアクティブになった時にリセット状態をチェック
         const handleAppStateChange = async (nextAppState: string) => {
             if (nextAppState === 'active') {
