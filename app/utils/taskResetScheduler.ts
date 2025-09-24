@@ -28,27 +28,18 @@ const calculateNextResetTime = (currentUtc9DateTime: Date, resetHour: number, re
     todayReset.setHours(safeHour, safeMinute, safeSecond, 0);
     // UTC+9オフセットを明示的に適用
     todayReset.setTime(todayReset.getTime() + (9 * 60 * 60 * 1000));
-    
-    console.log('=== リセット時刻計算 ===');
-    console.log('現在時刻 (UTC+9):', currentUtc9DateTime.toISOString());
-    console.log('設定時刻:', `${safeHour}:${safeMinute.toString().padStart(2, '0')}:${safeSecond.toString().padStart(2, '0')}`);
-    console.log('今日のリセット時刻 (UTC+9):', todayReset.toISOString());
-    console.log('比較結果:', currentUtc9DateTime.toISOString(), '>=', todayReset.toISOString(), '=', currentUtc9DateTime >= todayReset);
 
     // 今日のリセット時刻が過ぎている場合は明日のリセット時刻
     if (currentUtc9DateTime >= todayReset) {
-        console.log('リセット時刻を過ぎているため、明日のリセット時刻を設定');
         // 明日のリセット時刻を作成（UTC+9オフセットを適用）
         const tomorrowReset = new Date(currentUtc9DateTime);
         tomorrowReset.setDate(tomorrowReset.getDate() + 1);
         tomorrowReset.setHours(safeHour, safeMinute, safeSecond, 0);
         // UTC+9オフセットを明示的に適用
         tomorrowReset.setTime(tomorrowReset.getTime() + (9 * 60 * 60 * 1000));
-        console.log('明日のリセット時刻 (UTC+9):', tomorrowReset.toISOString());
-        return tomorrowReset;
+        return tomorrowReset; // リセット時刻を過ぎているため、明日のリセット時刻を設定
     } else {
-        console.log('リセット時刻前のため、今日のリセット時刻を使用');
-        return todayReset;
+        return todayReset; // リセット時刻前のため、今日のリセット時刻を使用
     }
 };
 
