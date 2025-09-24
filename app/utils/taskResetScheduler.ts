@@ -16,32 +16,58 @@ const getUtc9DateTime = (): Date => {
     return new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9に変換
 };
 
-// 指定した時刻が過ぎているかチェックする関数
-const hasResetTimePassed = async (currentUtc9DateTime: Date, lastResetDate: string): Promise<boolean> => {
-    const { hour, minute, second } = await getTaskResetTime();
-    const today = getUtc9Date();
-    // 今日の設定時刻を作成（UTC+9オフセット適用済み）
-    const todayResetTime = new Date(currentUtc9DateTime);
-    todayResetTime.setHours(hour + 9, minute, second + 1, 0); // UTC+9オフセット適用
+// 次回リセット予定時刻を計算する関数
+const calculateNextResetTime = (currentUtc9DateTime: Date, resetHour: number, resetMinute: number, resetSecond: number): Date => {
+    // 安全な値に変換（undefinedやNaNを防ぐ）
+    const safeHour = Number.isInteger(resetHour) ? resetHour : 0;
+    const safeMinute = Number.isInteger(resetMinute) ? resetMinute : 0;
+    const safeSecond = Number.isInteger(resetSecond) ? resetSecond : 1;
 
-    // 最後のリセットが今日でない場合、かつ現在時刻が設定時刻を過ぎている場合
-    if (lastResetDate !== today && currentUtc9DateTime >= todayResetTime) {
-        return true;
+    // 今日のリセット時刻を作成（UTC+9オフセットを考慮）
+    // currentUtc9DateTimeは既にUTC+9オフセットが適用済みなので、そのまま使用
+    const nextReset = new Date(currentUtc9DateTime);
+    const debugNextReset = new Date(currentUtc9DateTime);
+
+    // UTC+9オフセットを考慮して、日本時間の設定時刻をUTC時刻に変換
+    nextReset.setHours(safeHour + 9, safeMinute, safeSecond + 1, 0);
+    debugNextReset.setHours(safeHour + 9, safeMinute, safeSecond + 1, 0);
+    console.log('debugNextReset:',debugNextReset);
+
+    // 今日のリセット時刻が過ぎている場合は明日のリセット時刻
+    if (nextReset <= currentUtc9DateTime) {
+        // 明日のリセット時刻を作成
+        const tomorrow = new Date(currentUtc9DateTime);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(safeHour + 9, safeMinute, safeSecond + 1, 0);
+        nextReset.setTime(tomorrow.getTime());
     }
 
-    return false;
+    return nextReset;
+};
+
+// リセットが必要かチェックする関数
+const shouldResetTasks = async (currentUtc9DateTime: Date): Promise<boolean> => {
+    const nextResetTimeStr = await AsyncStorage.getItem('nextTaskResetTime');
+
+    if (!nextResetTimeStr) {
+        // 初回起動時はリセットしない
+        return false;
+    }
+
+    const nextResetTime = new Date(parseInt(nextResetTimeStr));
+
+    // 現在時刻が次回リセット時刻を過ぎているかチェック
+    return currentUtc9DateTime >= nextResetTime;
 };
 
 // リセット時刻チェック関数
 export const checkAndResetTasks = async () => {
     try {
-        // 最後のリセット日時をチェック
-        const lastResetDate = await AsyncStorage.getItem('lastTaskResetDate');
         const currentUtc9DateTime = getUtc9DateTime(); // UTC+9での現在日時を取得
         const today = getUtc9Date(); // UTC+9での現在日付を取得
 
-        // 設定された時刻が過ぎているかチェック
-        const shouldReset = await hasResetTimePassed(currentUtc9DateTime, lastResetDate || '');
+        // リセットが必要かチェック
+        const shouldReset = await shouldResetTasks(currentUtc9DateTime);
 
         if (shouldReset) {
             // 全ユーザーのタスクをリセット
@@ -60,7 +86,12 @@ export const checkAndResetTasks = async () => {
                 }));
                 await AsyncStorage.setItem('users', JSON.stringify(resetUsers));
                 await AsyncStorage.setItem('lastTaskResetDate', today);
-                console.log('タスクリセット完了');
+
+                // 次回リセット予定時刻を計算して保存
+                const { hour, minute, second } = await getTaskResetTime();
+                const nextResetTime = calculateNextResetTime(currentUtc9DateTime, hour, minute, second);
+                await AsyncStorage.setItem('nextTaskResetTime', nextResetTime.getTime().toString());
+
                 return true; // リセットが実行された
             }
         }
@@ -71,31 +102,23 @@ export const checkAndResetTasks = async () => {
     }
 };
 
-// バックグラウンドタスクの登録（Expo Goでは無効）
-export const registerTaskResetBackgroundFetch = async () => {
-    console.log('バックグラウンドタスク: Expo Goでは制限されているため、アプリ起動時チェックのみ有効');
-};
-
-// バックグラウンドタスクの登録解除（Expo Goでは無効）
-export const unregisterTaskResetBackgroundFetch = async () => {
-    console.log('バックグラウンドタスク登録解除: Expo Goでは制限されているため、何もしません');
-};
-
 // リセット時刻の設定
 export const setTaskResetTime = async (hour: number, minute: number = 0) => {
     const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
     await AsyncStorage.setItem('taskResetTime', timeString);
-    console.log('リセット時刻設定:', timeString);
 };
 
 // リセット時刻の取得
 export const getTaskResetTime = async (): Promise<{ hour: number; minute: number; second: number }> => {
     const resetTime = await AsyncStorage.getItem('taskResetTime');
     if (resetTime) {
-        const [hour, minute, second] = resetTime.split(':').map(Number);
+        const timeParts = resetTime.split(':');
+        const hour = parseInt(timeParts[0], 10);
+        const minute = parseInt(timeParts[1], 10);
+        const second = timeParts[2] ? parseInt(timeParts[2], 10) : 1; // secondが存在しない場合は1
         return { hour, minute, second };
     }
-    return { hour: 3, minute: 0, second: 0 }; // デフォルト: 3:00:00
+    return { hour: 3, minute: 0, second: 1 }; // デフォルト: 3:00:00
 };
 
 // 手動でタスクリセットを実行
@@ -115,10 +138,17 @@ export const manualTaskReset = async () => {
                 }))
             }));
             await AsyncStorage.setItem('users', JSON.stringify(resetUsers));
-            // UTC+9での現在日付を使用
+
+            // UTC+9での現在日付と時刻を使用
+            const currentUtc9DateTime = getUtc9DateTime();
             const today = getUtc9Date();
             await AsyncStorage.setItem('lastTaskResetDate', today);
-            console.log('手動タスクリセット完了');
+
+            // 次回リセット予定時刻を計算して保存
+            const { hour, minute, second } = await getTaskResetTime();
+            const nextResetTime = calculateNextResetTime(currentUtc9DateTime, hour, minute, second);
+            await AsyncStorage.setItem('nextTaskResetTime', nextResetTime.getTime().toString());
+
             return true;
         }
         return false;
@@ -131,8 +161,6 @@ export const manualTaskReset = async () => {
 // デフォルトエクスポート（警告回避用）
 export default {
     checkAndResetTasks,
-    registerTaskResetBackgroundFetch,
-    unregisterTaskResetBackgroundFetch,
     setTaskResetTime,
     getTaskResetTime,
     manualTaskReset,
