@@ -1,15 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Expo Goではバックグラウンドタスクが制限されているため、
-// アプリ起動時とアクティブ時のチェックのみでリセット機能を提供
-
-// UTC+9（日本標準時）での現在日付を取得する関数
-const getUtc9Date = (): string => {
-    const now = new Date();
-    const utc9Now = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9に変換
-    return utc9Now.toISOString().slice(0, 10); // YYYY-MM-DD形式で返す
-};
-
 // UTC+9（日本標準時）での現在時刻を取得する関数
 const getUtc9DateTime = (): Date => {
     const now = new Date();
@@ -62,7 +52,6 @@ const shouldResetTasks = async (currentUtc9DateTime: Date): Promise<boolean> => 
 export const checkAndResetTasks = async () => {
     try {
         const currentUtc9DateTime = getUtc9DateTime(); // UTC+9での現在日時を取得
-        const today = getUtc9Date(); // UTC+9での現在日付を取得
 
         // リセットが必要かチェック
         const shouldReset = await shouldResetTasks(currentUtc9DateTime);
@@ -83,7 +72,6 @@ export const checkAndResetTasks = async () => {
                     }))
                 }));
                 await AsyncStorage.setItem('users', JSON.stringify(resetUsers));
-                await AsyncStorage.setItem('lastTaskResetDate', today);
 
                 // 次回リセット予定時刻を計算して保存
                 const { hour, minute, second } = await getTaskResetTime();
@@ -139,8 +127,6 @@ export const manualTaskReset = async () => {
 
             // UTC+9での現在日付と時刻を使用
             const currentUtc9DateTime = getUtc9DateTime();
-            const today = getUtc9Date();
-            await AsyncStorage.setItem('lastTaskResetDate', today);
 
             // 次回リセット予定時刻を計算して保存
             const { hour, minute, second } = await getTaskResetTime();
