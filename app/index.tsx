@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -24,11 +25,14 @@ export default function MainPage() {
     const appState = useRef(AppState.currentState);
     const [orientation, setOrientation] = useState<ScreenOrientation.Orientation | null>(null);
 
-    const { isVisible, clockType, clockSize, clockPosition } = useClockSetting();
+    const { isVisible, setIsVisible, clockType, clockSize, clockPosition } = useClockSetting();
     const { displayMode, showCompleted } = useTaskDisplaySetting();
     const { userCount } = useUserCountSetting();
     const { users, addUser } = useUserContext();
     const visibleUsers = users.slice(0, userCount);
+
+    // 画面幅500以下では時計設定を強制的にオフ
+    const shouldShowClock = isVisible && windowWidth > 500;
 
     const [isReady, setIsReady] = useState(false);
     const [isAppActive, setIsAppActive] = useState(false);
@@ -37,10 +41,20 @@ export default function MainPage() {
     const [newUserName, setNewUserName] = useState('');
     const [selectedColor, setSelectedColor] = useState(colorList[0]);
 
+    // useEffect(() => {
+    //     // 横向き（ランドスケープ）に固定
+    //     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+    // }, []);
+
+    // 画面幅に応じて時計設定を動的に変更
     useEffect(() => {
-        // 横向き（ランドスケープ）に固定
-        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
-    }, []);
+        if (windowWidth > 0) {
+            if (windowWidth <= 500 && isVisible) {
+                // 画面幅500以下で時計がオンになっている場合は強制的にオフ
+                setIsVisible(false);
+            }
+        }
+    }, [windowWidth, isVisible, setIsVisible]);
 
     // 初期サイズをストレージに保存
     useEffect(() => {
@@ -53,10 +67,6 @@ export default function MainPage() {
                     await AsyncStorage.setItem('longLength', longLength.toString());
                     await AsyncStorage.setItem('shortLength', shortLength.toString());
                     await AsyncStorage.setItem('hasSavedInitialSize', 'true');
-                    console.log('初回起動時の画面サイズを保存しました');
-                } else {
-                    // 2回目以降は何もしない
-                    console.log('画面サイズは既に保存済みです');
                 }
             } catch (e) {
                 console.error('初回画面サイズ保存エラー', e);
@@ -96,7 +106,6 @@ export default function MainPage() {
                     setWindowWidth(parseInt(storedShort));
                     setWindowHeight(parseInt(storedLong));
                 }
-                console.log('AsyncStorageから画面サイズを復元');
             }
         } catch (e) {
             console.error('画面サイズのストレージ復元エラー', e);
@@ -147,19 +156,6 @@ export default function MainPage() {
             ScreenOrientation.removeOrientationChangeListener(subscription);
         };
     }, []);
-
-    // 設定変更時のログ
-    useEffect(() => {
-        console.log('時計設定変更:', { isVisible, clockType, clockSize, clockPosition });
-    }, [isVisible, clockType, clockSize, clockPosition]);
-
-    useEffect(() => {
-        console.log('やること表示設定変更:', { displayMode, showCompleted });
-    }, [displayMode, showCompleted]);
-
-    useEffect(() => {
-        console.log('表示人数設定変更:', { userCount });
-    }, [userCount]);
 
     // 画面サイズ取得のリトライ処理。0のときはストレージからも復元を試みる
     useEffect(() => {
@@ -250,31 +246,37 @@ export default function MainPage() {
             </View>,
         ];
     } else if (visibleUsers.length === 1) {
-        if (clockPosition === 'left') {
+        if (shouldShowClock && clockPosition === 'left') {
             columns = [
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
+                    <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.col} key="user0">
                     <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
-        } else {
-            // 'right'
+        } else if (shouldShowClock && clockPosition === 'right') {
             columns = [
                 <View style={styles.col} key="user0">
                     <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
+                    <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />
+                </View>,
+            ];
+        } else {
+            // 時計を表示しない場合
+            columns = [
+                <View style={styles.col} key="user0">
+                    <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
         }
     } else if (visibleUsers.length === 2) {
-        if (clockPosition === 'left') {
+        if (shouldShowClock && clockPosition === 'left') {
             columns = [
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
+                    <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.col} key="user0">
                     <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
@@ -283,20 +285,19 @@ export default function MainPage() {
                     <UserTasks userId={users[1].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
-        } else if (clockPosition === 'center') {
+        } else if (shouldShowClock && clockPosition === 'center') {
             columns = [
                 <View style={styles.col} key="user0">
                     <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={[styles.clockCol, { minWidth: 100 }]} key="clock">
-                    {isVisible ? <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} /> : <View style={styles.colBorder} />}
+                    <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.col} key="user1">
                     <UserTasks userId={users[1].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
-        } else {
-            // 'right'
+        } else if (shouldShowClock && clockPosition === 'right') {
             columns = [
                 <View style={styles.col} key="user0">
                     <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
@@ -305,7 +306,17 @@ export default function MainPage() {
                     <UserTasks userId={users[1].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
                 <View style={styles.clockCol} key="clock">
-                    {isVisible && <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />}
+                    <ClockArea windowHeight={windowHeight} windowWidth={windowWidth} />
+                </View>,
+            ];
+        } else {
+            // 時計を表示しない場合
+            columns = [
+                <View style={styles.col} key="user0">
+                    <UserTasks userId={users[0].id} windowHeight={windowHeight} windowWidth={windowWidth} />
+                </View>,
+                <View style={styles.col} key="user1">
+                    <UserTasks userId={users[1].id} windowHeight={windowHeight} windowWidth={windowWidth} />
                 </View>,
             ];
         }

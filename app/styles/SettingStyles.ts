@@ -86,6 +86,27 @@ const SettingStyles = StyleSheet.create({
     iconText: {
         fontSize: 14,
     },
+    radioButtonText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    radioButtonTextSelected: {
+        color: '#007AFF',
+        fontWeight: 'bold',
+    },
+    button: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        backgroundColor: '#f0f4ff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+    },
 });
 
 export default SettingStyles; 

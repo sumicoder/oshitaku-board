@@ -2,8 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import TaskItem from '../../components/TaskItem';
-import { colorList, Icon, iconList, useUserContext } from '../../context/UserContext';
+import { colorList, Icon, iconList, Task, useUserContext } from '../../context/UserContext';
+import { getBackButtonFontSize } from '../../utils/deviceUtils';
 import { renderIcon } from '../../utils/renderIcon';
 
 // ユーザー詳細ページのコンポーネント
@@ -12,7 +14,7 @@ const UserDetailScreen = () => {
     const { userId } = useLocalSearchParams();
 
     // Contextからユーザー情報・タスクリスト並び替え関数を取得
-    const { users, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask, editUser, deleteUser } = useUserContext();
+    const { users, addTaskList, addTask, editTaskListName, deleteTaskList, editTask, deleteTask, editUser, deleteUser, reorderTasks } = useUserContext();
 
     // userId（string）で一致するユーザーを検索
     const currentUser = users.find((u) => u.id === userId);
@@ -27,7 +29,7 @@ const UserDetailScreen = () => {
                     }}
                     style={{ backgroundColor: currentUser?.color || '#fff', padding: 8 }}
                 >
-                    <Text style={{ fontSize: 24, fontWeight: 'bold', paddingHorizontal: 20 }}>戻る</Text>
+                    <Text style={{ fontSize: getBackButtonFontSize(), fontWeight: 'bold', paddingHorizontal: 20 }}>戻る</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -179,7 +181,7 @@ const UserDetailScreen = () => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.container}>
             <Stack.Screen
                 options={{
                     title: currentUser?.name || 'ユーザー詳細',
@@ -196,7 +198,7 @@ const UserDetailScreen = () => {
                             }}
                             style={{ marginLeft: 32, backgroundColor: currentUser?.color || '#fff', padding: 8 }}
                         >
-                            <Text style={{ fontSize: 24, color: '#fff', fontWeight: 'bold' }}>戻る</Text>
+                            <Text style={{ fontSize: getBackButtonFontSize(), color: '#fff', fontWeight: 'bold' }}>戻る</Text>
                         </TouchableOpacity>
                     ),
                 }}
@@ -277,32 +279,69 @@ const UserDetailScreen = () => {
                             {!currentUser.taskLists || currentUser.taskLists.length === 0 || !currentUser.taskLists.find((list) => list.id === selectedTab) ? (
                                 <Text style={styles.noTask}>「やること」の登録がありません</Text>
                             ) : (
-                                currentUser.taskLists
-                                    .find((list) => list.id === selectedTab)
-                                    ?.tasks.map((task, taskIdx) => (
-                                        <View key={taskIdx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                                            <TaskItem
-                                                task={task}
-                                                currentUser={currentUser}
-                                                style={{ flex: 1, borderWidth: 1, marginRight: 24 }}
-                                                onPress={() => handleOpenEditTaskModal(selectedTab || '', taskIdx, task)}
-                                                editMode={true}
-                                            />
+                                <DraggableFlatList
+                                    data={currentUser.taskLists.find((list) => list.id === selectedTab)?.tasks || []}
+                                    keyExtractor={(item: Task) => item.id}
+                                    renderItem={({ item: task, drag, isActive }: RenderItemParams<Task>) => (
+                                        <View 
+                                            style={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                marginBottom: 8,
+                                                opacity: isActive ? 0.8 : 1,
+                                                elevation: isActive ? 5 : 0,
+                                                backgroundColor: isActive ? '#f0f0f0' : 'transparent',
+                                                borderRadius: isActive ? 8 : 0,
+                                            }}
+                                        >
+                                            <TouchableOpacity
+                                                onLongPress={drag}
+                                                disabled={isActive}
+                                                style={{ 
+                                                    flex: 1,
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <Ionicons 
+                                                    name="reorder-three" 
+                                                    size={24} 
+                                                    color="#999" 
+                                                    style={{ marginRight: 8 }}
+                                                />
+                                                <TaskItem
+                                                    task={task}
+                                                    currentUser={currentUser}
+                                                    style={{ flex: 1, borderWidth: 1, marginRight: 24 }}
+                                                    onPress={() => handleOpenEditTaskModal(selectedTab || '', 0, task)}
+                                                    editMode={true}
+                                                />
+                                            </TouchableOpacity>
                                             {/* 削除ボタン */}
-                                            <TouchableOpacity style={{ marginRight: 20 }} onPress={() => handleDeleteTask(selectedTab || '', task.id)}>
+                                            <TouchableOpacity 
+                                                style={{ marginRight: 20 }} 
+                                                onPress={() => handleDeleteTask(selectedTab || '', task.id)}
+                                            >
                                                 <Ionicons name="trash" size={40} color="#f44" />
                                             </TouchableOpacity>
                                         </View>
-                                    ))
+                                    )}
+                                    onDragEnd={({ data }: { data: Task[] }) => {
+                                        if (currentUser?.id && selectedTab) {
+                                            reorderTasks(currentUser.id, selectedTab, data);
+                                        }
+                                    }}
+                                    showsVerticalScrollIndicator={false}
+                                />
                             )}
                         </View>
                         {/* タスクリスト名編集モーダル */}
                         <Modal visible={editListId !== null} transparent animationType="fade">
                             <View style={styles.modalOverlay}>
-                                <ScrollView contentContainerStyle={styles.modalContent}>
+                                <ScrollView contentContainerStyle={[styles.modalContent,{maxWidth: 600}]}>
                                     <Text style={styles.title}>お支度ボード名を編集</Text>
-                                    <TextInput style={styles.input} value={editListName} onChangeText={setEditListName} placeholder="お支度ボード名" />
-                                    <View style={{ flexDirection: 'row', marginTop: 16 }}>
+                                    <TextInput style={[styles.input,{width: 540}]} value={editListName} onChangeText={setEditListName} placeholder="お支度ボード名" />
+                                    <View style={{ flexDirection: 'row', marginTop: 40 }}>
                                         <TouchableOpacity style={styles.modalBtn} onPress={handleEditListName}>
                                             <Text style={{ color: '#fff', fontSize: 20 }}>保存</Text>
                                         </TouchableOpacity>
@@ -316,10 +355,10 @@ const UserDetailScreen = () => {
                         {/* タスク追加・編集モーダル（共通） */}
                         <Modal visible={modalVisible} transparent animationType="slide">
                             <View style={styles.modalOverlay}>
-                                <ScrollView contentContainerStyle={styles.modalContent}>
+                                <ScrollView contentContainerStyle={[styles.modalContent,{maxWidth: 610}]}>
                                     <Text style={styles.title}>{editTaskInfo ? '「やること」を編集' : '「やること」を追加'}</Text>
                                     {/* 「やること」名入力 */}
-                                    <TextInput style={styles.input} placeholder="「やること」名" value={newTaskName} onChangeText={setNewTaskName} />
+                                    <TextInput style={[styles.input,{width: 540}]} placeholder="「やること」名" value={newTaskName} onChangeText={setNewTaskName} />
                                     {/* アイコン選択 */}
                                     <Text style={styles.title}>アイコン</Text>
                                     <View style={styles.modalWrap}>
@@ -354,12 +393,13 @@ const UserDetailScreen = () => {
                     </View>
                 </View>
             )}
-        </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 16,
     },
     title: {
@@ -386,7 +426,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     taskList: {
-        marginBottom: 16,
+        marginBottom: 180,
     },
     taskListName: {
         fontSize: 16,
@@ -432,7 +472,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 8,
         padding: 16,
-        width: 300,
+        width: '100%',
         marginTop: 8,
         fontSize: 24,
     },

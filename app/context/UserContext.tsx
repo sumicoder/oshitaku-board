@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { initialTaskLists } from '../data/taskInitialData';
+import { manualTaskReset, checkAndResetTasks } from '../utils/taskResetScheduler';
 
 // タスク型
 export type Task = {
@@ -36,36 +37,49 @@ export type User = {
 export const colorList = ['#FFD700', '#00BFFF', '#FF69B4', '#90EE90', '#FFA500', '#FF6347', '#8A2BE2', '#00CED1', '#FFB6C1', '#A9A9A9'];
 // 汎用的なアイコン30種類のリスト
 export const iconList = [
-    { name: 'home', type: 'AntDesign' },
-    { name: 'user', type: 'AntDesign' },
-    { name: 'star', type: 'AntDesign' },
-    { name: 'checkcircle', type: 'AntDesign' },
-    { name: 'smileo', type: 'AntDesign' },
-    { name: 'coffee', type: 'FontAwesome' },
-    { name: 'bath', type: 'FontAwesome' },
-    { name: 'book', type: 'FontAwesome' },
-    { name: 'palette', type: 'MaterialIcons' },
-    { name: 'videogame-asset', type: 'MaterialIcons' },
-    { name: 'shopping-cart', type: 'Feather' },
-    { name: 'calendar', type: 'Feather' },
-    { name: 'bell', type: 'Feather' },
-    { name: 'camera', type: 'Feather' },
-    { name: 'music', type: 'Feather' },
-    { name: 'gift', type: 'Feather' },
-    { name: 'heart', type: 'FontAwesome' },
-    { name: 'car', type: 'FontAwesome' },
-    { name: 'cutlery', type: 'FontAwesome' },
-    { name: 'paw', type: 'FontAwesome' },
-    { name: 'bicycle', type: 'FontAwesome' },
-    { name: 'umbrella', type: 'FontAwesome' },
-    { name: 'leaf', type: 'FontAwesome' },
-    { name: 'plane', type: 'FontAwesome' },
     { name: 'sun', type: 'Feather' },
     { name: 'moon', type: 'Feather' },
     { name: 'cloud', type: 'Feather' },
     { name: 'map', type: 'Feather' },
     { name: 'key', type: 'Feather' },
     { name: 'lock', type: 'Feather' },
+    { name: 'shopping-cart', type: 'Feather' },
+    { name: 'calendar', type: 'Feather' },
+    { name: 'bell', type: 'Feather' },
+    { name: 'camera', type: 'Feather' },
+    { name: 'music', type: 'Feather' },
+    { name: 'gift', type: 'Feather' },
+    { name: 'heart', type: 'Feather' },
+    { name: 'book', type: 'Feather' },
+    { name: 'home', type: 'AntDesign' },
+    { name: 'check-circle', type: 'AntDesign' },
+    { name: 'smile', type: 'AntDesign' },
+    { name: 'face-retouching-natural', type: 'MaterialIcons' },
+    { name: 'user', type: 'AntDesign' },
+    { name: 'star', type: 'AntDesign' },
+    { name: 'backpack', type: 'MaterialIcons' },
+    { name: 'palette', type: 'MaterialIcons' },
+    { name: 'dirty-lens', type: 'MaterialIcons' },
+    { name: 'coffee', type: 'FontAwesome' },
+    { name: 'bath', type: 'FontAwesome' },
+    { name: 'book', type: 'FontAwesome' },
+    { name: 'car', type: 'FontAwesome' },
+    { name: 'shirt', type: 'Ionicons' },
+    { name: 'cutlery', type: 'FontAwesome' },
+    { name: 'paw', type: 'FontAwesome' },
+    { name: 'umbrella', type: 'FontAwesome' },
+    { name: 'leaf', type: 'FontAwesome' },
+    { name: 'plane', type: 'FontAwesome' },
+    { name: 'cup-water', type: 'MaterialCommunityIcons' },
+    { name: 'food', type: 'MaterialCommunityIcons' },
+    { name: 'toothbrush', type: 'MaterialCommunityIcons' },
+    { name: 'toilet', type: 'MaterialCommunityIcons' },
+    { name: 'gamepad-variant', type: 'MaterialCommunityIcons' },
+    { name: 'door', type: 'MaterialCommunityIcons' },
+    { name: 'home', type: 'MaterialCommunityIcons' },
+    { name: 'hand-wash', type: 'MaterialCommunityIcons' },
+    { name: 'broom', type: 'MaterialCommunityIcons' },
+    { name: 'food-turkey', type: 'MaterialCommunityIcons' },
 ];
 
 type UserContextType = {
@@ -84,6 +98,8 @@ type UserContextType = {
     deleteUser: (userId: string) => void;
     moveUser: (userId: string, toIndex: number) => void;
     setUsersOrder: (newOrder: User[]) => void;
+    reorderTasks: (userId: string, listId: string, newTasks: Task[]) => void;
+    resetAllTasks: () => Promise<boolean>;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -123,17 +139,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         if (!loading && selectedUserId !== null) AsyncStorage.setItem('selectedUserId', String(selectedUserId));
     }, [selectedUserId, loading]);
 
-    // アプリがアクティブになった時に日付を比較し、異なれば全タスクdoneをfalseにリセット
+    // バックグラウンドタスクの登録とアプリ起動時のリセットチェック
     useEffect(() => {
+        // アプリがアクティブになった時にリセット状態をチェック
         const handleAppStateChange = async (nextAppState: string) => {
             if (nextAppState === 'active') {
                 try {
-                    // ストレージから前回保存日付を取得
-                    const lastDate = await AsyncStorage.getItem('lastCheckedDate');
-                    // 今日の日付（YYYY-MM-DD）
-                    const today = new Date().toISOString().slice(0, 10);
-                    if (lastDate === null || lastDate !== today) {
-                        // 日付が異なれば全タスクdoneをfalseにリセット
+                    // リセット時刻チェックを実行
+                    const wasReset = await checkAndResetTasks();
+                    if (wasReset) {
+                        // リセットが実行された場合は状態を更新
                         setUsers((prev) =>
                             prev.map((u) => ({
                                 ...u,
@@ -143,11 +158,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                                 })),
                             }))
                         );
-                        // 日付をストレージに保存
-                        await AsyncStorage.setItem('lastCheckedDate', today);
                     }
                 } catch (e) {
-                    console.error('日付チェック・リセットエラー', e);
+                    console.error('リセットチェックエラー', e);
                 }
             }
         };
@@ -299,6 +312,44 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUsers(newOrder);
     };
 
+    // タスクの順序を変更（ドラッグ&ドロップ用）
+    const reorderTasks = (userId: string, listId: string, newTasks: Task[]) => {
+        setUsers((prev) =>
+            prev.map((u) =>
+                u.id === userId
+                    ? {
+                          ...u,
+                          taskLists: u.taskLists.map((l) => (l.id === listId ? { ...l, tasks: newTasks } : l)),
+                      }
+                    : u
+            )
+        );
+    };
+
+    // 全タスクを手動リセット
+    const resetAllTasks = async () => {
+        try {
+            const success = await manualTaskReset();
+            if (success) {
+                // 状態を更新
+                setUsers((prev) =>
+                    prev.map((u) => ({
+                        ...u,
+                        taskLists: u.taskLists.map((l) => ({
+                            ...l,
+                            tasks: l.tasks.map((t) => ({ ...t, done: false })),
+                        })),
+                    }))
+                );
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('手動リセットエラー:', error);
+            return false;
+        }
+    };
+
     if (loading) return null; // ローディングUI推奨
 
     return (
@@ -319,6 +370,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 deleteUser,
                 moveUser,
                 setUsersOrder,
+                reorderTasks,
+                resetAllTasks,
             }}
         >
             {children}

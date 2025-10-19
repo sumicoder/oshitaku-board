@@ -31,3 +31,6 @@ export const renderIcon = (icon: Icon, size: number = 32, color: string = '#333'
             return null;
     }
 };
+
+// デフォルトエクスポート（警告回避用）
+export default renderIcon;
