@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { initialTaskLists } from '../data/taskInitialData';
-import { registerTaskResetBackgroundFetch, manualTaskReset, checkAndResetTasks } from '../utils/taskResetScheduler';
+import { manualTaskReset, checkAndResetTasks } from '../utils/taskResetScheduler';
 
 // タスク型
 export type Task = {
@@ -51,13 +51,12 @@ export const iconList = [
     { name: 'gift', type: 'Feather' },
     { name: 'heart', type: 'Feather' },
     { name: 'book', type: 'Feather' },
-    { name: 'shirt-outline', type: 'Ionicons' },
     { name: 'home', type: 'AntDesign' },
+    { name: 'check-circle', type: 'AntDesign' },
+    { name: 'smile', type: 'AntDesign' },
+    { name: 'face-retouching-natural', type: 'MaterialIcons' },
     { name: 'user', type: 'AntDesign' },
     { name: 'star', type: 'AntDesign' },
-    { name: 'checkcircle', type: 'AntDesign' },
-    { name: 'smileo', type: 'AntDesign' },
-    { name: 'face-retouching-natural', type: 'MaterialIcons' },
     { name: 'backpack', type: 'MaterialIcons' },
     { name: 'palette', type: 'MaterialIcons' },
     { name: 'dirty-lens', type: 'MaterialIcons' },
@@ -65,6 +64,7 @@ export const iconList = [
     { name: 'bath', type: 'FontAwesome' },
     { name: 'book', type: 'FontAwesome' },
     { name: 'car', type: 'FontAwesome' },
+    { name: 'shirt', type: 'Ionicons' },
     { name: 'cutlery', type: 'FontAwesome' },
     { name: 'paw', type: 'FontAwesome' },
     { name: 'umbrella', type: 'FontAwesome' },
@@ -78,7 +78,6 @@ export const iconList = [
     { name: 'door', type: 'MaterialCommunityIcons' },
     { name: 'home', type: 'MaterialCommunityIcons' },
     { name: 'hand-wash', type: 'MaterialCommunityIcons' },
-    { name: 'cup-water', type: 'MaterialCommunityIcons' },
     { name: 'broom', type: 'MaterialCommunityIcons' },
     { name: 'food-turkey', type: 'MaterialCommunityIcons' },
 ];
@@ -142,9 +141,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     // バックグラウンドタスクの登録とアプリ起動時のリセットチェック
     useEffect(() => {
-        // バックグラウンドタスクを登録
-        registerTaskResetBackgroundFetch();
-
         // アプリがアクティブになった時にリセット状態をチェック
         const handleAppStateChange = async (nextAppState: string) => {
             if (nextAppState === 'active') {
