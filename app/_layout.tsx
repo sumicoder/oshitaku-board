@@ -6,7 +6,9 @@ import ProgressBarSettingProvider from './context/ProgressBarSettingContext';
 import TaskDisplaySettingProvider from './context/TaskDisplaySettingContext';
 import UserProvider from './context/UserContext';
 import UserCountSettingProvider from './context/UserCountSettingContext';
+import SecurityGateSettingProvider from './context/SecurityGateSettingContext';
 import CustomDrawerContent from './CustomDrawerContent';
+import SecurityQuestionGate from './components/SecurityQuestionGate';
 
 export default function Layout() {
     // アプリが起動中は画面のスリープを無効にする
@@ -18,7 +20,14 @@ export default function Layout() {
                 <TaskDisplaySettingProvider>
                     <UserProvider>
                         <UserCountSettingProvider>
-                            <Drawer drawerContent={() => <CustomDrawerContent />} />
+                            <SecurityGateSettingProvider>
+                                <Drawer
+                                    drawerContent={() => <CustomDrawerContent />}
+                                    screenOptions={({ navigation }) => ({
+                                        headerLeft: () => <SecurityQuestionGate onPassed={() => navigation.openDrawer()} />,
+                                    })}
+                                />
+                            </SecurityGateSettingProvider>
                         </UserCountSettingProvider>
                     </UserProvider>
                 </TaskDisplaySettingProvider>

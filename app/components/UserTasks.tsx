@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { useClockSetting } from '../context/ClockSettingContext';
 import { useProgressBarSetting } from '../context/ProgressBarSettingContext';
 import { useTaskDisplaySetting } from '../context/TaskDisplaySettingContext';
 import { useUserContext } from '../context/UserContext';
+import { useSecurityGateSetting } from '../context/SecurityGateSettingContext';
 import { useUserCountSetting } from '../context/UserCountSettingContext';
 import { getClockSizePx } from '../utils/clockSize';
 import TaskItem from './TaskItem';
@@ -17,7 +18,50 @@ interface UserTasksProps {
 
 const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth }) => {
     const { users, toggleTaskDone, selectUser } = useUserContext();
+    const { showCalculationModal } = useSecurityGateSetting();
     const currentUser = users.find((user) => user.id === userId) || { id: Math.random().toString(36).substring(2, 15), name: 'ユーザー', taskLists: [], color: '#007AFF' };
+    const [isSecurityModalVisible, setIsSecurityModalVisible] = useState(false);
+    const [firstNumber, setFirstNumber] = useState(0);
+    const [secondNumber, setSecondNumber] = useState(0);
+    const [answerText, setAnswerText] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+
+    // ユーザー名タップ時に毎回ランダムな掛け算を出題して、正解時のみ編集画面へ進める
+    const openUserEditSecurityModal = () => {
+        // 1桁×1桁（それぞれ 1〜9）
+        const randomFirstNumber = Math.floor(Math.random() * 9) + 1;
+        const randomSecondNumber = Math.floor(Math.random() * 9) + 1;
+        setFirstNumber(randomFirstNumber);
+        setSecondNumber(randomSecondNumber);
+        setAnswerText('');
+        setErrorMessage('');
+        setIsSecurityModalVisible(true);
+    };
+
+    // 正解時のみユーザー編集画面へ遷移する
+    const handleSubmitSecurityAnswer = () => {
+        const expectedAnswer = firstNumber * secondNumber;
+        const inputAnswer = Number(answerText);
+        if (inputAnswer === expectedAnswer) {
+            setIsSecurityModalVisible(false);
+            setErrorMessage('');
+            setAnswerText('');
+            selectUser(userId);
+            router.push(`/user/${userId}`);
+            return;
+        }
+        setErrorMessage('答えがちがいます。もう一度ためしてください。');
+    };
+
+    // ユーザー名タップ時：計算モーダルオフなら即編集画面へ、オンならモーダルを開く
+    const handleUserNamePress = () => {
+        if (!showCalculationModal) {
+            selectUser(userId);
+            router.push(`/user/${userId}`);
+            return;
+        }
+        openUserEditSecurityModal();
+    };
 
     if (currentUser?.taskLists.length === 0) {
         // タスクリストがない場合の表示
@@ -25,12 +69,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
             <View style={styles.container}>
                 {/* ユーザー名表示 */}
                 {currentUser && (
-                    <TouchableOpacity
-                        onPress={() => {
-                            selectUser(userId);
-                            router.push(`/user/${userId}`);
-                        }}
-                    >
+                    <TouchableOpacity onPress={handleUserNamePress}>
                         <View style={styles.userName}>
                             <Text style={[styles.userNameText, { color: currentUser.color }]}>{currentUser.name}</Text>
                         </View>
@@ -40,6 +79,39 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                 <View style={[styles.tabContainer, { marginBlockStart: 40 }]}>
                     <Text style={styles.noTask}>タスクリストがありません</Text>
                 </View>
+                <Modal visible={isSecurityModalVisible} transparent animationType="fade">
+                    <View style={styles.securityModalOverlay}>
+                        <View style={styles.securityModalContent}>
+                            <Text style={styles.securityModalTitle}>かんたんな問題にこたえてください</Text>
+                            <Text style={styles.securityQuestionText}>
+                                {firstNumber} × {secondNumber} = ?
+                            </Text>
+                            <TextInput
+                                style={styles.securityAnswerInput}
+                                keyboardType="number-pad"
+                                value={answerText}
+                                onChangeText={setAnswerText}
+                                placeholder="答えを入力"
+                            />
+                            {errorMessage ? <Text style={styles.securityErrorText}>{errorMessage}</Text> : null}
+                            <View style={styles.securityButtonRow}>
+                                <TouchableOpacity style={styles.securityConfirmButton} onPress={handleSubmitSecurityAnswer}>
+                                    <Text style={styles.securityButtonText}>確認</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.securityCancelButton}
+                                    onPress={() => {
+                                        setIsSecurityModalVisible(false);
+                                        setAnswerText('');
+                                        setErrorMessage('');
+                                    }}
+                                >
+                                    <Text style={styles.securityButtonText}>キャンセル</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         );
     }
@@ -116,12 +188,7 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
         <View style={[styles.container, { paddingHorizontal: CONTAINER_PADDING }]}>
             {/* ユーザー名表示 */}
             {currentUser && (
-                <TouchableOpacity
-                    onPress={() => {
-                        selectUser(userId);
-                        router.push(`/user/${userId}`);
-                    }}
-                >
+                <TouchableOpacity onPress={handleUserNamePress}>
                     <View style={styles.userName} onLayout={(e) => setProgressBarWidth(e.nativeEvent.layout.width)}>
                         <Text style={[styles.userNameText, { color: currentUser.color }]}>{currentUser.name}</Text>
                         {isProgressBarVisible && (
@@ -249,6 +316,39 @@ const UserTasks: React.FC<UserTasksProps> = ({ userId, windowHeight, windowWidth
                     )}
                 </View>
             )}
+            <Modal visible={isSecurityModalVisible} transparent animationType="fade">
+                <View style={styles.securityModalOverlay}>
+                    <View style={styles.securityModalContent}>
+                        <Text style={styles.securityModalTitle}>かんたんな問題にこたえてください</Text>
+                        <Text style={styles.securityQuestionText}>
+                            {firstNumber} × {secondNumber} = ?
+                        </Text>
+                        <TextInput
+                            style={styles.securityAnswerInput}
+                            keyboardType="number-pad"
+                            value={answerText}
+                            onChangeText={setAnswerText}
+                            placeholder="答えを入力"
+                        />
+                        {errorMessage ? <Text style={styles.securityErrorText}>{errorMessage}</Text> : null}
+                        <View style={styles.securityButtonRow}>
+                            <TouchableOpacity style={styles.securityConfirmButton} onPress={handleSubmitSecurityAnswer}>
+                                <Text style={styles.securityButtonText}>確認</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.securityCancelButton}
+                                onPress={() => {
+                                    setIsSecurityModalVisible(false);
+                                    setAnswerText('');
+                                    setErrorMessage('');
+                                }}
+                            >
+                                <Text style={styles.securityButtonText}>キャンセル</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -318,5 +418,65 @@ const styles = StyleSheet.create({
         color: '#aaa',
         textAlign: 'center',
         width: '100%',
+    },
+    securityModalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    securityModalContent: {
+        width: 320,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 20,
+        alignItems: 'center',
+    },
+    securityModalTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    securityQuestionText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 12,
+    },
+    securityAnswerInput: {
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        fontSize: 18,
+    },
+    securityErrorText: {
+        marginTop: 8,
+        color: '#d00',
+        fontSize: 14,
+    },
+    securityButtonRow: {
+        marginTop: 16,
+        flexDirection: 'row',
+    },
+    securityConfirmButton: {
+        backgroundColor: '#007AFF',
+        borderRadius: 8,
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        marginHorizontal: 6,
+    },
+    securityCancelButton: {
+        backgroundColor: '#999',
+        borderRadius: 8,
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        marginHorizontal: 6,
+    },
+    securityButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
 });

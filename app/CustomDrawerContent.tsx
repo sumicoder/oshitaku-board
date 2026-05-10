@@ -5,19 +5,57 @@ import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import type { User } from './context/UserContext';
 import { colorList, useUserContext } from './context/UserContext';
+import { useSecurityGateSetting } from './context/SecurityGateSettingContext';
 import ClockSettingAccordion from './settings/ClockSettingAccordion';
 import ProgressBarSettingAccordion from './settings/ProgressBarSettingAccordion';
 import TaskDisplaySettingAccordion from './settings/TaskDisplaySettingAccordion';
 import TaskResetSettingAccordion from './settings/TaskResetSettingAccordion';
+import SecurityGateSettingAccordion from './settings/SecurityGateSettingAccordion';
 import UserCountSettingAccordion from './settings/UserCountSettingAccordion';
 
 // カスタムドロワーコンテンツ（ページリンク＋各種設定アコーディオン）
 export default function CustomDrawerContent() {
     const router = useRouter();
     const { users, addUser, selectUser, setUsersOrder } = useUserContext();
+    const { showCalculationModal } = useSecurityGateSetting();
     const [modalVisible, setModalVisible] = useState(false);
     const [newUserName, setNewUserName] = useState('');
     const [selectedColor, setSelectedColor] = useState(colorList[0]);
+    const [isSecurityModalVisible, setIsSecurityModalVisible] = useState(false);
+    const [firstNumber, setFirstNumber] = useState(0);
+    const [secondNumber, setSecondNumber] = useState(0);
+    const [answerText, setAnswerText] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+
+    // ユーザー編集画面へ移動する前に、毎回ランダムな掛け算を生成して認証モーダルを開く
+    const openUserEditSecurityModal = (userId: string) => {
+        // 1桁×1桁（それぞれ 1〜9）
+        const randomFirstNumber = Math.floor(Math.random() * 9) + 1;
+        const randomSecondNumber = Math.floor(Math.random() * 9) + 1;
+        setFirstNumber(randomFirstNumber);
+        setSecondNumber(randomSecondNumber);
+        setAnswerText('');
+        setErrorMessage('');
+        setPendingUserId(userId);
+        setIsSecurityModalVisible(true);
+    };
+
+    // 正解時のみ対象ユーザーの編集画面へ遷移し、入力ミス時はメッセージだけ更新して再入力させる
+    const handleSubmitSecurityAnswer = () => {
+        const expectedAnswer = firstNumber * secondNumber;
+        const inputAnswer = Number(answerText);
+        if (inputAnswer === expectedAnswer && pendingUserId) {
+            setIsSecurityModalVisible(false);
+            setErrorMessage('');
+            setAnswerText('');
+            selectUser(pendingUserId);
+            router.push(`/user/${pendingUserId}`);
+            setPendingUserId(null);
+            return;
+        }
+        setErrorMessage('答えがちがいます。もう一度ためしてください。');
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -41,10 +79,21 @@ export default function CustomDrawerContent() {
                         <TouchableOpacity onLongPress={drag} style={styles.dragHandle}>
                             <AntDesign name="bars" size={22} color="#888" />
                         </TouchableOpacity>
-                        {/* ユーザー名 */}
-                        <Text style={[styles.userName]}>{item.name}</Text>
+                        {/* ユーザー名タップで編集画面へ（計算モーダルは設定でオン／オフ） */}
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (!showCalculationModal) {
+                                    selectUser(item.id);
+                                    router.push(`/user/${item.id}`);
+                                    return;
+                                }
+                                openUserEditSecurityModal(item.id);
+                            }}
+                        >
+                            <Text style={[styles.userName]}>{item.name}</Text>
+                        </TouchableOpacity>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                            {/* 編集ボタン */}
+                            {/* 編集ボタンは直接遷移（設定ボタン側で認証するため） */}
                             <TouchableOpacity
                                 style={[styles.button, { backgroundColor: item.color }]}
                                 onPress={() => {
@@ -97,7 +146,43 @@ export default function CustomDrawerContent() {
                     </ScrollView>
                 </View>
             </Modal>
+            {/* ユーザー編集画面に入る前の簡易セキュリティモーダル */}
+            <Modal visible={isSecurityModalVisible} transparent animationType="fade">
+                <View style={styles.securityModalOverlay}>
+                    <View style={styles.securityModalContent}>
+                        <Text style={styles.securityModalTitle}>かんたんな問題にこたえてください</Text>
+                        <Text style={styles.securityQuestionText}>
+                            {firstNumber} × {secondNumber} = ?
+                        </Text>
+                        <TextInput
+                            style={styles.securityAnswerInput}
+                            keyboardType="number-pad"
+                            value={answerText}
+                            onChangeText={setAnswerText}
+                            placeholder="答えを入力"
+                        />
+                        {errorMessage ? <Text style={styles.securityErrorText}>{errorMessage}</Text> : null}
+                        <View style={styles.securityButtonRow}>
+                            <TouchableOpacity style={styles.securityConfirmButton} onPress={handleSubmitSecurityAnswer}>
+                                <Text style={styles.securityButtonText}>確認</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.securityCancelButton}
+                                onPress={() => {
+                                    setIsSecurityModalVisible(false);
+                                    setAnswerText('');
+                                    setErrorMessage('');
+                                    setPendingUserId(null);
+                                }}
+                            >
+                                <Text style={styles.securityButtonText}>キャンセル</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
             {/* 各種設定アコーディオン */}
+            <SecurityGateSettingAccordion />
             <ClockSettingAccordion />
             <ProgressBarSettingAccordion />
             <TaskDisplaySettingAccordion />
@@ -216,6 +301,66 @@ const styles = StyleSheet.create({
         marginRight: 8,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    securityModalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.45)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    securityModalContent: {
+        width: 320,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 20,
+        alignItems: 'center',
+    },
+    securityModalTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    securityQuestionText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 12,
+    },
+    securityAnswerInput: {
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        fontSize: 18,
+    },
+    securityErrorText: {
+        marginTop: 8,
+        color: '#d00',
+        fontSize: 14,
+    },
+    securityButtonRow: {
+        marginTop: 16,
+        flexDirection: 'row',
+    },
+    securityConfirmButton: {
+        backgroundColor: '#007AFF',
+        borderRadius: 8,
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        marginHorizontal: 6,
+    },
+    securityCancelButton: {
+        backgroundColor: '#999',
+        borderRadius: 8,
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        marginHorizontal: 6,
+    },
+    securityButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
     supportBanner: {
         marginHorizontal: 16,
